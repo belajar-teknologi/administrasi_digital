@@ -221,6 +221,7 @@
       transition: width 0.3s ease;
     }
 
+    /* Refresh Button Animation */
     .btn-refresh {
       transition: transform 0.3s ease;
     }
@@ -447,7 +448,7 @@
           </div>
           <div class="table-responsive">
             <table class="table table-hover table-sm">
-              <thead class="table-light"><tr><th>No Absen</th><th>Nama Lengkap</th><th>Username</th><th>Aksi</th></tr></thead>
+              <thead class="table-light"><tr><th>No Absen</th><th>Nama Lengkap</th><th>Aksi</th></tr></thead>
               <tbody id="tbody-siswa"></tbody>
             </table>
           </div>
@@ -1867,7 +1868,7 @@ function syncJurnal(data) {
     }
 
     // ============================================================
-    // CRUD SISWA - USERNAME = siswa_ + NOMOR ABSEN
+    // CRUD SISWA
     // ============================================================
     
     function saveUsers() {
@@ -1880,28 +1881,13 @@ function syncJurnal(data) {
     }
 
     function renderSiswaTable() {
-        const tbody = document.getElementById('tbody-siswa');
-        if (!tbody) return;
-        
+        const tbody = document.getElementById('tbody-siswa'); if(!tbody) return;
         const siswa = usersDb.filter(u => u.role === 'siswa');
-        
-        if (siswa.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="4" class="text-center">Belum ada siswa.</td></tr>';
-            return;
-        }
-        
-        tbody.innerHTML = siswa.map((s) => `
-            <tr>
-                <td>${s.id_tambahan || '-'}</td>
-                <td>${s.nama}</td>
-                <td><code>${s.username}</code></td>
-                <td>
-                    <button class="btn btn-sm btn-outline-danger" onclick="hapusSiswa('${s.username}')">
-                        <i class="fa-solid fa-trash"></i>
-                    </button>
-                </td>
-            </tr>
-        `).join('');
+        tbody.innerHTML = siswa.length ? siswa.map((s, index) => `<tr>
+            <td>${s.id_tambahan || (index + 1)}</td>
+            <td>${s.nama}</td>
+            <td><button class="btn btn-sm btn-outline-danger" onclick="hapusSiswa('${s.username}')"><i class="fa-solid fa-trash"></i></button></td>
+        </tr>`).join('') : '<tr><td colspan="3" class="text-center">Belum ada siswa.</td></tr>';
     }
 
     function tambahSiswa() {
@@ -1915,39 +1901,26 @@ function syncJurnal(data) {
                 const nama = document.getElementById('swal-nama').value.trim();
                 const noAbsen = document.getElementById('swal-noabsen').value.trim();
                 
-                if (!nama) {
-                    return Swal.showValidationMessage('Nama siswa harus diisi!');
-                }
-                if (!noAbsen) {
-                    return Swal.showValidationMessage('Nomor absen harus diisi!');
-                }
+                if(!nama) return Swal.showValidationMessage('Nama siswa harus diisi!');
+                if(!noAbsen) return Swal.showValidationMessage('Nomor absen harus diisi!');
                 
-                // Cek apakah nomor absen sudah terdaftar
                 const existing = usersDb.find(u => u.role === 'siswa' && u.id_tambahan === noAbsen);
-                if (existing) {
-                    return Swal.showValidationMessage('Nomor absen sudah terdaftar!');
-                }
+                if(existing) return Swal.showValidationMessage('Nomor absen sudah terdaftar!');
                 
-                // Cek apakah username dengan nomor absen sudah ada
-                const usernameExist = usersDb.find(u => u.username === 'siswa_' + noAbsen);
-                if (usernameExist) {
-                    return Swal.showValidationMessage('Username siswa_' + noAbsen + ' sudah terdaftar!');
-                }
-                
-                return {
-                    role: 'siswa',
-                    username: 'siswa_' + noAbsen,  // 🔥 username = siswa_ + nomor absen
-                    password: '123',
-                    nama: nama,
+                return { 
+                    role: 'siswa', 
+                    username: 'siswa_' + Date.now(), 
+                    password: '123', 
+                    nama: nama, 
                     id_tambahan: noAbsen,
                     kelas: 'sesuaikan'
                 };
             }
         }).then((res) => {
-            if (res.isConfirmed) {
-                usersDb.push(res.value);
-                saveUsers();
-                Swal.fire('Sukses', 'Siswa ditambahkan', 'success');
+            if(res.isConfirmed) { 
+                usersDb.push(res.value); 
+                saveUsers(); 
+                Swal.fire('Sukses', 'Siswa ditambahkan', 'success'); 
             }
         });
     }
@@ -1970,7 +1943,7 @@ function syncJurnal(data) {
     }
 
     // ============================================================
-    // IMPORT / EXPORT EXCEL SISWA - USERNAME = siswa_ + NOMOR ABSEN
+    // IMPORT / EXPORT EXCEL SISWA
     // ============================================================
     
     function downloadTemplateSiswa() {
@@ -2017,7 +1990,6 @@ function syncJurnal(data) {
                         return;
                     }
 
-                    // Cek apakah nomor absen sudah terdaftar
                     const existing = usersDb.find(u => u.role === 'siswa' && u.id_tambahan === noAbsen);
                     if (existing) {
                         errorCount++;
@@ -2025,17 +1997,9 @@ function syncJurnal(data) {
                         return;
                     }
 
-                    // Cek apakah username sudah ada
-                    const usernameExist = usersDb.find(u => u.username === 'siswa_' + noAbsen);
-                    if (usernameExist) {
-                        errorCount++;
-                        errors.push(`Baris ${index + 2}: Username siswa_${noAbsen} sudah terdaftar`);
-                        return;
-                    }
-
                     usersDb.push({
                         role: 'siswa',
-                        username: 'siswa_' + noAbsen,  // 🔥 username = siswa_ + nomor absen
+                        username: 'siswa_' + Date.now() + '_' + index,
                         password: '123',
                         nama: nama.trim(),
                         id_tambahan: noAbsen,
