@@ -123,7 +123,7 @@
                 <i class="fa-solid fa-graduation-cap"></i>
             </div>
             <div>
-                <span class="block text-[10px] font-semibold text-slate-400 tracking-wider uppercase leading-none">Portal Resmi</span>
+                <span class="block text-[10px] font-semibold text-slate-400 tracking-wider uppercase leading-none">TEMPAT BELAJAR</span>
                 <span class="text-xs font-bold text-white tracking-wide" id="headerSchoolName">Memuat...</span>
             </div>
         </div>
@@ -152,7 +152,7 @@
                     <div class="w-24 h-24 sm:w-28 sm:h-28 mx-auto rounded-full bg-white p-2.5 shadow-xl border border-slate-100 flex items-center justify-center relative z-10 transition-transform duration-300 group-hover:scale-105" id="schoolLogoContainer">
                         <img 
                             id="schoolLogoImg"
-                            src="logo sekolah.png" 
+                            src="logo_depan.png" 
                             alt="Logo Sekolah" 
                             class="w-full h-full object-contain drop-shadow-md rounded-full"
                             onerror="this.onerror=null; this.src='https://placehold.co/120x120/4f46e5/ffffff?text=SEKOLAH';"
@@ -377,7 +377,7 @@
 
     <!-- Footer -->
     <footer class="relative z-10 w-full py-4 text-center text-slate-400 text-[11px] font-medium">
-        <p>&copy; 2026 <span id="footerSchoolName">Memuat...</span>. All rights reserved.</p>
+        <p>&copy; 2026 <span id="footerSchoolName">Memuat...</span>. lubisbima@gmail.com .</p>
     </footer>
 
     <script>
@@ -392,7 +392,7 @@
         
         function loadSchoolDataFromStorage() {
             // Load Nama Sekolah dari localStorage (key: app_nama_sekolah)
-            const schoolName = localStorage.getItem('app_nama_sekolah') || 'SD NEGERI 3 NGANTRU';
+            const schoolName = localStorage.getItem('app_nama_sekolah') || 'TUT WURI HANDAYANI';
             
             // Update semua elemen yang menampilkan nama sekolah
             const headerEl = document.getElementById('headerSchoolName');
@@ -418,8 +418,8 @@
                     if (backupLogo && backupLogo.startsWith('data:image')) {
                         logoImg.src = backupLogo;
                     } else {
-                        // Fallback ke default
-                        logoImg.src = 'logo sekolah.png';
+                        // Fallback ke logo_depan.png
+                        logoImg.src = 'logo_depan.png';
                     }
                 }
             }
