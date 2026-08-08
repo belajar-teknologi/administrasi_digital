@@ -308,17 +308,29 @@
                     <ol class="list-decimal list-inside text-[11px] text-amber-900/90 leading-relaxed font-medium space-y-1">
                         <li>Tab sheet bernama <strong class="text-brand-700">Users</strong>.</li>
                         <li>Susunan kolom: <code class="bg-amber-100 px-1 rounded">Role | Username | Password | Nama</code>.</li>
+                        <li>Jika anda adalah pengguna baru, maka masuk ke <strong class="text-brand-700">setting pengguna baru</strong> terlebih dahulu.</li>
                     </ol>
                 </div>
             </div>
 
-            <div class="mt-6 flex justify-end gap-2">
-                <button onclick="closeConfigModal()" class="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 cursor-pointer transition">
-                    Batal
-                </button>
-                <button onclick="saveConfig()" class="px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold shadow-md cursor-pointer transition">
-                    Simpan Kode Akses
-                </button>
+            <div class="mt-6 flex flex-col sm:flex-row items-center justify-between gap-3 pt-2 border-t border-slate-100">
+                <a 
+                    href="dashboard_demo.html" 
+                    class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 text-xs font-bold transition shadow-sm"
+                >
+                    <i class="fa-solid fa-user-gear text-brand-600"></i>
+                    <span>Setting Pengguna Baru</span>
+                    <i class="fa-solid fa-arrow-up-right-from-square text-[10px] opacity-60"></i>
+                </a>
+
+                <div class="w-full sm:w-auto flex items-center justify-end gap-2">
+                    <button onclick="closeConfigModal()" class="flex-1 sm:flex-none px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 cursor-pointer transition">
+                        Batal
+                    </button>
+                    <button onclick="saveConfig()" class="flex-1 sm:flex-none px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold shadow-md cursor-pointer transition">
+                        Simpan Kode Akses
+                    </button>
+                </div>
             </div>
         </div>
     </div>
