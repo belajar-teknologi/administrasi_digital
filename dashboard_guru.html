@@ -242,6 +242,33 @@
 </head>
 <body class="theme-default">
 
+  <!-- CEK AKSES: HANYA BISA DIAKSES DARI INDEX -->
+  <script>
+    (function() {
+      // Cek apakah halaman diakses dari file index.html
+      // Jika tidak, redirect ke index.html
+      const currentPath = window.location.pathname;
+      const currentFile = currentPath.split('/').pop();
+      
+      // Jika halaman ini diakses langsung (bukan dari index)
+      if (currentFile === 'dashboard_guru.html' || currentFile === '') {
+        // Cek apakah ada referer dari index.html
+        const referer = document.referrer || '';
+        const isFromIndex = referer.includes('index.html') || referer.includes('index');
+        
+        // Jika tidak ada referer atau bukan dari index, redirect
+        if (!isFromIndex && !sessionStorage.getItem('from_index')) {
+          // Coba redirect ke index
+          window.location.href = 'index.html';
+          return;
+        }
+        
+        // Tandai bahwa pengguna datang dari index
+        sessionStorage.setItem('from_index', 'true');
+      }
+    })();
+  </script>
+
   <div class="mobile-topbar" id="mobileTopbar">
     <button class="menu-toggle" onclick="toggleMobileSidebar()"><i class="fa-solid fa-bars"></i></button>
     <span class="brand-text"><i class="fa-solid fa-school me-1"></i> <span id="mobile-app-title">Sistem Guru</span></span>
@@ -287,7 +314,8 @@
         <a class="nav-link" onclick="showSection('asisten')" style="color: #10b981;"><i class="fa-solid fa-robot"></i><span class="fw-bold">Asisten AI Guru</span></a>
         <a class="nav-link" style="color: #38bdf8;" onclick="showPengembang()"><i class="fa-solid fa-laptop-code"></i><span class="fw-bold">Info Pengembang</span></a>
         <a class="nav-link mt-4" onclick="showSection('setting')"><i class="fa-solid fa-gear"></i><span>Setting & Database</span></a>
-        <a class="nav-link text-danger mt-auto" onclick="resetDataLocal()"><i class="fa-solid fa-power-off"></i><span>Reset Data</span></a>
+        <!-- LOG OUT - Menggantikan Reset Data di menu utama -->
+        <a class="nav-link text-danger mt-auto" onclick="logoutToIndex()"><i class="fa-solid fa-right-from-bracket"></i><span>Log Out</span></a>
       </nav>
     </div>
 
@@ -1367,10 +1395,36 @@ function syncJurnal(data) {
     let absenChartInstance = null;
 
     // ============================================================
+    // FUNGSI LOGOUT - KEMBALI KE INDEX
+    // ============================================================
+    
+    function logoutToIndex() {
+        Swal.fire({
+            title: 'Log Out',
+            text: 'Anda akan keluar dari sistem dan kembali ke halaman login.',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Ya, Log Out',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Hapus session dan redirect ke index
+                sessionStorage.removeItem('from_index');
+                sessionStorage.removeItem('logged_in');
+                window.location.href = 'index.html';
+            }
+        });
+    }
+
+    // ============================================================
     // INISIALISASI
     // ============================================================
     
     window.onload = function() {
+        // Cek akses lagi
+        checkAccessFromIndex();
         initDefaultData();
         initAppData();
         loadSettingsFromStorage();
@@ -1382,6 +1436,22 @@ function syncJurnal(data) {
         showSection('dashboard');
         updateDashboard();
     };
+
+    function checkAccessFromIndex() {
+        const currentPath = window.location.pathname;
+        const currentFile = currentPath.split('/').pop();
+        
+        if (currentFile === 'dashboard_guru.html' || currentFile === '') {
+            const referer = document.referrer || '';
+            const isFromIndex = referer.includes('index.html') || referer.includes('index');
+            
+            if (!isFromIndex && !sessionStorage.getItem('from_index')) {
+                window.location.href = 'index.html';
+                return;
+            }
+            sessionStorage.setItem('from_index', 'true');
+        }
+    }
 
     function initDefaultData() {
         if (!localStorage.getItem('app_users_db')) {
