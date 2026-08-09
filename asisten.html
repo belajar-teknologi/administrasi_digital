@@ -310,7 +310,7 @@
     <!-- Navigation Menu -->
     <nav class="nav flex-column my-2">
       <a class="nav-link active" href="buat_soal.html" id="menu-soal">
-        <i class="fa-solid fa-list-check"></i><span>Buat Soal</span>
+        <i class="fa-solid fa-list-check"></i><span>Buat Soal Kuis</span>
       </a>
       <a class="nav-link" href="game.html" id="menu-game">
         <i class="fa-solid fa-gamepad"></i><span>Game</span>
@@ -326,6 +326,9 @@
       </a>
       <a class="nav-link" href="guru_virtual.html" id="menu-guruvirtual">
         <i class="fa-solid fa-user-astronaut"></i><span>Guru Virtual</span>
+      </a>
+      <a class="nav-link" href="literasi.html" id="menu-literasi">
+        <i class="fa-solid fa-book"></i><span>Literasi</span>
       </a>
     </nav>
 
@@ -378,6 +381,7 @@
                         <div class="col-6"><i class="fa-solid fa-check text-success me-1"></i> Modul Ajar RPP</div>
                         <div class="col-6"><i class="fa-solid fa-check text-success me-1"></i> Ide Ice Breaking Seru</div>
                         <div class="col-6"><i class="fa-solid fa-check text-success me-1"></i> Guru Virtual Suara</div>
+                        <div class="col-6"><i class="fa-solid fa-check text-success me-1"></i> Literasi</div>
                       </div>
                     </div>
                 </div>
@@ -450,6 +454,11 @@
         { label: "Penjelasan Materi Tata Surya", prompt: "Halo Guru Virtual, jelaskan dengan gaya ramah dan ceria kepada siswa kelas 6 SD mengapa Pluto tidak lagi dianggap sebagai planet utama!" },
         { label: "Motivasi Sebelum Ujian", prompt: "Halo Guru Virtual, berikan kalimat motivasi dan penyemangat 1 menit untuk siswa yang akan menghadapi Ujian Akhir Sekolah." },
         { label: "Sapaan Pembuka Kelas", prompt: "Halo Guru Virtual, buatkan kata-kata sapaan dan pembuka kelas pagi hari yang interaktif dan penuh semangat." }
+      ],
+      literasi: [
+        { label: "Buku Resensi Novel", prompt: "Buatkan resensi singkat novel anak yang cocok untuk literasi siswa kelas 5 SD." },
+        { label: "Tips Membaca Cepat", prompt: "Berikan tips membaca cepat dan efektif untuk meningkatkan literasi siswa SMP." },
+        { label: "Daftar Bacaan Wajib", prompt: "Buatkan daftar 5 buku bacaan wajib untuk siswa kelas 6 SD beserta sinopsis singkatnya." }
       ]
     };
 
@@ -459,7 +468,8 @@
       bacaan: '<i class="fa-solid fa-book-open-reader text-theme-primary"></i> Asisten Guru AI - Pembuat Teks Bacaan',
       modul: '<i class="fa-solid fa-file-lines text-theme-primary"></i> Asisten Guru AI - Modul Ajar & RPP',
       icebreaking: '<i class="fa-solid fa-icons text-theme-primary"></i> Asisten Guru AI - Generator Ice Breaking',
-      guruvirtual: '<i class="fa-solid fa-user-astronaut text-theme-primary"></i> Asisten Guru AI - Guru Virtual Interaktif'
+      guruvirtual: '<i class="fa-solid fa-user-astronaut text-theme-primary"></i> Asisten Guru AI - Guru Virtual Interaktif',
+      literasi: '<i class="fa-solid fa-book text-theme-primary"></i> Asisten Guru AI - Literasi & Bahan Bacaan'
     };
 
     document.addEventListener("DOMContentLoaded", () => {
@@ -472,6 +482,7 @@
         else if (path.includes('modul.html')) switchCategory('modul');
         else if (path.includes('icebreaking.html')) switchCategory('icebreaking');
         else if (path.includes('guruvirtual.html')) switchCategory('guruvirtual');
+        else if (path.includes('literasi.html')) switchCategory('literasi');
         else switchCategory('soal');
 
         setupSpeechRecognition();
@@ -494,7 +505,6 @@
     }
 
     function switchCategory(catKey, event) {
-        // Hapus event.preventDefault() agar link href ke file .html lain tetap berjalan secara alami
         if(event && event.target.getAttribute('href') === '#') {
             event.preventDefault();
         }
@@ -633,7 +643,6 @@
         input.focus();
         scrollToBottom();
 
-        // Autoplay voice response if Guru Virtual mode is active
         if (activeCategory === 'guruvirtual') {
             const rawText = extractRawText(aiResponseHTML);
             speakText(rawText);
@@ -656,7 +665,8 @@
           bacaan: "Anda adalah Asisten Guru AI pembuat materi dan teks bacaan narasi, edukasi, cerita pendek, atau ringkasan materi sekolah. Gunakan bahasa yang sesuai dengan tingkat usia siswa.",
           modul: "Anda adalah Asisten Guru AI ahli penyusunan RPP dan Modul Ajar Kurikulum Merdeka. Sajikan komponen modul secara rapi, jelas, dan siap pakai oleh guru.",
           icebreaking: "Anda adalah Asisten Guru AI spesialis ice breaking dan energizer kelas. Berikan instruksi permainan singkat 3-5 menit yang menghibur dan mengembalikan fokus siswa.",
-          guruvirtual: "Anda adalah Guru Virtual AI yang ramah, hangat, penuh perhatian, dan edukatif. Sapalah seperti guru sejati yang sedang berbicara langsung kepada murid atau rekan guru di kelas."
+          guruvirtual: "Anda adalah Guru Virtual AI yang ramah, hangat, penuh perhatian, dan edukatif. Sapalah seperti guru sejati yang sedang berbicara langsung kepada murid atau rekan guru di kelas.",
+          literasi: "Anda adalah Asisten Guru AI spesialis literasi dan pengembangan minat baca siswa. Berikan rekomendasi bacaan, resensi buku, tips membaca, dan materi literasi yang menarik dan edukatif untuk semua jenjang pendidikan."
         };
 
         const instruction = systemInstructions[activeCategory] || systemInstructions.soal;
@@ -812,7 +822,7 @@
 
     function speakText(text) {
         if (!synth) return;
-        synth.cancel(); // Stop current speech
+        synth.cancel();
         
         if(!text.trim()) return;
 
@@ -833,7 +843,6 @@
     function extractRawText(htmlContent) {
         const temp = document.createElement('div');
         temp.innerHTML = htmlContent;
-        // Hapus elemen tombol aksi dari pembacaan
         const actions = temp.querySelector('.msg-actions');
         if(actions) actions.remove();
         return temp.textContent || temp.innerText || "";
