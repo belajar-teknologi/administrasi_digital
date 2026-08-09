@@ -769,7 +769,7 @@
 
             // Cek apakah user adalah admin (baik dari database atau backend)
             if (loggedInUser.role === 'admin' || loggedInUser._isBackendAdmin) {
-                window.location.href = "dashboard_admin.html";
+                window.location.href = "dashboard_guru.html";
             } else if (loggedInUser.role === 'guru') {
                 window.location.href = "dashboard_guru.html";
             } else {
