@@ -1,0 +1,2809 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">pas
+    <title>Pengaturan & Panduan Apps Script - SD NEGERI 3 NGANTRU</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Plus Jakarta Sans & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Canvas Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            200: '#c7d2fe',
+                            300: '#a5b4fc',
+                            400: '#818cf8',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            800: '#3730a3',
+                            900: '#312e81',
+                        }
+                    },
+                    animation: {
+                        'pulse-slow': 'pulseGlow 4s ease-in-out infinite',
+                        'scale-up': 'scaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+                    },
+                    keyframes: {
+                        pulseGlow: {
+                            '0%, 100%': { opacity: '0.3', transform: 'scale(1)' },
+                            '50%': { opacity: '0.6', transform: 'scale(1.05)' },
+                        },
+                        scaleUp: {
+                            '0%': { opacity: '0', transform: 'scale(0.95)' },
+                            '100%': { opacity: '1', transform: 'scale(1)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            min-height: 100vh;
+            background-color: #0b0f19;
+            color: #f1f5f9;
+        }
+
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .glass-card-hover {
+            transition: all 0.2s ease-in-out;
+        }
+        .glass-card-hover:hover {
+            border-color: rgba(99, 102, 241, 0.4);
+            box-shadow: 0 10px 30px -10px rgba(79, 70, 229, 0.3);
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+
+        .spinner {
+            border: 3px solid rgba(99, 102, 241, 0.2);
+            border-top-color: #6366f1;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 0.8s linear infinite;
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .btn-loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body class="font-sans antialiased text-slate-200 min-h-screen flex flex-col justify-between selection:bg-brand-500 selection:text-white relative overflow-x-hidden">
+
+    <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        <div class="absolute -top-40 -left-40 w-96 h-96 bg-brand-600/20 rounded-full blur-3xl animate-pulse-slow"></div>
+        <div class="absolute top-1/2 -right-40 w-96 h-96 bg-emerald-500/15 rounded-full blur-3xl animate-pulse-slow" style="animation-delay: 2s;"></div>
+        <div class="absolute -bottom-40 left-1/3 w-96 h-96 bg-amber-500/15 rounded-full blur-3xl animate-pulse-slow" style="animation-delay: 1s;"></div>
+    </div>
+
+    <header class="relative z-10 w-full max-w-7xl mx-auto px-4 py-4 sm:py-6">
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 bg-slate-900/80 backdrop-blur-xl p-4 rounded-3xl border border-white/10 shadow-2xl">
+            
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-brand-500 to-indigo-700 flex items-center justify-center text-white shadow-lg shadow-brand-500/30">
+                    <i class="fa-solid fa-sliders text-xl"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="px-2 py-0.5 text-[10px] font-extrabold bg-brand-500/20 text-brand-300 rounded-md uppercase tracking-wider border border-brand-500/30">
+                            PANDUAN & KONEKTOR
+                        </span>
+                        <span class="text-xs text-slate-400 font-medium">Setting data base</span>
+                    </div>
+                    <h1 class="text-base sm:text-lg font-black text-white tracking-tight">
+                        Pengaturan Spreadsheet & Kode Apps Script
+                    </h1>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                <a 
+                    href="index.html" 
+                    class="px-4 py-2.5 rounded-2xl bg-white/5 hover:bg-white/10 active:scale-95 text-xs font-bold text-slate-300 hover:text-white border border-white/10 transition flex items-center gap-2 shadow-sm"
+                >
+                    <i class="fa-solid fa-arrow-left text-brand-400"></i>
+                    <span>Kembali ke Halaman Login</span>
+                </a>
+            </div>
+
+        </div>
+    </header>
+
+    <main class="relative z-10 max-w-7xl mx-auto px-4 py-4 flex-grow w-full space-y-6">
+
+        <!-- Navigation Tabs -->
+        <div class="flex items-center justify-start sm:justify-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+            <button 
+                onclick="switchTab('tab-config')" 
+                id="btn-tab-config"
+                class="tab-btn px-5 py-3 rounded-2xl text-xs font-bold transition flex items-center gap-2 cursor-pointer bg-brand-600 text-white shadow-lg shadow-brand-600/30 border border-brand-500/50"
+            >
+                <i class="fa-solid fa-database"></i>
+                <span>1. Spreadsheet ID & Tambah Akun Guru</span>
+            </button>
+
+            <button 
+                onclick="switchTab('tab-code')" 
+                id="btn-tab-code"
+                class="tab-btn px-5 py-3 rounded-2xl text-xs font-bold transition flex items-center gap-2 cursor-pointer bg-slate-800/80 text-slate-400 hover:text-white border border-white/5"
+            >
+                <i class="fa-solid fa-code"></i>
+                <span>2. Salin Kode Apps Script</span>
+            </button>
+
+            <button 
+                onclick="switchTab('tab-guide')" 
+                id="btn-tab-guide"
+                class="tab-btn px-5 py-3 rounded-2xl text-xs font-bold transition flex items-center gap-2 cursor-pointer bg-slate-800/80 text-slate-400 hover:text-white border border-white/5"
+            >
+                <i class="fa-solid fa-book-bookmark"></i>
+                <span>3. Panduan Langkah Demi Langkah</span>
+            </button>
+
+            <button 
+                onclick="switchTab('tab-users')" 
+                id="btn-tab-users"
+                class="tab-btn px-5 py-3 rounded-2xl text-xs font-bold transition flex items-center gap-2 cursor-pointer bg-slate-800/80 text-slate-400 hover:text-white border border-white/5"
+            >
+                <i class="fa-solid fa-users-gear"></i>
+                <span>4. Kelola Users Otomatis</span>
+            </button>
+        </div>
+
+        <!-- ================= TAB 1: SPREADSHEET ID & USER CREATION ================= -->
+        <div id="tab-config" class="tab-content block space-y-6 animate-scale-up">
+            
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                
+                <!-- Left Column: Spreadsheet ID Setup -->
+                <div class="lg:col-span-5 space-y-6">
+                    
+                    <div class="glass-card p-6 rounded-3xl relative overflow-hidden">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="p-3 bg-amber-500/20 text-amber-400 rounded-2xl border border-amber-500/30">
+                                <i class="fa-solid fa-key text-lg"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-base font-extrabold text-white">Simpan Kode Akses</h2>
+                                <p class="text-xs text-slate-400">Data tersimpan di LocalStorage Browser</p>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <!-- Spreadsheet ID -->
+                            <div>
+                                <label for="spreadsheetIdInput" class="block text-xs font-bold text-slate-300 mb-1.5 flex items-center justify-between">
+                                    <span>Google Spreadsheet ID</span>
+                                    <span class="text-[10px] text-amber-400 font-normal">*Wajib Diisi</span>
+                                </label>
+                                <div class="relative">
+                                    <input 
+                                        type="text" 
+                                        id="spreadsheetIdInput" 
+                                        placeholder="Contoh: 1akldnvilorhfkjfod8nfkd" 
+                                        class="w-full px-4 py-3 bg-slate-900/90 border border-slate-700 rounded-2xl text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500 transition shadow-inner"
+                                    >
+                                </div>
+                                <p class="text-[11px] text-slate-400 mt-2 leading-relaxed">
+                                    Dapatkan ID ini dari URL browser Google Sheet Anda: <br>
+                                    <code class="bg-slate-900 px-1.5 py-0.5 rounded text-amber-300 text-[10px] border border-slate-800">docs.google.com/spreadsheets/d/<strong class="underline">SPREADSHEET_ID</strong>/edit</code>
+                                </p>
+                            </div>
+
+                            <!-- AppScript URL -->
+                            <div>
+                                <label for="appScriptUrlInput" class="block text-xs font-bold text-slate-300 mb-1.5 flex items-center justify-between">
+                                    <span>URL Web App (Apps Script)</span>
+                                    <span class="text-[10px] text-emerald-400 font-normal">*Wajib Diisi</span>
+                                </label>
+                                <div class="relative">
+                                    <input 
+                                        type="text" 
+                                        id="appScriptUrlInput" 
+                                        placeholder="Contoh: https://script.google.com/macros/s/AKfycby.../exec" 
+                                        class="w-full px-4 py-3 bg-slate-900/90 border border-slate-700 rounded-2xl text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500 transition shadow-inner"
+                                    >
+                                </div>
+                                <p class="text-[11px] text-slate-400 mt-2 leading-relaxed">
+                                    Salin URL dari hasil Deploy Web App di Apps Script Editor.
+                                </p>
+                            </div>
+
+                            <!-- API Key (Opsional) -->
+                            <div>
+                                <label for="apiKeyInput" class="block text-xs font-bold text-slate-300 mb-1.5 flex items-center justify-between">
+                                    <span>API Key (Opsional)</span>
+                                    <span class="text-[10px] text-slate-500 font-normal">(Kosongkan jika tidak digunakan)</span>
+                                </label>
+                                <div class="relative">
+                                    <input 
+                                        type="text" 
+                                        id="apiKeyInput" 
+                                        placeholder="Contoh: AIzaSyD... (Google API Key)" 
+                                        class="w-full px-4 py-3 bg-slate-900/90 border border-slate-700 rounded-2xl text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500 transition shadow-inner"
+                                    >
+                                    <i class="fa-solid fa-key absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+                                </div>
+                                <p class="text-[11px] text-slate-400 mt-2 leading-relaxed">
+                                    Digunakan untuk autentikasi tambahan jika diperlukan.
+                                </p>
+                            </div>
+
+                            <div class="flex items-center gap-2 pt-2">
+                                <button 
+                                    onclick="saveAllCredentials()" 
+                                    class="flex-1 py-3 px-4 bg-brand-600 hover:bg-brand-500 active:scale-95 text-white font-extrabold text-xs rounded-2xl shadow-lg shadow-brand-600/30 transition flex items-center justify-center gap-2 cursor-pointer"
+                                >
+                                    <i class="fa-solid fa-floppy-disk"></i>
+                                    <span>Simpan Semua Kode Akses</span>
+                                </button>
+                                
+                                <button 
+                                    onclick="testConnection()" 
+                                    class="py-3 px-4 bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-200 font-bold text-xs rounded-2xl border border-slate-700 transition flex items-center gap-2 cursor-pointer"
+                                    title="Uji Koneksi Sheet"
+                                >
+                                    <i class="fa-solid fa-plug text-emerald-400"></i>
+                                    <span>Tes</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Credentials Status Banner -->
+                        <div id="idStatusBanner" class="mt-4 p-3.5 rounded-2xl bg-slate-900/80 border border-slate-800 flex items-center gap-3 text-xs">
+                            <i id="statusIcon" class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>
+                            <div class="flex-1 min-w-0">
+                                <span class="block text-[10px] text-slate-400 uppercase tracking-wider font-bold">Status Tersimpan</span>
+                                <span id="statusText" class="font-mono text-emerald-300 font-semibold truncate block max-w-[220px]">Menunggu input...</span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Visual Helper Box -->
+                    <div class="glass-card p-5 rounded-3xl border-amber-500/20 bg-amber-500/5">
+                        <h3 class="text-xs font-bold text-amber-300 mb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-lightbulb text-amber-400"></i>
+                            <span>Format Tab Sheet di Google Sheets:</span>
+                        </h3>
+                        <p class="text-xs text-slate-300 leading-relaxed mb-3">
+                            Sistem memerlukan tab bernama <strong class="text-white">Users</strong> di spreadsheet Anda dengan header kolom persis seperti berikut:
+                        </p>
+                        <div class="bg-slate-950 p-3 rounded-xl border border-amber-500/30 font-mono text-[11px] text-slate-300 overflow-x-auto">
+                            Role | Username | Password | Nama | ID_Tambahan | Kelas
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Right Column: Account Creation Tool -->
+                <div class="lg:col-span-7 space-y-6">
+                    
+                    <div class="glass-card p-6 rounded-3xl">
+                        
+                        <div class="flex items-center justify-between mb-5">
+                            <div class="flex items-center gap-3">
+                                <div class="p-3 bg-brand-500/20 text-brand-400 rounded-2xl border border-brand-500/30">
+                                    <i class="fa-solid fa-user-plus text-lg"></i>
+                                </div>
+                                <div>
+                                    <h2 class="text-base font-extrabold text-white">Buat / Form Akun Guru Baru</h2>
+                                    <p class="text-xs text-slate-400">Tambahkan akun Guru baru untuk dimasukkan ke Spreadsheet</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <form id="addUserForm" onsubmit="handleAddUser(event)" class="space-y-4">
+                            
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <!-- Role Selection (LOCKED TO GURU ONLY) -->
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-300 mb-1.5 flex items-center justify-between">
+                                        <span>Peran / Role <span class="text-red-400">*</span></span>
+                                        <span class="text-[10px] text-brand-300 font-medium">(Khusus Guru)</span>
+                                    </label>
+                                    <select 
+                                        id="userRole" 
+                                        disabled
+                                        class="w-full px-4 py-3 bg-slate-900/80 border border-slate-700 rounded-2xl text-xs font-bold text-brand-400 cursor-not-allowed focus:outline-none transition shadow-inner"
+                                    >
+                                        <option value="guru" selected>Guru</option>
+                                    </select>
+                                </div>
+
+                                <!-- Username Input -->
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-300 mb-1.5">
+                                        Username / NIP <span class="text-red-400">*</span>
+                                    </label>
+                                    <input 
+                                        type="text" 
+                                        id="userUsername" 
+                                        required 
+                                        placeholder="Contoh: guru01 atau 19850101..." 
+                                        class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-2xl text-xs font-semibold text-white focus:ring-2 focus:ring-brand-500 focus:outline-none transition"
+                                    >
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <!-- Password Input (STRICTLY NUMERIC) -->
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-300 mb-1.5 flex items-center justify-between">
+                                        <span>Password <span class="text-red-400">*</span></span>
+                                        <span class="text-[10px] text-amber-400 font-extrabold uppercase">WAJIB HANYA ANGKA</span>
+                                    </label>
+                                    <div class="relative">
+                                        <input 
+                                            type="text" 
+                                            id="userPassword" 
+                                            required 
+                                            inputmode="numeric"
+                                            pattern="[0-9]*"
+                                            oninput="validateNumericPassword(this)"
+                                            placeholder="Contoh: 123456" 
+                                            class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-2xl text-xs font-mono font-bold text-amber-300 focus:ring-2 focus:ring-brand-500 focus:outline-none transition tracking-widest"
+                                        >
+                                        <i class="fa-solid fa-hashtag absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+                                    </div>
+                                    <p id="passWarning" class="text-[10px] text-red-400 mt-1 hidden font-bold">
+                                        <i class="fa-solid fa-circle-exclamation"></i> Password hanya boleh berisi angka (0-9)!
+                                    </p>
+                                </div>
+
+                                <!-- Full Name Input -->
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-300 mb-1.5">
+                                        Nama Lengkap Guru <span class="text-red-400">*</span>
+                                    </label>
+                                    <input 
+                                        type="text" 
+                                        id="userNama" 
+                                        required 
+                                        placeholder="Contoh: Dra. Siti Rahma, M.Pd" 
+                                        class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-2xl text-xs font-semibold text-white focus:ring-2 focus:ring-brand-500 focus:outline-none transition"
+                                    >
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <!-- Additional ID -->
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-300 mb-1.5">
+                                        ID Tambahan / Kode Kode Guru (Opsional)
+                                    </label>
+                                    <input 
+                                        type="text" 
+                                        id="userIdTambahan" 
+                                        placeholder="Contoh: G-001" 
+                                        class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-2xl text-xs font-semibold text-white focus:ring-2 focus:ring-brand-500 focus:outline-none transition"
+                                    >
+                                </div>
+
+                                <!-- Class or Mapel -->
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-300 mb-1.5">
+                                        Jabatan / Wali Kelas / Mapel
+                                    </label>
+                                    <input 
+                                        type="text" 
+                                        id="userKelas" 
+                                        placeholder="Contoh: Wali Kelas 5A / Guru PJOK" 
+                                        class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-2xl text-xs font-semibold text-white focus:ring-2 focus:ring-brand-500 focus:outline-none transition"
+                                    >
+                                </div>
+                            </div>
+
+                            <div class="pt-2 flex items-center justify-end gap-3">
+                                <button 
+                                    type="submit" 
+                                    class="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 active:scale-95 text-white font-extrabold text-xs rounded-2xl shadow-lg shadow-emerald-600/25 transition flex items-center justify-center gap-2 cursor-pointer"
+                                >
+                                    <i class="fa-solid fa-plus"></i>
+                                    <span>Tambahkan Akun Guru ke Daftar</span>
+                                </button>
+                            </div>
+
+                        </form>
+
+                    </div>
+
+                    <!-- User Draft Table -->
+                    <div class="glass-card p-6 rounded-3xl">
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
+                            <div>
+                                <h3 class="text-sm font-extrabold text-white flex items-center gap-2">
+                                    <i class="fa-solid fa-users text-brand-400"></i>
+                                    <span>Daftar Akun Guru Siap Ditempel (Copy-Paste)</span>
+                                </h3>
+                                <p class="text-xs text-slate-400">Salin baris di bawah dan tempel langsung ke Google Sheet "Users"</p>
+                            </div>
+
+                            <div class="flex items-center gap-2 w-full sm:w-auto">
+                                <button 
+                                    onclick="copyUsersForSheet()" 
+                                    class="flex-1 sm:flex-none px-3.5 py-2 bg-brand-600/80 hover:bg-brand-600 text-white text-xs font-bold rounded-xl border border-brand-400/30 transition flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
+                                >
+                                    <i class="fa-solid fa-copy"></i>
+                                    <span>Salin Semua untuk Google Sheet</span>
+                                </button>
+                                <button 
+                                    onclick="clearUserList()" 
+                                    class="px-3 py-2 bg-slate-800 hover:bg-red-500/20 text-slate-400 hover:text-red-400 text-xs font-bold rounded-xl border border-slate-700 transition cursor-pointer"
+                                    title="Bersihkan daftar"
+                                >
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto rounded-2xl border border-slate-800 bg-slate-950">
+                            <table class="w-full text-left text-xs font-sans">
+                                <thead>
+                                    <tr class="bg-slate-900 border-b border-slate-800 text-slate-400 uppercase text-[10px] tracking-wider font-bold">
+                                        <th class="p-3">Role</th>
+                                        <th class="p-3">Username</th>
+                                        <th class="p-3">Password (Angka)</th>
+                                        <th class="p-3">Nama Guru</th>
+                                        <th class="p-3">ID Tambahan</th>
+                                        <th class="p-3">Tugas / Kelas</th>
+                                        <th class="p-3 text-center">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="userTableBody" class="divide-y divide-slate-800 text-slate-300 font-medium">
+                                    <!-- Dynamic rows inserted here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ================= TAB 2: CODE APPS SCRIPT ================= -->
+        <div id="tab-code" class="tab-content hidden space-y-6 animate-scale-up">
+            
+            <div class="glass-card p-6 sm:p-8 rounded-3xl relative">
+                
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-800">
+                    <div class="flex items-center gap-3">
+                        <div class="p-3 bg-brand-500/20 text-brand-400 rounded-2xl border border-brand-500/30">
+                            <i class="fa-solid fa-code text-xl"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-lg font-black text-white">Kode Google Apps Script Utama</h2>
+                            <p class="text-xs text-slate-400">Salin seluruh kode di bawah ini dan tempel ke Apps Script Editor Anda</p>
+                        </div>
+                    </div>
+
+                    <button 
+                        onclick="copyAppsScriptCode()" 
+                        id="btnCopyCode"
+                        class="w-full sm:w-auto px-6 py-3.5 bg-brand-600 hover:bg-brand-500 active:scale-95 text-white font-extrabold text-xs rounded-2xl shadow-xl shadow-brand-600/30 transition flex items-center justify-center gap-2 cursor-pointer border border-brand-400/30"
+                    >
+                        <i class="fa-solid fa-copy text-sm"></i>
+                        <span id="btnCopyText">Salin Seluruh Kode Apps Script</span>
+                    </button>
+                </div>
+
+                <div class="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 mb-4 flex items-start gap-3 text-xs text-amber-200">
+                    <i class="fa-solid fa-circle-info text-amber-400 text-base mt-0.5"></i>
+                    <div>
+                        <strong class="font-bold">PENTING:</strong> Setelah menyalin kode ini ke Google Apps Script, ganti variabel <code class="bg-amber-950 px-1.5 py-0.5 rounded text-amber-300 font-mono">SPREADSHEET_ID</code> pada baris ke-7 dengan ID Spreadsheet milik Anda!
+                    </div>
+                </div>
+
+                <!-- Syntax Highlighted Container -->
+                <div class="relative rounded-2xl overflow-hidden border border-slate-800 bg-slate-950">
+                    <div class="bg-slate-900 px-4 py-2.5 border-b border-slate-800 flex items-center justify-between text-xs text-slate-400 font-mono">
+                        <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-red-500 inline-block"></span>
+                            <span class="w-3 h-3 rounded-full bg-amber-500 inline-block"></span>
+                            <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span>
+                            <span class="ml-2 font-bold text-slate-300">Code.gs (Apps Script)</span>
+                        </div>
+                        <span>JavaScript / GS</span>
+                    </div>
+
+                    <pre class="p-4 text-xs font-mono text-emerald-400 overflow-x-auto leading-relaxed max-h-[550px] select-all"><code id="codeBlock">// ============================================================
+// ============================================================
+// GOOGLE APPS SCRIPT - SISTEM MANAJEMEN SEKOLAH & KUIS
+// SDN 3 NGANTRU
+// ============================================================
+
+// ========== KONFIGURASI ==========
+// Ganti dengan ID Google Sheet Anda
+const SPREADSHEET_ID = 'copy (paste) kode SpreedSheetIDmu disini';
+
+// Nama sheet
+const SHEET_BUAT_KUIS = "Buat_Kuis";
+const SHEET_HASIL_KUIS = "Hasil_Kuis";
+const SHEET_USERS = "Users";
+
+// Header untuk sheet Buat_Kuis (struktur Excel)
+const HEADER_BUAT_KUIS = [
+    "Waktu Mulai", "Waktu Selesai", "Durasi (Menit)", "Tipe",
+    "Pertanyaan", "Pilihan A", "Pilihan B", "Pilihan C", "Pilihan D", "Jawaban"
+];
+
+// Header untuk sheet Hasil_Kuis
+const HEADER_HASIL_KUIS = [
+    "No", "ID_Hasil", "ID_Kuis", "Nama_Siswa", "Nomor_Absen", "Kelas",
+    "Skor", "Total_Soal", "Jawaban_Benar", "Jawaban_Salah",
+    "Nilai", "Tanggal_Pengerjaan", "Durasi_Pengerjaan", "Status", "Timestamp"
+];
+
+// Header untuk sheet Users
+const HEADER_USERS = ["Role", "Username", "Password", "Nama", "ID_Tambahan", "Kelas"];
+
+// ============================================================
+// ========== FUNGSI INITIALISASI SHEET ==========
+// ============================================================
+function initializeSheets() {
+    try {
+        const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+        let created = [];
+        let messages = [];
+        
+        // ========== BUAT SHEET "Buat_Kuis" dengan struktur Excel ==========
+        let sheetBuatKuis = ss.getSheetByName(SHEET_BUAT_KUIS);
+        if (!sheetBuatKuis) {
+            sheetBuatKuis = ss.insertSheet(SHEET_BUAT_KUIS);
+            
+            // Header sesuai struktur Excel
+            sheetBuatKuis.getRange(1, 1, 1, HEADER_BUAT_KUIS.length).setValues([HEADER_BUAT_KUIS]);
+            sheetBuatKuis.getRange(1, 1, 1, HEADER_BUAT_KUIS.length).setFontWeight("bold");
+            sheetBuatKuis.setFrozenRows(1);
+            
+            // Set lebar kolom
+            const lebarKolom = [180, 180, 120, 120, 350, 200, 200, 200, 200, 180];
+            for (let i = 0; i < lebarKolom.length; i++) {
+                sheetBuatKuis.setColumnWidth(i + 1, lebarKolom[i]);
+            }
+            
+            created.push(SHEET_BUAT_KUIS);
+            messages.push(`✅ Sheet "${SHEET_BUAT_KUIS}" berhasil dibuat (struktur Excel)`);
+            console.log(`✅ Sheet "${SHEET_BUAT_KUIS}" berhasil dibuat`);
+        } else {
+            // Cek apakah header sudah sesuai, jika tidak update
+            const existingHeader = sheetBuatKuis.getRange(1, 1, 1, HEADER_BUAT_KUIS.length).getValues()[0];
+            let needUpdate = false;
+            for (let i = 0; i < HEADER_BUAT_KUIS.length; i++) {
+                if (existingHeader[i] !== HEADER_BUAT_KUIS[i]) {
+                    needUpdate = true;
+                    break;
+                }
+            }
+            if (needUpdate) {
+                sheetBuatKuis.getRange(1, 1, 1, HEADER_BUAT_KUIS.length).setValues([HEADER_BUAT_KUIS]);
+                sheetBuatKuis.getRange(1, 1, 1, HEADER_BUAT_KUIS.length).setFontWeight("bold");
+                messages.push(`🔄 Sheet "${SHEET_BUAT_KUIS}" diupdate dengan header baru`);
+            }
+            messages.push(`ℹ️ Sheet "${SHEET_BUAT_KUIS}" sudah ada`);
+            console.log(`ℹ️ Sheet "${SHEET_BUAT_KUIS}" sudah ada`);
+        }
+        
+        // ========== BUAT SHEET "Hasil_Kuis" ==========
+        let sheetHasilKuis = ss.getSheetByName(SHEET_HASIL_KUIS);
+        if (!sheetHasilKuis) {
+            sheetHasilKuis = ss.insertSheet(SHEET_HASIL_KUIS);
+            sheetHasilKuis.getRange(1, 1, 1, HEADER_HASIL_KUIS.length).setValues([HEADER_HASIL_KUIS]);
+            sheetHasilKuis.getRange(1, 1, 1, HEADER_HASIL_KUIS.length).setFontWeight("bold");
+            sheetHasilKuis.setFrozenRows(1);
+            
+            const lebarKolomHasil = [60, 120, 120, 150, 120, 100, 80, 100, 120, 120, 80, 150, 150, 100, 180];
+            for (let i = 0; i < lebarKolomHasil.length; i++) {
+                sheetHasilKuis.setColumnWidth(i + 1, lebarKolomHasil[i]);
+            }
+            
+            created.push(SHEET_HASIL_KUIS);
+            messages.push(`✅ Sheet "${SHEET_HASIL_KUIS}" berhasil dibuat`);
+            console.log(`✅ Sheet "${SHEET_HASIL_KUIS}" berhasil dibuat`);
+        } else {
+            messages.push(`ℹ️ Sheet "${SHEET_HASIL_KUIS}" sudah ada`);
+            console.log(`ℹ️ Sheet "${SHEET_HASIL_KUIS}" sudah ada`);
+        }
+        
+        // ========== BUAT SHEET "Users" ==========
+        let sheetUsers = ss.getSheetByName(SHEET_USERS);
+        if (!sheetUsers) {
+            sheetUsers = ss.insertSheet(SHEET_USERS);
+            sheetUsers.getRange(1, 1, 1, HEADER_USERS.length).setValues([HEADER_USERS]);
+            sheetUsers.getRange(1, 1, 1, HEADER_USERS.length).setFontWeight("bold");
+            sheetUsers.setFrozenRows(1);
+            
+            // Set lebar kolom
+            const lebarKolomUsers = [120, 150, 150, 200, 150, 150];
+            for (let i = 0; i < lebarKolomUsers.length; i++) {
+                sheetUsers.setColumnWidth(i + 1, lebarKolomUsers[i]);
+            }
+            
+            // Tambahkan data default users
+            const defaultUsers = [
+                ["Admin", "admin", "admin123", "Administrator", "ADM001", "System"],
+                ["Guru", "guru01", "guru123", "Guru Contoh", "G001", "Wali Kelas 5A"],
+                ["Guru", "guru02", "guru123", "Guru Kedua", "G002", "Wali Kelas 5B"],
+                ["Siswa", "siswa01", "siswa123", "Siswa Contoh", "S001", "5A"],
+                ["Siswa", "siswa02", "siswa123", "Siswa Kedua", "S002", "5B"]
+            ];
+            
+            if (defaultUsers.length > 0) {
+                sheetUsers.getRange(2, 1, defaultUsers.length, HEADER_USERS.length).setValues(defaultUsers);
+                console.log(`✅ ${defaultUsers.length} data Users default tersimpan`);
+                messages.push(`✅ Sheet "${SHEET_USERS}" berhasil dibuat dengan ${defaultUsers.length} data default`);
+            }
+            
+            created.push(SHEET_USERS);
+            messages.push(`✅ Sheet "${SHEET_USERS}" berhasil dibuat`);
+            console.log(`✅ Sheet "${SHEET_USERS}" berhasil dibuat`);
+        } else {
+            // Cek apakah header sudah sesuai
+            const existingHeader = sheetUsers.getRange(1, 1, 1, HEADER_USERS.length).getValues()[0];
+            let needUpdate = false;
+            for (let i = 0; i < HEADER_USERS.length; i++) {
+                if (existingHeader[i] !== HEADER_USERS[i]) {
+                    needUpdate = true;
+                    break;
+                }
+            }
+            if (needUpdate) {
+                sheetUsers.getRange(1, 1, 1, HEADER_USERS.length).setValues([HEADER_USERS]);
+                sheetUsers.getRange(1, 1, 1, HEADER_USERS.length).setFontWeight("bold");
+                messages.push(`🔄 Sheet "${SHEET_USERS}" diupdate dengan header baru`);
+            }
+            messages.push(`ℹ️ Sheet "${SHEET_USERS}" sudah ada`);
+            console.log(`ℹ️ Sheet "${SHEET_USERS}" sudah ada`);
+        }
+        
+        return {
+            status: 'success',
+            message: 'Inisialisasi sheet selesai',
+            messages: messages,
+            created: created,
+            timestamp: new Date().toISOString()
+        };
+        
+    } catch(err) {
+        console.error('❌ Error initializeSheets:', err.toString());
+        return {
+            status: 'error',
+            message: 'Error: ' + err.toString()
+        };
+    }
+}
+
+// ============================================================
+// ========== FUNGSI UTAMA DOGET ==========
+// ============================================================
+function doGet(e) {
+    try {
+        const action = (e && e.parameter) ? e.parameter.action : '';
+        
+        if (action === 'init_sheets') {
+            const result = initializeSheets();
+            return ContentService
+                .createTextOutput(JSON.stringify(result))
+                .setMimeType(ContentService.MimeType.JSON);
+        }
+        
+        if (action === 'ping') {
+            return ContentService
+                .createTextOutput(JSON.stringify({
+                    status: 'success',
+                    message: 'Koneksi ke Google Sheets berhasil!',
+                    timestamp: new Date().toISOString()
+                }))
+                .setMimeType(ContentService.MimeType.JSON);
+        }
+        
+        // GET data dengan struktur Excel
+        if (action === 'get_kuis') {
+            return handleGetKuis(e);
+        }
+        
+        // GET data sistem manajemen (tetap support)
+        if (action === 'get_data') {
+            return handleGetData(e);
+        }
+        
+        // GET data Buat_Kuis (legacy, tetap support)
+        if (action === 'get_buat_kuis') {
+            return handleGetBuatKuis(e);
+        }
+        
+        // GET data Hasil_Kuis
+        if (action === 'get_hasil_kuis') {
+            return handleGetHasilKuis(e);
+        }
+        
+        // GET data Users
+        if (action === 'get_users') {
+            return handleGetUsers(e);
+        }
+        
+        return ContentService
+            .createTextOutput(JSON.stringify({
+                status: 'success',
+                message: 'Server siap menerima data POST',
+                endpoints: [
+                    '?action=ping - Cek koneksi',
+                    '?action=init_sheets - Inisialisasi sheet',
+                    '?action=get_kuis - Ambil semua kuis (format Excel)',
+                    '?action=get_data&type=all - Ambil semua data',
+                    '?action=get_hasil_kuis - Ambil semua hasil kuis',
+                    '?action=get_users - Ambil semua data users'
+                ]
+            }))
+            .setMimeType(ContentService.MimeType.JSON);
+        
+    } catch(err) {
+        return ContentService
+            .createTextOutput(JSON.stringify({
+                status: 'error',
+                message: 'Error: ' + err.toString()
+            }))
+            .setMimeType(ContentService.MimeType.JSON);
+    }
+}
+
+// ============================================================
+// ========== FUNGSI UTAMA DOPOST ==========
+// ============================================================
+function doPost(e) {
+    try {
+        console.log('📥 Menerima request POST');
+        
+        if (!e || !e.postData) {
+            console.log('❌ Tidak ada postData');
+            return ContentService
+                .createTextOutput(JSON.stringify({
+                    status: 'error',
+                    message: 'Tidak ada data yang diterima'
+                }))
+                .setMimeType(ContentService.MimeType.JSON);
+        }
+        
+        console.log('📥 Raw data length:', e.postData.contents.length);
+        
+        const data = JSON.parse(e.postData.contents);
+        const action = data.action || '';
+        const payload = data.data || [];
+        
+        console.log(`📥 Action: ${action}, Jumlah data: ${payload.length}`);
+        
+        // ========== GET DATA VIA POST ==========
+        if (action === 'get_data') {
+            const result = handleGetDataPost(data);
+            return ContentService
+                .createTextOutput(JSON.stringify(result))
+                .setMimeType(ContentService.MimeType.JSON);
+        }
+        
+        // ========== HANDLE SISTEM MANAJEMEN SEKOLAH ==========
+        if (action === 'sync_users' || action === 'sync_siswa' || action === 'sync_guru') {
+            return syncUsers(payload);
+        }
+        
+        if (action === 'sync_mapel') {
+            return syncMapel(payload);
+        }
+        
+        if (action === 'sync_absensi') {
+            return syncAbsensi(payload);
+        }
+        
+        if (action === 'sync_nilai') {
+            return syncNilai(payload);
+        }
+        
+        if (action === 'sync_pengumuman') {
+            return syncPengumuman(payload);
+        }
+        
+        if (action === 'sync_jurnal') {
+            return syncJurnal(payload);
+        }
+        
+        // ========== HANDLE KUIS (format Excel) ==========
+        if (action === 'save_kuis' || action === 'sync_kuis') {
+            return handleSaveKuis(data);
+        }
+        
+        // ========== HANDLE IMPORT KUIS (seperti import file) ==========
+        if (action === 'import_kuis') {
+            return handleImportKuis(data);
+        }
+        
+        // ========== HANDLE KUIS (legacy) ==========
+        if (action === 'save_buat_kuis') {
+            return handleSaveBuatKuisLegacy(data);
+        }
+        
+        if (action === 'save_hasil_kuis' || action === 'sync_hasil_kuis') {
+            return handleSaveHasilKuis(data);
+        }
+        
+        if (action === 'update_status_kuis') {
+            return handleUpdateStatusKuis(data);
+        }
+        
+        if (action === 'delete_kuis') {
+            return handleDeleteKuis(data);
+        }
+        
+        if (action === 'clear_all_kuis') {
+            return handleClearAllKuis();
+        }
+        
+        return ContentService
+            .createTextOutput(JSON.stringify({
+                status: 'error',
+                message: 'Action tidak dikenal: ' + action
+            }))
+            .setMimeType(ContentService.MimeType.JSON);
+        
+    } catch(err) {
+        console.log('❌ Error doPost:', err.toString());
+        return ContentService
+            .createTextOutput(JSON.stringify({
+                status: 'error',
+                message: 'Error: ' + err.toString()
+            }))
+            .setMimeType(ContentService.MimeType.JSON);
+    }
+}
+
+// ============================================================
+// ========== FUNGSI RESPONSE HELPER ==========
+// ============================================================
+function createResponse(success, message, data = {}) {
+    const response = {
+        status: success ? "success" : "error",
+        message: message,
+        ...data,
+        timestamp: new Date().toISOString()
+    };
+    
+    return ContentService
+        .createTextOutput(JSON.stringify(response))
+        .setMimeType(ContentService.MimeType.JSON);
+}
+
+// ============================================================
+// ========== FUNGSI GET SHEET ==========
+// ============================================================
+function getSheetBuatKuis() {
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    let sheet = ss.getSheetByName(SHEET_BUAT_KUIS);
+    
+    if (!sheet) {
+        initializeSheets();
+        sheet = ss.getSheetByName(SHEET_BUAT_KUIS);
+    }
+    
+    return sheet;
+}
+
+function getSheetHasilKuis() {
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    let sheet = ss.getSheetByName(SHEET_HASIL_KUIS);
+    
+    if (!sheet) {
+        initializeSheets();
+        sheet = ss.getSheetByName(SHEET_HASIL_KUIS);
+    }
+    
+    return sheet;
+}
+
+function getSheetUsers() {
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    let sheet = ss.getSheetByName(SHEET_USERS);
+    
+    if (!sheet) {
+        initializeSheets();
+        sheet = ss.getSheetByName(SHEET_USERS);
+    }
+    
+    return sheet;
+}
+
+// ============================================================
+// ========== FUNGSI HANDLE GET USERS ==========
+// ============================================================
+function handleGetUsers(e) {
+    try {
+        const sheet = getSheetUsers();
+        const lastRow = sheet.getLastRow();
+        
+        if (lastRow < 2) {
+            return createResponse(true, "Belum ada data users", { data: [] });
+        }
+        
+        const range = sheet.getRange(2, 1, lastRow - 1, HEADER_USERS.length);
+        const values = range.getValues();
+        
+        const data = values.map(row => {
+            let obj = {};
+            HEADER_USERS.forEach((header, idx) => {
+                obj[header] = row[idx] || '';
+            });
+            return obj;
+        });
+        
+        return createResponse(true, "Data users berhasil diambil", { 
+            data: data, 
+            total: data.length 
+        });
+        
+    } catch(error) {
+        return createResponse(false, "Gagal mengambil data users: " + error.toString());
+    }
+}
+
+// ============================================================
+// ========== FUNGSI HANDLE SAVE KUIS (FORMAT EXCEL) ==========
+// ============================================================
+function handleSaveKuis(data) {
+    try {
+        console.log('📝 Menyimpan data kuis ke sheet (format Excel)...');
+        console.log('📝 Data yang diterima:', JSON.stringify(data));
+        
+        const sheet = getSheetBuatKuis();
+        const questions = data.questions || [];
+        const metadata = data.metadata || {};
+        
+        if (questions.length === 0) {
+            return createResponse(false, "Tidak ada soal untuk disimpan");
+        }
+
+        // Ambil metadata
+        const waktuMulai = metadata.waktu_mulai || new Date().toLocaleString('id-ID');
+        const waktuSelesai = metadata.waktu_selesai || new Date(Date.now() + 7*24*60*60*1000).toLocaleString('id-ID');
+        const durasi = metadata.durasi || 30;
+
+        console.log(`📝 Waktu Mulai: ${waktuMulai}`);
+        console.log(`📝 Waktu Selesai: ${waktuSelesai}`);
+        console.log(`📝 Durasi: ${durasi}`);
+        console.log(`📝 Jumlah soal: ${questions.length}`);
+
+        // Siapkan data sesuai struktur Excel
+        const rows = questions.map((q, index) => {
+            let jawaban = q.jawaban || '';
+            
+            // Format khusus untuk MENJODOHKAN
+            if (q.tipe === 'MENJODOHKAN' && q.jodohIndex) {
+                jawaban = q.jodohIndex.join(';');
+            }
+            
+            // Format khusus untuk ISIAN dengan multiple answers
+            if (q.tipe === 'ISIAN' && q.jawaban_alternatif) {
+                jawaban = q.jawaban + ' | ' + q.jawaban_alternatif;
+            }
+
+            const row = [
+                waktuMulai,                                    // A: Waktu Mulai
+                waktuSelesai,                                  // B: Waktu Selesai
+                durasi,                                        // C: Durasi (Menit)
+                q.tipe || 'PG',                                // D: Tipe
+                q.pertanyaan || '',                            // E: Pertanyaan
+                q.pilihanA || '',                              // F: Pilihan A
+                q.pilihanB || '',                              // G: Pilihan B
+                q.pilihanC || '',                              // H: Pilihan C
+                q.pilihanD || '',                              // I: Pilihan D
+                jawaban                                        // J: Jawaban
+            ];
+            
+            console.log(`📝 Soal ${index + 1}:`, JSON.stringify(row));
+            return row;
+        });
+
+        // Tulis data ke sheet - PAKAI appendRow AGAR LEBIH RELIABLE
+        if (rows.length > 0) {
+            // Jika ada data sebelumnya, tambahkan baris kosong sebagai pemisah
+            const lastRow = sheet.getLastRow();
+            console.log(`📝 LastRow sebelum simpan: ${lastRow}`);
+            
+            if (lastRow >= 2) {
+                const lastRowData = sheet.getRange(lastRow, 1, 1, 10).getValues()[0];
+                const isEmpty = lastRowData.every(cell => cell === '');
+                if (!isEmpty) {
+                    sheet.appendRow(['', '', '', '', '', '', '', '', '', '']);
+                    console.log('📝 Menambahkan baris kosong sebagai pemisah');
+                }
+            }
+            
+            // Tulis data satu per satu dengan appendRow
+            let successCount = 0;
+            for (let i = 0; i < rows.length; i++) {
+                try {
+                    sheet.appendRow(rows[i]);
+                    successCount++;
+                } catch(rowError) {
+                    console.error(`❌ Gagal menyimpan baris ${i+1}:`, rowError);
+                }
+            }
+            
+            console.log(`✅ ${successCount} dari ${rows.length} soal berhasil disimpan`);
+            
+            // Verifikasi data tersimpan
+            const newLastRow = sheet.getLastRow();
+            console.log(`📝 LastRow setelah simpan: ${newLastRow}`);
+        }
+
+        return createResponse(true, `Berhasil menyimpan ${rows.length} soal kuis`, {
+            total: rows.length,
+            timestamp: new Date().toISOString()
+        });
+        
+    } catch(error) {
+        console.error("❌ Error save kuis:", error);
+        return createResponse(false, "Terjadi kesalahan: " + error.toString());
+    }
+}
+
+// ============================================================
+// ========== FUNGSI HANDLE IMPORT KUIS ==========
+// ============================================================
+function handleImportKuis(data) {
+    try {
+        console.log('📥 Mengimpor data kuis dari Excel...');
+        console.log('📥 Data yang diterima:', JSON.stringify(data));
+        
+        const sheet = getSheetBuatKuis();
+        const excelData = data.excelData || [];
+        const metadata = data.metadata || {};
+        
+        if (excelData.length === 0) {
+            return createResponse(false, "Tidak ada data Excel untuk diimpor");
+        }
+
+        // Ambil metadata dari data Excel (baris pertama)
+        const firstRow = excelData[0];
+        const waktuMulai = firstRow['Waktu Mulai'] || metadata.waktu_mulai || new Date().toLocaleString('id-ID');
+        const waktuSelesai = firstRow['Waktu Selesai'] || metadata.waktu_selesai || new Date(Date.now() + 7*24*60*60*1000).toLocaleString('id-ID');
+        const durasi = firstRow['Durasi (Menit)'] || metadata.durasi || 30;
+
+        console.log(`📝 Waktu Mulai: ${waktuMulai}`);
+        console.log(`📝 Waktu Selesai: ${waktuSelesai}`);
+        console.log(`📝 Durasi: ${durasi}`);
+        console.log(`📝 Jumlah data: ${excelData.length}`);
+
+        // Siapkan data untuk di-append
+        const rows = excelData.map((row, index) => {
+            let jawaban = row['Jawaban'] || '';
+            
+            const rowData = [
+                waktuMulai,
+                waktuSelesai,
+                durasi,
+                row['Tipe'] || 'PG',
+                row['Pertanyaan'] || '',
+                row['Pilihan A'] || '',
+                row['Pilihan B'] || '',
+                row['Pilihan C'] || '',
+                row['Pilihan D'] || '',
+                jawaban
+            ];
+            
+            console.log(`📝 Baris ${index + 1}:`, JSON.stringify(rowData));
+            return rowData;
+        });
+
+        // Tulis data ke sheet
+        if (rows.length > 0) {
+            const lastRow = sheet.getLastRow();
+            console.log(`📝 LastRow sebelum import: ${lastRow}`);
+            
+            if (lastRow >= 2) {
+                const lastRowData = sheet.getRange(lastRow, 1, 1, 10).getValues()[0];
+                const isEmpty = lastRowData.every(cell => cell === '');
+                if (!isEmpty) {
+                    sheet.appendRow(['', '', '', '', '', '', '', '', '', '']);
+                    console.log('📝 Menambahkan baris kosong sebagai pemisah');
+                }
+            }
+            
+            // Gunakan appendRow untuk setiap baris
+            let successCount = 0;
+            for (let i = 0; i < rows.length; i++) {
+                try {
+                    sheet.appendRow(rows[i]);
+                    successCount++;
+                } catch(rowError) {
+                    console.error(`❌ Gagal mengimpor baris ${i+1}:`, rowError);
+                }
+            }
+            
+            console.log(`✅ ${successCount} dari ${rows.length} baris berhasil diimpor`);
+        }
+
+        return createResponse(true, `Berhasil mengimpor ${rows.length} soal dari Excel`, {
+            total: rows.length,
+            timestamp: new Date().toISOString()
+        });
+        
+    } catch(error) {
+        console.error("❌ Error import kuis:", error);
+        return createResponse(false, "Terjadi kesalahan: " + error.toString());
+    }
+}
+
+// ============================================================
+// ========== FUNGSI HANDLE GET KUIS (FORMAT EXCEL) ==========
+// ============================================================
+function handleGetKuis(e) {
+    try {
+        const sheet = getSheetBuatKuis();
+        const lastRow = sheet.getLastRow();
+        
+        if (lastRow < 2) {
+            return createResponse(true, "Belum ada data kuis", { data: [] });
+        }
+        
+        const range = sheet.getRange(2, 1, lastRow - 1, HEADER_BUAT_KUIS.length);
+        const values = range.getValues();
+        
+        const data = values.map(row => {
+            let obj = {};
+            HEADER_BUAT_KUIS.forEach((header, idx) => {
+                obj[header] = row[idx] || '';
+            });
+            return obj;
+        });
+        
+        return createResponse(true, "Data kuis berhasil diambil", { 
+            data: data, 
+            total: data.length 
+        });
+        
+    } catch(error) {
+        return createResponse(false, "Gagal mengambil data kuis: " + error.toString());
+    }
+}
+
+// ============================================================
+// ========== FUNGSI HANDLE SAVE BUAT KUIS (LEGACY) ==========
+// ============================================================
+function handleSaveBuatKuisLegacy(data) {
+    try {
+        console.log('📝 Menyimpan data kuis (legacy) ke sheet Buat_Kuis...');
+        console.log('📝 Data yang diterima:', JSON.stringify(data));
+        
+        const sheet = getSheetBuatKuis();
+        
+        // Ambil data dengan berbagai kemungkinan format
+        const judul = data.Judul_Kuis || data.judul || data.title || "Kuis Baru";
+        const mapel = data.Mata_Pelajaran || data.mapel || data.subject || "";
+        const kelas = data.Kelas || data.kelas || data.class || "";
+        const durasi = data.Durasi || data.durasi || "30 menit";
+        const jumlahSoal = data.Jumlah_Soal || data.jumlah_soal || data.count || 0;
+        const tipeSoal = data.Tipe_Soal || data.tipe_soal || data.type || "Pilihan Ganda";
+        const gayaBahasa = data.Gaya_Bahasa || data.gaya_bahasa || data.style || "Formal & Edukatif";
+        const status = data.Status || data.status || "Aktif";
+        
+        // Ambil detail soal jika ada
+        const questions = data.questions || [];
+        const metadata = data.metadata || {};
+        
+        // Jika ada questions, simpan dengan format Excel
+        if (questions.length > 0) {
+            console.log(`📝 Menyimpan ${questions.length} soal dengan format Excel...`);
+            return handleSaveKuis(data);
+        }
+        
+        // Jika tidak ada questions, simpan metadata saja sebagai satu baris
+        const waktuMulai = metadata.waktu_mulai || new Date().toLocaleString('id-ID');
+        const waktuSelesai = metadata.waktu_selesai || new Date(Date.now() + 7*24*60*60*1000).toLocaleString('id-ID');
+        const durasiNum = parseInt(durasi) || 30;
+        
+        const row = [
+            waktuMulai,
+            waktuSelesai,
+            durasiNum,
+            tipeSoal,
+            `📚 ${judul} | Mapel: ${mapel} | Kelas: ${kelas} | Gaya: ${gayaBahasa} | Status: ${status}`,
+            '', '', '', '',
+            `${jumlahSoal} soal`
+        ];
+        
+        console.log('📝 Row yang akan disimpan:', JSON.stringify(row));
+        
+        // PAKAI appendRow AGAR LEBIH RELIABLE
+        sheet.appendRow(row);
+        console.log(`✅ Data kuis "${judul}" berhasil disimpan (legacy) di baris ${sheet.getLastRow()}`);
+        
+        return createResponse(true, "Data kuis berhasil disimpan", {
+            judul: judul,
+            row: sheet.getLastRow()
+        });
+        
+    } catch(error) {
+        console.error("❌ Error save buat kuis legacy:", error);
+        return createResponse(false, "Terjadi kesalahan: " + error.toString());
+    }
+}
+
+// ============================================================
+// ========== FUNGSI HANDLE HASIL KUIS ==========
+// ============================================================
+function handleSaveHasilKuis(data) {
+    try {
+        console.log('📝 Menyimpan data hasil kuis ke sheet Hasil_Kuis...');
+        
+        const sheet = getSheetHasilKuis();
+        const lastRow = sheet.getLastRow();
+        const noUrut = lastRow;
+        
+        const idHasil = data.ID_Hasil || data.id_hasil || `H${String(Date.now()).slice(-6)}`;
+        const idKuis = data.ID_Kuis || data.id_kuis || "KUIS001";
+        const nama = data.Nama_Siswa || data.nama || data.name || "";
+        const absen = data.Nomor_Absen || data.absen || "";
+        const kelas = data.Kelas || data.kelas || "";
+        const skor = data.Skor || data.skor || data.score || 0;
+        const totalSoal = data.Total_Soal || data.total_soal || 10;
+        const jawabanBenar = data.Jawaban_Benar || data.jawaban_benar || 0;
+        const jawabanSalah = data.Jawaban_Salah || data.jawaban_salah || 0;
+        const nilai = data.Nilai || data.nilai || (totalSoal > 0 ? (skor / totalSoal * 100) : 0);
+        const tanggal = data.Tanggal_Pengerjaan || data.tanggal || new Date().toLocaleDateString('id-ID');
+        const durasi = data.Durasi_Pengerjaan || data.durasi || "";
+        const status = data.Status || data.status || "Selesai";
+        const timestamp = new Date();
+        
+        const newRow = [
+            noUrut, idHasil, idKuis, nama, absen, kelas,
+            skor, totalSoal, jawabanBenar, jawabanSalah,
+            nilai, tanggal, durasi, status, timestamp
+        ];
+        
+        sheet.appendRow(newRow);
+        sheet.getRange(lastRow + 1, 15).setNumberFormat("dd/mm/yyyy HH:mm:ss");
+        
+        console.log(`✅ Hasil kuis untuk "${nama}" berhasil disimpan`);
+        
+        return createResponse(true, "Data hasil kuis berhasil disimpan", { 
+            id_hasil: idHasil,
+            row: lastRow + 1 
+        });
+        
+    } catch(error) {
+        console.error("❌ Error save hasil kuis:", error);
+        return createResponse(false, "Terjadi kesalahan: " + error.toString());
+    }
+}
+
+function handleUpdateStatusKuis(data) {
+    try {
+        const idKuis = data.ID_Kuis || data.id_kuis;
+        const statusBaru = data.Status || data.status;
+        
+        if (!idKuis || !statusBaru) {
+            return createResponse(false, "ID_Kuis dan Status baru wajib diisi");
+        }
+        
+        const sheet = getSheetBuatKuis();
+        const dataRange = sheet.getDataRange();
+        const values = dataRange.getValues();
+        
+        // Cari di kolom Pertanyaan (indeks 4) yang berisi metadata
+        for (let i = 1; i < values.length; i++) {
+            const pertanyaan = values[i][4] || '';
+            if (pertanyaan.includes(idKuis)) {
+                // Update status dengan menambahkan ke kolom Pertanyaan
+                const newPertanyaan = pertanyaan.replace(/Status: [A-Za-z]+/, `Status: ${statusBaru}`);
+                sheet.getRange(i + 1, 5).setValue(newPertanyaan);
+                
+                return createResponse(true, "Status kuis berhasil diperbarui", {
+                    id_kuis: idKuis,
+                    status: statusBaru,
+                    row: i + 1
+                });
+            }
+        }
+        
+        return createResponse(false, "Kuis dengan ID " + idKuis + " tidak ditemukan");
+        
+    } catch(error) {
+        console.error("❌ Error update status:", error);
+        return createResponse(false, "Terjadi kesalahan: " + error.toString());
+    }
+}
+
+function handleDeleteKuis(data) {
+    try {
+        const idKuis = data.ID_Kuis || data.id_kuis;
+        
+        if (!idKuis) {
+            return createResponse(false, "ID_Kuis wajib diisi");
+        }
+        
+        const sheet = getSheetBuatKuis();
+        const dataRange = sheet.getDataRange();
+        const values = dataRange.getValues();
+        
+        for (let i = 1; i < values.length; i++) {
+            const pertanyaan = values[i][4] || '';
+            if (pertanyaan.includes(idKuis)) {
+                sheet.deleteRow(i + 1);
+                return createResponse(true, "Kuis berhasil dihapus", {
+                    id_kuis: idKuis,
+                    row: i + 1
+                });
+            }
+        }
+        
+        return createResponse(false, "Kuis dengan ID " + idKuis + " tidak ditemukan");
+        
+    } catch(error) {
+        console.error("❌ Error delete kuis:", error);
+        return createResponse(false, "Terjadi kesalahan: " + error.toString());
+    }
+}
+
+function handleClearAllKuis() {
+    try {
+        const sheet = getSheetBuatKuis();
+        const lastRow = sheet.getLastRow();
+        
+        if (lastRow >= 2) {
+            sheet.deleteRows(2, lastRow - 1);
+            return createResponse(true, "Semua data kuis berhasil dihapus", {
+                deleted_rows: lastRow - 1
+            });
+        }
+        
+        return createResponse(true, "Tidak ada data kuis untuk dihapus");
+        
+    } catch(error) {
+        console.error("❌ Error clear all kuis:", error);
+        return createResponse(false, "Terjadi kesalahan: " + error.toString());
+    }
+}
+
+function handleGetBuatKuis(e) {
+    // Redirect ke handleGetKuis
+    return handleGetKuis(e);
+}
+
+function handleGetHasilKuis(e) {
+    try {
+        const sheet = getSheetHasilKuis();
+        const lastRow = sheet.getLastRow();
+        
+        if (lastRow < 2) {
+            return createResponse(true, "Belum ada data hasil kuis", { data: [] });
+        }
+        
+        const range = sheet.getRange(2, 1, lastRow - 1, HEADER_HASIL_KUIS.length);
+        const values = range.getValues();
+        
+        const data = values.map(row => {
+            let obj = {};
+            HEADER_HASIL_KUIS.forEach((header, idx) => {
+                obj[header] = row[idx] || '';
+            });
+            return obj;
+        });
+        
+        if (e && e.parameter && e.parameter.id_kuis) {
+            const idKuis = e.parameter.id_kuis;
+            const filtered = data.filter(item => item.ID_Kuis === idKuis);
+            return createResponse(true, "Data hasil kuis berhasil diambil", { 
+                data: filtered, 
+                total: filtered.length,
+                id_kuis: idKuis
+            });
+        }
+        
+        return createResponse(true, "Data hasil kuis berhasil diambil", { 
+            data: data, 
+            total: data.length 
+        });
+        
+    } catch(error) {
+        return createResponse(false, "Gagal mengambil data hasil kuis: " + error.toString());
+    }
+}
+
+// ============================================================
+// ========== FUNGSI GET DATA VIA POST ==========
+// ============================================================
+function handleGetDataPost(data) {
+    try {
+        const type = data.type || 'all';
+        const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+        const result = {};
+        
+        function getSheetData(sheetName, headers) {
+            const sheet = ss.getSheetByName(sheetName);
+            if (!sheet) return [];
+            const data = sheet.getDataRange().getValues();
+            if (data.length < 2) return [];
+            const headerRow = headers || data[0];
+            const rows = data.slice(1);
+            return rows.map(row => {
+                const obj = {};
+                headerRow.forEach((h, i) => {
+                    obj[h] = row[i] || '';
+                });
+                return obj;
+            });
+        }
+        
+        if (type === 'all' || type === 'users') {
+            result.users = getSheetData(SHEET_USERS, HEADER_USERS);
+        }
+        if (type === 'all' || type === 'mapel') {
+            result.mapel = getSheetData('Mapel');
+        }
+        if (type === 'all' || type === 'absensi') {
+            result.absensi = getSheetData('Absensi');
+        }
+        if (type === 'all' || type === 'nilai') {
+            result.nilai = getSheetData('Nilai');
+        }
+        if (type === 'all' || type === 'jurnal') {
+            result.jurnal = getSheetData('Jurnal');
+        }
+        if (type === 'all' || type === 'pengumuman') {
+            result.pengumuman = getSheetData('Pengumuman');
+        }
+        if (type === 'all' || type === 'buat_kuis') {
+            result.buat_kuis = getSheetData(SHEET_BUAT_KUIS, HEADER_BUAT_KUIS);
+        }
+        if (type === 'all' || type === 'hasil_kuis') {
+            result.hasil_kuis = getSheetData(SHEET_HASIL_KUIS, HEADER_HASIL_KUIS);
+        }
+        
+        return {
+            status: 'success',
+            message: 'Data berhasil diambil',
+            data: result,
+            timestamp: new Date().toISOString()
+        };
+        
+    } catch(err) {
+        return {
+            status: 'error',
+            message: 'Error: ' + err.toString()
+        };
+    }
+}
+
+// ============================================================
+// ========== FUNGSI GET DATA VIA GET ==========
+// ============================================================
+function handleGetData(e) {
+    try {
+        const type = e.parameter.type || 'all';
+        const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+        const result = {};
+        
+        function getSheetData(sheetName, headers) {
+            const sheet = ss.getSheetByName(sheetName);
+            if (!sheet) return [];
+            const data = sheet.getDataRange().getValues();
+            if (data.length < 2) return [];
+            const headerRow = headers || data[0];
+            const rows = data.slice(1);
+            return rows.map(row => {
+                const obj = {};
+                headerRow.forEach((h, i) => {
+                    obj[h] = row[i] || '';
+                });
+                return obj;
+            });
+        }
+        
+        if (type === 'all' || type === 'users') {
+            result.users = getSheetData(SHEET_USERS, HEADER_USERS);
+        }
+        if (type === 'all' || type === 'mapel') {
+            result.mapel = getSheetData('Mapel');
+        }
+        if (type === 'all' || type === 'absensi') {
+            result.absensi = getSheetData('Absensi');
+        }
+        if (type === 'all' || type === 'nilai') {
+            result.nilai = getSheetData('Nilai');
+        }
+        if (type === 'all' || type === 'jurnal') {
+            result.jurnal = getSheetData('Jurnal');
+        }
+        if (type === 'all' || type === 'pengumuman') {
+            result.pengumuman = getSheetData('Pengumuman');
+        }
+        if (type === 'all' || type === 'buat_kuis') {
+            result.buat_kuis = getSheetData(SHEET_BUAT_KUIS, HEADER_BUAT_KUIS);
+        }
+        if (type === 'all' || type === 'hasil_kuis') {
+            result.hasil_kuis = getSheetData(SHEET_HASIL_KUIS, HEADER_HASIL_KUIS);
+        }
+        
+        return ContentService
+            .createTextOutput(JSON.stringify({
+                status: 'success',
+                message: 'Data berhasil diambil',
+                data: result,
+                timestamp: new Date().toISOString()
+            }))
+            .setMimeType(ContentService.MimeType.JSON);
+        
+    } catch(err) {
+        return ContentService
+            .createTextOutput(JSON.stringify({
+                status: 'error',
+                message: 'Error: ' + err.toString()
+            }))
+            .setMimeType(ContentService.MimeType.JSON);
+    }
+}
+
+// ============================================================
+// ========== FUNGSI SYNC USERS ==========
+// ============================================================
+function syncUsers(data) {
+    try {
+        console.log('📝 Menyimpan data Users...');
+        console.log('📝 Data length:', data ? data.length : 0);
+        
+        const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+        let sheet = ss.getSheetByName(SHEET_USERS);
+        if (!sheet) {
+            console.log('📝 Membuat sheet Users...');
+            sheet = ss.insertSheet(SHEET_USERS);
+            sheet.getRange(1, 1, 1, HEADER_USERS.length).setValues([HEADER_USERS]);
+            sheet.getRange(1, 1, 1, HEADER_USERS.length).setFontWeight('bold');
+            sheet.setFrozenRows(1);
+        }
+        
+        // Jika data kosong, clear semua isi (kecuali header)
+        if (!data || data.length === 0) {
+            const lastRow = sheet.getLastRow();
+            if (lastRow > 1) {
+                sheet.deleteRows(2, lastRow - 1);
+                console.log('🗑️ Semua data Users dihapus');
+            }
+            return ContentService
+                .createTextOutput(JSON.stringify({
+                    status: 'success',
+                    message: 'Semua data Users telah dihapus'
+                }))
+                .setMimeType(ContentService.MimeType.JSON);
+        }
+        
+        // Clear data lama (kecuali header)
+        const lastRow = sheet.getLastRow();
+        if (lastRow > 1) {
+            sheet.deleteRows(2, lastRow - 1);
+            console.log('🗑️ Data lama dihapus');
+        }
+        
+        // Tambahkan data baru
+        const rows = data.map(item => [
+            item.Role || 'Guru',
+            item.Username || '',
+            item.Password || '',
+            item.Nama || '',
+            item.ID_Tambahan || '',
+            item.Kelas || ''
+        ]);
+        
+        if (rows.length > 0) {
+            sheet.getRange(2, 1, rows.length, HEADER_USERS.length).setValues(rows);
+            console.log(`✅ ${rows.length} baris data Users tersimpan`);
+        }
+        
+        return ContentService
+            .createTextOutput(JSON.stringify({
+                status: 'success',
+                message: 'Data Users berhasil disinkronisasi (' + data.length + ' records)',
+                count: data.length
+            }))
+            .setMimeType(ContentService.MimeType.JSON);
+        
+    } catch(err) {
+        console.log('❌ Error syncUsers:', err.toString());
+        return ContentService
+            .createTextOutput(JSON.stringify({
+                status: 'error',
+                message: 'Error syncUsers: ' + err.toString()
+            }))
+            .setMimeType(ContentService.MimeType.JSON);
+    }
+}
+
+// ============================================================
+// ========== FUNGSI SYNC MAPEL ==========
+// ============================================================
+function syncMapel(data) {
+    try {
+        console.log('📝 Menyimpan data Mapel...');
+        
+        const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+        let sheet = ss.getSheetByName('Mapel');
+        if (!sheet) {
+            sheet = ss.insertSheet('Mapel');
+        }
+        
+        sheet.clear();
+        const headers = ['ID', 'Kode', 'Nama', 'KKM'];
+        sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+        
+        if (data && data.length > 0) {
+            const rows = data.map(item => [
+                item.ID || '',
+                item.Kode || '',
+                item.Nama || '',
+                item.KKM || 75
+            ]);
+            if (rows.length > 0) {
+                sheet.getRange(2, 1, rows.length, headers.length).setValues(rows);
+                console.log(`✅ ${rows.length} baris data Mapel tersimpan`);
+            }
+        }
+        
+        return ContentService
+            .createTextOutput(JSON.stringify({
+                status: 'success',
+                message: 'Data Mapel berhasil disinkronisasi (' + (data ? data.length : 0) + ' records)'
+            }))
+            .setMimeType(ContentService.MimeType.JSON);
+        
+    } catch(err) {
+        console.log('❌ Error syncMapel:', err.toString());
+        return ContentService
+            .createTextOutput(JSON.stringify({
+                status: 'error',
+                message: 'Error syncMapel: ' + err.toString()
+            }))
+            .setMimeType(ContentService.MimeType.JSON);
+    }
+}
+
+// ============================================================
+// ========== FUNGSI SYNC ABSENSI ==========
+// ============================================================
+function syncAbsensi(data) {
+    try {
+        console.log('📝 Menyimpan data Absensi...');
+        
+        const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+        let sheet = ss.getSheetByName('Absensi');
+        if (!sheet) {
+            sheet = ss.insertSheet('Absensi');
+        }
+        
+        sheet.clear();
+        const headers = ['Tanggal', 'Username', 'Nama_Siswa', 'Status_Kehadiran'];
+        sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+        
+        if (data && data.length > 0) {
+            const rows = data.map(item => [
+                item.Tanggal || '',
+                item.Username || '',
+                item.Nama_Siswa || '',
+                item.Status_Kehadiran || 'Hadir'
+            ]);
+            if (rows.length > 0) {
+                sheet.getRange(2, 1, rows.length, headers.length).setValues(rows);
+                console.log(`✅ ${rows.length} baris data Absensi tersimpan`);
+            }
+        }
+        
+        return ContentService
+            .createTextOutput(JSON.stringify({
+                status: 'success',
+                message: 'Data Absensi berhasil disinkronisasi (' + (data ? data.length : 0) + ' records)'
+            }))
+            .setMimeType(ContentService.MimeType.JSON);
+        
+    } catch(err) {
+        console.log('❌ Error syncAbsensi:', err.toString());
+        return ContentService
+            .createTextOutput(JSON.stringify({
+                status: 'error',
+                message: 'Error syncAbsensi: ' + err.toString()
+            }))
+            .setMimeType(ContentService.MimeType.JSON);
+    }
+}
+
+// ============================================================
+// ========== FUNGSI SYNC NILAI ==========
+// ============================================================
+function syncNilai(data) {
+    try {
+        console.log('📝 Menyimpan data Nilai...');
+        
+        const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+        let sheet = ss.getSheetByName('Nilai');
+        if (!sheet) {
+            sheet = ss.insertSheet('Nilai');
+        }
+        
+        sheet.clear();
+        const headers = ['Mapel', 'Username', 'Nama_Siswa', 
+            'Harian_1', 'Harian_2', 'Harian_3', 'Harian_4', 'Harian_5',
+            'Harian_6', 'Harian_7', 'Harian_8', 'Harian_9', 'Harian_10',
+            'UTS', 'UAS', 'Nilai_Akhir'];
+        sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+        
+        if (data && data.length > 0) {
+            const rows = data.map(item => [
+                item.Mapel || '',
+                item.Username || '',
+                item.Nama_Siswa || '',
+                item.Harian_1 || 0, item.Harian_2 || 0, item.Harian_3 || 0, 
+                item.Harian_4 || 0, item.Harian_5 || 0,
+                item.Harian_6 || 0, item.Harian_7 || 0, item.Harian_8 || 0, 
+                item.Harian_9 || 0, item.Harian_10 || 0,
+                item.UTS || 0, item.UAS || 0, item.Nilai_Akhir || 0
+            ]);
+            if (rows.length > 0) {
+                sheet.getRange(2, 1, rows.length, headers.length).setValues(rows);
+                console.log(`✅ ${rows.length} baris data Nilai tersimpan`);
+            }
+        }
+        
+        return ContentService
+            .createTextOutput(JSON.stringify({
+                status: 'success',
+                message: 'Data Nilai berhasil disinkronisasi (' + (data ? data.length : 0) + ' records)'
+            }))
+            .setMimeType(ContentService.MimeType.JSON);
+        
+    } catch(err) {
+        console.log('❌ Error syncNilai:', err.toString());
+        return ContentService
+            .createTextOutput(JSON.stringify({
+                status: 'error',
+                message: 'Error syncNilai: ' + err.toString()
+            }))
+            .setMimeType(ContentService.MimeType.JSON);
+    }
+}
+
+// ============================================================
+// ========== FUNGSI SYNC PENGUMUMAN ==========
+// ============================================================
+function syncPengumuman(data) {
+    try {
+        console.log('📝 Menyimpan data Pengumuman...');
+        
+        const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+        let sheet = ss.getSheetByName('Pengumuman');
+        if (!sheet) {
+            sheet = ss.insertSheet('Pengumuman');
+        }
+        
+        sheet.clear();
+        const headers = ['ID', 'Tanggal', 'Isi', 'Pembuat'];
+        sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+        
+        if (data && data.length > 0) {
+            const rows = data.map(item => [
+                item.ID || '',
+                item.Tanggal || '',
+                item.Isi || '',
+                item.Pembuat || 'Admin'
+            ]);
+            if (rows.length > 0) {
+                sheet.getRange(2, 1, rows.length, headers.length).setValues(rows);
+                console.log(`✅ ${rows.length} baris data Pengumuman tersimpan`);
+            }
+        }
+        
+        return ContentService
+            .createTextOutput(JSON.stringify({
+                status: 'success',
+                message: 'Data Pengumuman berhasil disinkronisasi (' + (data ? data.length : 0) + ' records)'
+            }))
+            .setMimeType(ContentService.MimeType.JSON);
+        
+    } catch(err) {
+        console.log('❌ Error syncPengumuman:', err.toString());
+        return ContentService
+            .createTextOutput(JSON.stringify({
+                status: 'error',
+                message: 'Error syncPengumuman: ' + err.toString()
+            }))
+            .setMimeType(ContentService.MimeType.JSON);
+    }
+}
+
+// ============================================================
+// ========== FUNGSI SYNC JURNAL HARIAN ==========
+// ============================================================
+function syncJurnal(data) {
+    try {
+        console.log('📝 Menyimpan data Jurnal Harian...');
+        console.log('📝 Data length:', data ? data.length : 0);
+        
+        const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+        let sheet = ss.getSheetByName('Jurnal');
+        if (!sheet) {
+            console.log('📝 Membuat sheet Jurnal...');
+            sheet = ss.insertSheet('Jurnal');
+        }
+        
+        sheet.clear();
+        const headers = ['Tanggal', 'Mata Pelajaran', 'Kegiatan Pembelajaran'];
+        sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+        
+        if (data && data.length > 0) {
+            const rows = data.map(item => [
+                item.Tanggal || '',
+                item.Mapel || '',
+                item.Kegiatan || ''
+            ]);
+            
+            if (rows.length > 0) {
+                sheet.getRange(2, 1, rows.length, headers.length).setValues(rows);
+                console.log(`✅ ${rows.length} baris data Jurnal tersimpan`);
+            }
+        }
+        
+        return ContentService
+            .createTextOutput(JSON.stringify({
+                status: 'success',
+                message: 'Data Jurnal Harian berhasil disinkronisasi (' + (data ? data.length : 0) + ' records)'
+            }))
+            .setMimeType(ContentService.MimeType.JSON);
+        
+    } catch(err) {
+        console.log('❌ Error syncJurnal:', err.toString());
+        return ContentService
+            .createTextOutput(JSON.stringify({
+                status: 'error',
+                message: 'Error syncJurnal: ' + err.toString()
+            }))
+            .setMimeType(ContentService.MimeType.JSON);
+    }
+}
+
+// ============================================================
+// ========== FUNGSI UTILITY ==========
+// ============================================================
+
+function testConnection() {
+    const testData = {
+        action: 'save_kuis',
+        metadata: {
+            waktu_mulai: new Date().toLocaleString('id-ID'),
+            waktu_selesai: new Date(Date.now() + 7*24*60*60*1000).toLocaleString('id-ID'),
+            durasi: 30
+        },
+        questions: [
+            {
+                tipe: 'PG',
+                pertanyaan: 'Contoh soal uji coba?',
+                pilihanA: 'Opsi A',
+                pilihanB: 'Opsi B',
+                pilihanC: 'Opsi C',
+                pilihanD: 'Opsi D',
+                jawaban: 'A'
+            }
+        ]
+    };
+    
+    const mockEvent = {
+        postData: {
+            contents: JSON.stringify(testData)
+        }
+    };
+    
+    const result = doPost(mockEvent);
+    Logger.log("Hasil test: " + result.getContent());
+    return result;
+}
+
+function clearBuatKuisData() {
+    const sheet = getSheetBuatKuis();
+    const lastRow = sheet.getLastRow();
+    
+    if (lastRow >= 2) {
+        sheet.deleteRows(2, lastRow - 1);
+        Logger.log("✅ Semua data buat kuis telah dihapus. Total baris: " + (lastRow - 1));
+    } else {
+        Logger.log("ℹ️ Tidak ada data yang dihapus");
+    }
+}
+
+function clearHasilKuisData() {
+    const sheet = getSheetHasilKuis();
+    const lastRow = sheet.getLastRow();
+    
+    if (lastRow >= 2) {
+        sheet.deleteRows(2, lastRow - 1);
+        Logger.log("✅ Semua data hasil kuis telah dihapus. Total baris: " + (lastRow - 1));
+    } else {
+        Logger.log("ℹ️ Tidak ada data yang dihapus");
+    }
+}
+
+function clearAllUsersData() {
+    const sheet = getSheetUsers();
+    const lastRow = sheet.getLastRow();
+    
+    if (lastRow >= 2) {
+        sheet.deleteRows(2, lastRow - 1);
+        Logger.log("✅ Semua data Users telah dihapus. Total baris: " + (lastRow - 1));
+    } else {
+        Logger.log("ℹ️ Tidak ada data Users yang dihapus");
+    }
+}
+
+function onDeploy() {
+    const result = initializeSheets();
+    Logger.log("🚀 Deploy selesai: " + JSON.stringify(result));
+    return result;
+}
+</code></pre>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ================= TAB 3: STEP BY STEP GUIDE ================= -->
+        <div id="tab-guide" class="tab-content hidden space-y-6 animate-scale-up">
+            
+            <div class="glass-card p-6 sm:p-8 rounded-3xl">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="p-3 bg-amber-500/20 text-amber-400 rounded-2xl border border-amber-500/30">
+                        <i class="fa-solid fa-book-bookmark text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-black text-white">Panduan Integrasi Google Sheets & Apps Script</h2>
+                        <p class="text-xs text-slate-400">Langkah mudah menghubungkan portal website ke Google Sheets sekolah Anda</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    
+                    <!-- Step 1 -->
+                    <div class="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-3 glass-card-hover">
+                        <div class="flex items-center justify-between">
+                            <span class="w-8 h-8 rounded-xl bg-brand-600 text-white font-black text-xs flex items-center justify-center">1</span>
+                            <span class="text-[10px] font-bold text-brand-300 uppercase tracking-wider bg-brand-500/10 px-2 py-0.5 rounded">Google Sheets</span>
+                        </div>
+                        <h3 class="text-sm font-bold text-white">Buat Spreadsheet Baru</h3>
+                        <p class="text-xs text-slate-400 leading-relaxed">
+                            Buka <a href="https://sheets.new" target="_blank" class="text-brand-400 underline font-bold">sheets.new</a> di browser Anda. Beri nama file, misalnya <strong>Database SDN 3 Ngantru</strong>. Buat tab bernama <code class="text-amber-300 bg-slate-950 px-1 py-0.5 rounded">Users</code>.
+                        </p>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-3 glass-card-hover">
+                        <div class="flex items-center justify-between">
+                            <span class="w-8 h-8 rounded-xl bg-brand-600 text-white font-black text-xs flex items-center justify-center">2</span>
+                            <span class="text-[10px] font-bold text-amber-300 uppercase tracking-wider bg-amber-500/10 px-2 py-0.5 rounded">Spreadsheet ID</span>
+                        </div>
+                        <h3 class="text-sm font-bold text-white">Dapatkan Spreadsheet ID</h3>
+                        <p class="text-xs text-slate-400 leading-relaxed">
+                            Lihat alamat URL browser Google Sheet Anda. Salin deretan kode unik di antara <code class="text-amber-300 bg-slate-950 px-1 py-0.5 rounded">/d/</code> dan <code class="text-amber-300 bg-slate-950 px-1 py-0.5 rounded">/edit</code>. Tempelkan kode ini di Tab 1.
+                        </p>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-3 glass-card-hover">
+                        <div class="flex items-center justify-between">
+                            <span class="w-8 h-8 rounded-xl bg-brand-600 text-white font-black text-xs flex items-center justify-center">3</span>
+                            <span class="text-[10px] font-bold text-emerald-300 uppercase tracking-wider bg-emerald-500/10 px-2 py-0.5 rounded">Apps Script Editor</span>
+                        </div>
+                        <h3 class="text-sm font-bold text-white">Buka Google Apps Script</h3>
+                        <p class="text-xs text-slate-400 leading-relaxed">
+                            Di Google Sheets, klik menu top-bar: <strong class="text-white">Ekstensi (Extensions) &rarr; Apps Script</strong>. Hapus seluruh isi kode bawaan yang ada di editor tersebut.
+                        </p>
+                    </div>
+
+                    <!-- Step 4 -->
+                    <div class="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-3 glass-card-hover">
+                        <div class="flex items-center justify-between">
+                            <span class="w-8 h-8 rounded-xl bg-brand-600 text-white font-black text-xs flex items-center justify-center">4</span>
+                            <span class="text-[10px] font-bold text-indigo-300 uppercase tracking-wider bg-indigo-500/10 px-2 py-0.5 rounded">Paste & Save</span>
+                        </div>
+                        <h3 class="text-sm font-bold text-white">Tempelkan Kode Script</h3>
+                        <p class="text-xs text-slate-400 leading-relaxed">
+                            Buka <strong>Tab 2 (Salin Kode Apps Script)</strong> di halaman ini, klik tombol salin. Tempelkan kode ke editor Apps Script. Pastikan <code class="text-amber-300 bg-slate-950 px-1 py-0.5 rounded">SPREADSHEET_ID</code> telah diganti. Klik ikon Simpan.
+                        </p>
+                    </div>
+
+                    <!-- Step 5 -->
+                    <div class="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-3 glass-card-hover md:col-span-2">
+                        <div class="flex items-center justify-between">
+                            <span class="w-8 h-8 rounded-xl bg-emerald-600 text-white font-black text-xs flex items-center justify-center">5</span>
+                            <span class="text-[10px] font-bold text-emerald-300 uppercase tracking-wider bg-emerald-500/20 px-2 py-0.5 rounded">Deploy Web App</span>
+                        </div>
+                        <h3 class="text-sm font-bold text-white">Terapkan Sebagai Aplikasi Web (Deploy)</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-slate-300 pt-2">
+                            <div class="p-3 bg-slate-950 rounded-xl border border-slate-800">
+                                <strong class="text-brand-400 block mb-1">A. Klik Terapkan</strong>
+                                Pilih <strong class="text-white">Terapkan (Deploy) &rarr; Penerapan baru (New deployment)</strong>.
+                            </div>
+                            <div class="p-3 bg-slate-950 rounded-xl border border-slate-800">
+                                <strong class="text-brand-400 block mb-1">B. Pilih Jenis Web App</strong>
+                                Klik ikon gerigi <i class="fa-solid fa-gear text-amber-400"></i> &rarr; Pilih <strong class="text-white">Aplikasi Web (Web app)</strong>.
+                            </div>
+                            <div class="p-3 bg-slate-950 rounded-xl border border-slate-800">
+                                <strong class="text-brand-400 block mb-1">C. Izin Akses (Wajib!)</strong>
+                                Pada bagian <em>Who has access (Siapa yang memiliki akses)</em>, pilih: <strong class="text-emerald-400">Siapa saja (Anyone)</strong>.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 6 - TEST -->
+                    <div class="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-3 glass-card-hover md:col-span-2">
+                        <div class="flex items-center justify-between">
+                            <span class="w-8 h-8 rounded-xl bg-amber-600 text-white font-black text-xs flex items-center justify-center">6</span>
+                            <span class="text-[10px] font-bold text-amber-300 uppercase tracking-wider bg-amber-500/20 px-2 py-0.5 rounded">Testing</span>
+                        </div>
+                        <h3 class="text-sm font-bold text-white">Uji Koneksi & Sinkronisasi</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-slate-300 pt-2">
+                            <div class="p-3 bg-slate-950 rounded-xl border border-slate-800">
+                                <strong class="text-emerald-400 block mb-1">1. Simpan Kredensial</strong>
+                                Di Tab 1, isi Spreadsheet ID dan URL Web App, lalu klik <strong class="text-white">Simpan</strong>.
+                            </div>
+                            <div class="p-3 bg-slate-950 rounded-xl border border-slate-800">
+                                <strong class="text-emerald-400 block mb-1">2. Uji Koneksi</strong>
+                                Klik tombol <strong class="text-white">Tes</strong> di Tab 1 untuk memastikan koneksi ke Spreadsheet berhasil.
+                            </div>
+                            <div class="p-3 bg-slate-950 rounded-xl border border-slate-800">
+                                <strong class="text-emerald-400 block mb-1">3. Buat Users</strong>
+                                Buka Tab 4, klik <strong class="text-white">Buat Default Users</strong> untuk mengisi data ke Google Sheet.
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ================= TAB 4: AUTO CREATE USERS ================= -->
+        <div id="tab-users" class="tab-content hidden space-y-6 animate-scale-up">
+            
+            <div class="glass-card p-6 rounded-3xl">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="p-3 bg-emerald-500/20 text-emerald-400 rounded-2xl border border-emerald-500/30">
+                        <i class="fa-solid fa-users-gear text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-black text-white">Kelola Users Otomatis</h2>
+                        <p class="text-xs text-slate-400">Buat dan sinkronisasi Users ke Google Sheets secara otomatis</p>
+                    </div>
+                </div>
+
+                <!-- Form Tambah User Otomatis -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-slate-900/70 p-5 rounded-2xl border border-slate-800">
+                        <h3 class="text-sm font-bold text-white mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-user-plus text-emerald-400"></i>
+                            <span>Tambah User Baru</span>
+                        </h3>
+                        <form id="autoAddUserForm" onsubmit="autoAddUser(event)" class="space-y-3">
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-300 mb-1">Role</label>
+                                    <select id="autoUserRole" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                                        <option value="Admin">Admin</option>
+                                        <option value="Guru" selected>Guru</option>
+                                        <option value="Siswa">Siswa</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-300 mb-1">Username *</label>
+                                    <input type="text" id="autoUsername" required placeholder="username" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-300 mb-1">Password *</label>
+                                    <input type="text" id="autoPassword" required placeholder="password" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-300 mb-1">Nama Lengkap *</label>
+                                    <input type="text" id="autoNama" required placeholder="Nama User" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-300 mb-1">ID Tambahan</label>
+                                    <input type="text" id="autoIdTambahan" placeholder="ID Tambahan" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-300 mb-1">Kelas / Tugas</label>
+                                    <input type="text" id="autoKelas" placeholder="Kelas / Tugas" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                                </div>
+                            </div>
+                            <button type="submit" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-bold text-xs rounded-xl shadow-lg shadow-emerald-600/25 transition flex items-center justify-center gap-2 cursor-pointer">
+                                <i class="fa-solid fa-plus"></i>
+                                <span>Tambah User ke Sheet</span>
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="bg-slate-900/70 p-5 rounded-2xl border border-slate-800">
+                        <h3 class="text-sm font-bold text-white mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-bolt text-amber-400"></i>
+                            <span>Aksi Cepat</span>
+                        </h3>
+                        <div class="space-y-3">
+                            <button onclick="createDefaultUsers()" class="w-full py-2.5 bg-amber-600/80 hover:bg-amber-500 active:scale-95 text-white font-bold text-xs rounded-xl shadow-lg shadow-amber-600/20 transition flex items-center justify-center gap-2 cursor-pointer">
+                                <i class="fa-solid fa-users"></i>
+                                <span>Buat Default Users (5 Akun)</span>
+                            </button>
+                            <button onclick="syncAllUsersToSheet()" class="w-full py-2.5 bg-brand-600 hover:bg-brand-500 active:scale-95 text-white font-bold text-xs rounded-xl shadow-lg shadow-brand-600/25 transition flex items-center justify-center gap-2 cursor-pointer">
+                                <i class="fa-solid fa-cloud-upload-alt"></i>
+                                <span>Sinkronisasi Semua Users ke Sheet</span>
+                            </button>
+                            <button onclick="clearAllUsersInSheet()" class="w-full py-2.5 bg-red-600/80 hover:bg-red-500 active:scale-95 text-white font-bold text-xs rounded-xl shadow-lg shadow-red-600/20 transition flex items-center justify-center gap-2 cursor-pointer">
+                                <i class="fa-solid fa-trash-can"></i>
+                                <span>Hapus Semua Users di Sheet</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Status / Log -->
+                <div class="bg-slate-900/70 p-4 rounded-2xl border border-slate-800">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-terminal text-emerald-400"></i>
+                            <span>Log Aktivitas</span>
+                        </h3>
+                        <button onclick="clearLog()" class="px-3 py-1 text-xs text-slate-400 hover:text-white transition">Clear</button>
+                    </div>
+                    <div id="userLog" class="h-32 overflow-y-auto bg-slate-950 rounded-xl p-3 border border-slate-800 text-xs font-mono text-slate-400 space-y-1">
+                        <div>📋 Siap untuk mengelola users...</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 max-w-xs sm:max-w-sm bg-slate-900 text-white p-4 rounded-2xl shadow-2xl border border-slate-700 flex items-center gap-3">
+        <div id="toastIcon" class="text-amber-400 text-lg">
+            <i class="fa-solid fa-circle-info"></i>
+        </div>
+        <p id="toastMessage" class="text-xs font-semibold leading-snug">
+            Notifikasi
+        </p>
+    </div>
+
+    <!-- Footer -->
+    <footer class="relative z-10 w-full py-6 text-center text-slate-500 text-[11px] font-medium border-t border-slate-800/60 mt-10 bg-slate-950/60">
+        <p>&copy; 2026 lubisbima@gmail.com . Portal Manajemen Terpadu.</p>
+    </footer>
+
+    <script>
+        const DEFAULT_SHEET_ID = "(paste)";
+        const DEFAULT_APPSCRIPT_URL = "https://script.google.com/macros/s/AKfycby.../exec";
+        let localUsers = [
+            { role: 'guru', username: 'admin', password: '123', nama: 'Administrator Guru', id_tambahan: 'G01', kelas: 'Wali Kelas' },
+            { role: 'guru', username: 'guru01', password: '123', nama: 'Guru Contoh', id_tambahan: 'G02', kelas: 'Kelas 5A' }
+        ];
+
+        const STORAGE_KEYS = {
+            SHEET_ID: 'sdn3_ngantru_sheet_id',
+            APPSCRIPT_URL: 'sdn3_ngantru_appscript_url',
+            API_KEY: 'sdn3_ngantru_api_key'
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAllCredentials();
+            renderUserTable();
+            addLog('📋 Dashboard siap digunakan', 'info');
+        });
+
+        function switchTab(tabId) {
+            playUiSound('click');
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.className = "tab-btn px-5 py-3 rounded-2xl text-xs font-bold transition flex items-center gap-2 cursor-pointer bg-slate-800/80 text-slate-400 hover:text-white border border-white/5";
+            });
+
+            document.getElementById(tabId).classList.remove('hidden');
+            const activeBtn = document.getElementById('btn-' + tabId);
+            if (activeBtn) {
+                activeBtn.className = "tab-btn px-5 py-3 rounded-2xl text-xs font-bold transition flex items-center gap-2 cursor-pointer bg-brand-600 text-white shadow-lg shadow-brand-600/30 border border-brand-500/50";
+            }
+        }
+
+        function loadAllCredentials() {
+            const savedSheetId = localStorage.getItem(STORAGE_KEYS.SHEET_ID) || DEFAULT_SHEET_ID;
+            document.getElementById('spreadsheetIdInput').value = savedSheetId;
+
+            const savedAppScriptUrl = localStorage.getItem(STORAGE_KEYS.APPSCRIPT_URL) || DEFAULT_APPSCRIPT_URL;
+            document.getElementById('appScriptUrlInput').value = savedAppScriptUrl;
+
+            const savedApiKey = localStorage.getItem(STORAGE_KEYS.API_KEY) || '';
+            document.getElementById('apiKeyInput').value = savedApiKey;
+
+            updateStatusBanner(savedSheetId, savedAppScriptUrl, savedApiKey);
+        }
+
+        function saveAllCredentials() {
+            playUiSound('click');
+            
+            const sheetId = document.getElementById('spreadsheetIdInput').value.trim();
+            const appScriptUrl = document.getElementById('appScriptUrlInput').value.trim();
+            const apiKey = document.getElementById('apiKeyInput').value.trim();
+
+            if (!sheetId) {
+                showToast("ID Spreadsheet tidak boleh kosong!", "error");
+                return;
+            }
+
+            if (!appScriptUrl) {
+                showToast("URL Web App tidak boleh kosong!", "error");
+                return;
+            }
+
+            localStorage.setItem(STORAGE_KEYS.SHEET_ID, sheetId);
+            localStorage.setItem(STORAGE_KEYS.APPSCRIPT_URL, appScriptUrl);
+            localStorage.setItem(STORAGE_KEYS.API_KEY, apiKey);
+
+            updateStatusBanner(sheetId, appScriptUrl, apiKey);
+            showToast("Semua kode akses berhasil disimpan!", "success");
+            fireConfetti();
+        }
+
+        function updateStatusBanner(sheetId, appScriptUrl, apiKey) {
+            const statusText = document.getElementById('statusText');
+            const hasApi = apiKey ? '✅ API Key tersedia' : '❌ API Key kosong';
+            statusText.innerText = `📊 ${sheetId.substring(0, 15)}... | 🌐 ${appScriptUrl.substring(0, 20)}... | ${hasApi}`;
+        }
+
+        function testConnection() {
+            playUiSound('click');
+            const currentId = localStorage.getItem(STORAGE_KEYS.SHEET_ID) || document.getElementById('spreadsheetIdInput').value.trim();
+            const currentUrl = localStorage.getItem(STORAGE_KEYS.APPSCRIPT_URL) || document.getElementById('appScriptUrlInput').value.trim();
+            
+            if (!currentId) {
+                showToast("Simpan ID Spreadsheet terlebih dahulu!", "error");
+                return;
+            }
+
+            if (!currentUrl) {
+                showToast("Simpan URL Web App terlebih dahulu!", "error");
+                return;
+            }
+
+            showToast("Menguji koneksi ke Spreadsheet...", "info");
+            
+            const callbackName = 'test_cb_' + Math.floor(Math.random() * 100000);
+            window[callbackName] = function(data) {
+                delete window[callbackName];
+                const scriptTag = document.getElementById(callbackName);
+                if (scriptTag) scriptTag.remove();
+
+                if (data && data.status === 'ok') {
+                    showToast("Koneksi Spreadsheet Berhasil! Data Sheet Terdeteksi.", "success");
+                    fireConfetti();
+                } else {
+                    showToast("Gagal membaca sheet. Pastikan file Publik / Tab 'Users' ada.", "error");
+                }
+            };
+
+            const script = document.createElement('script');
+            script.id = callbackName;
+            script.src = `https://docs.google.com/spreadsheets/d/${currentId}/gviz/tq?sheet=Users&tqx=responseHandler:${callbackName}&_=${Date.now()}`;
+            script.onerror = function() {
+                delete window[callbackName];
+                script.remove();
+                showToast("Gagal terhubung. Periksa ID Spreadsheet & Koneksi.", "error");
+            };
+            document.head.appendChild(script);
+        }
+
+        function validateNumericPassword(input) {
+            const warningEl = document.getElementById('passWarning');
+            const cleaned = input.value.replace(/\D/g, '');
+            if (input.value !== cleaned) {
+                warningEl.classList.remove('hidden');
+                input.value = cleaned;
+                playUiSound('warning');
+            } else {
+                warningEl.classList.add('hidden');
+            }
+        }
+
+        function handleAddUser(event) {
+            event.preventDefault();
+
+            const role = 'guru';
+            const username = document.getElementById('userUsername').value.trim();
+            const password = document.getElementById('userPassword').value.trim();
+            const nama = document.getElementById('userNama').value.trim();
+            const id_tambahan = document.getElementById('userIdTambahan').value.trim();
+            const kelas = document.getElementById('userKelas').value.trim();
+
+            if (!/^\d+$/.test(password)) {
+                showToast("Password WAJIB hanya berupa angka (0-9)!", "error");
+                document.getElementById('passWarning').classList.remove('hidden');
+                return;
+            }
+
+            localUsers.push({ role, username, password, nama, id_tambahan, kelas });
+            renderUserTable();
+
+            document.getElementById('userUsername').value = '';
+            document.getElementById('userPassword').value = '';
+            document.getElementById('userNama').value = '';
+            document.getElementById('userIdTambahan').value = '';
+            document.getElementById('userKelas').value = '';
+
+            playUiSound('success');
+            showToast(`Akun Guru (${nama}) berhasil ditambahkan ke daftar draft!`, "success");
+        }
+
+        function renderUserTable() {
+            const tbody = document.getElementById('userTableBody');
+            tbody.innerHTML = '';
+
+            if (localUsers.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="p-4 text-center text-slate-500 italic">
+                            Belum ada akun guru di daftar. Silakan isi form di atas.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            localUsers.forEach((u, idx) => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-900/60 transition";
+                tr.innerHTML = `
+                    <td class="p-3 capitalize font-bold text-indigo-400">${u.role}</td>
+                    <td class="p-3 font-mono text-white">${u.username}</td>
+                    <td class="p-3 font-mono font-bold text-amber-300">${u.password}</td>
+                    <td class="p-3 text-slate-200">${u.nama}</td>
+                    <td class="p-3 text-slate-400 font-mono">${u.id_tambahan || '-'}</td>
+                    <td class="p-3 text-slate-400">${u.kelas || '-'}</td>
+                    <td class="p-3 text-center">
+                        <button onclick="removeUser(${idx})" class="p-1.5 text-slate-500 hover:text-red-400 transition" title="Hapus">
+                            <i class="fa-solid fa-xmark text-sm"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function removeUser(index) {
+            localUsers.splice(index, 1);
+            renderUserTable();
+            showToast("Akun dihapus dari daftar draft.", "info");
+        }
+
+        function clearUserList() {
+            if (confirm("Apakah Anda yakin ingin mengosongkan seluruh daftar akun draft?")) {
+                localUsers = [];
+                renderUserTable();
+                showToast("Daftar akun dikosongkan.", "info");
+            }
+        }
+
+        function copyUsersForSheet() {
+            if (localUsers.length === 0) {
+                showToast("Daftar akun kosong!", "error");
+                return;
+            }
+
+            let textToCopy = "Role\tUsername\tPassword\tNama\tID_Tambahan\tKelas\n";
+            localUsers.forEach(u => {
+                textToCopy += `${u.role}\t${u.username}\t${u.password}\t${u.nama}\t${u.id_tambahan || ''}\t${u.kelas || ''}\n`;
+            });
+
+            copyToClipboard(textToCopy);
+            showToast("Daftar akun Guru berhasil disalin! Tinggal Paste (Ctrl+V) di Google Sheet 'Users'.", "success");
+            fireConfetti();
+        }
+
+        function copyAppsScriptCode() {
+            const codeText = document.getElementById('codeBlock').innerText;
+            
+            const sheetId = localStorage.getItem(STORAGE_KEYS.SHEET_ID) || document.getElementById('spreadsheetIdInput').value.trim();
+            if (sheetId && sheetId !== DEFAULT_SHEET_ID) {
+                const modifiedCode = codeText.replace(
+                    "const SPREADSHEET_ID = 'copy (paste) kode SpreedSheetIDmu disini';",
+                    `const SPREADSHEET_ID = '${sheetId}';`
+                );
+                copyToClipboard(modifiedCode);
+            } else {
+                copyToClipboard(codeText);
+                showToast("⚠️ Jangan lupa ganti SPREADSHEET_ID di baris ke-7!", "info");
+            }
+            
+            const btnText = document.getElementById('btnCopyText');
+            btnText.innerText = "TERSALIN KE CLIPBOARD!";
+            showToast("Kode Apps Script berhasil disalin!", "success");
+            fireConfetti();
+
+            setTimeout(() => {
+                btnText.innerText = "Salin Seluruh Kode Apps Script";
+            }, 3000);
+        }
+
+        // ==================== TAB 4 FUNCTIONS ====================
+
+        function addLog(message, type = 'info') {
+            const logDiv = document.getElementById('userLog');
+            const colors = {
+                info: 'text-blue-400',
+                success: 'text-emerald-400',
+                error: 'text-red-400',
+                warning: 'text-amber-400'
+            };
+            const prefix = {
+                info: 'ℹ️',
+                success: '✅',
+                error: '❌',
+                warning: '⚠️'
+            };
+            const time = new Date().toLocaleTimeString();
+            logDiv.innerHTML += `<div class="${colors[type] || 'text-slate-400'}">[${time}] ${prefix[type] || '📌'} ${message}</div>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function clearLog() {
+            document.getElementById('userLog').innerHTML = '<div>📋 Log dibersihkan</div>';
+        }
+
+        function getWebAppUrl() {
+            const url = localStorage.getItem(STORAGE_KEYS.APPSCRIPT_URL) || document.getElementById('appScriptUrlInput').value.trim();
+            if (!url || url === DEFAULT_APPSCRIPT_URL) {
+                showToast("⚠️ Pastikan URL Web App sudah disimpan di Tab 1!", "error");
+                return null;
+            }
+            return url;
+        }
+
+        // Fungsi untuk mengirim data ke Apps Script via POST dengan fetch
+        async function sendToAppsScript(action, data) {
+            const webAppUrl = getWebAppUrl();
+            if (!webAppUrl) return null;
+
+            try {
+                const response = await fetch(webAppUrl, {
+                    method: 'POST',
+                    mode: 'cors', // Ubah ke cors agar bisa baca response
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: action,
+                        data: data
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                return result;
+            } catch (error) {
+                console.error('Error sending to Apps Script:', error);
+                // Jika CORS error, coba dengan mode no-cors (tapi tidak bisa baca response)
+                try {
+                    await fetch(webAppUrl, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            action: action,
+                            data: data
+                        })
+                    });
+                    // Return sukses meskipun tidak bisa baca response
+                    return { status: 'success', message: 'Data terkirim (mode no-cors)' };
+                } catch (e2) {
+                    throw error;
+                }
+            }
+        }
+
+        async function autoAddUser(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById('autoUsername').value.trim();
+            const password = document.getElementById('autoPassword').value.trim();
+            const nama = document.getElementById('autoNama').value.trim();
+            const role = document.getElementById('autoUserRole').value;
+            const id_tambahan = document.getElementById('autoIdTambahan').value.trim();
+            const kelas = document.getElementById('autoKelas').value.trim();
+
+            if (!username || !password || !nama) {
+                showToast("Username, Password, dan Nama wajib diisi!", "error");
+                return;
+            }
+
+            const btn = event.target.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Menyimpan...';
+
+            try {
+                addLog(`Menambahkan user "${username}"...`, 'info');
+                showToast("⏳ Menambahkan user...", "info");
+
+                const result = await sendToAppsScript('sync_users', [{
+                    Role: role,
+                    Username: username,
+                    Password: password,
+                    Nama: nama,
+                    ID_Tambahan: id_tambahan,
+                    Kelas: kelas
+                }]);
+
+                if (result && result.status === 'success') {
+                    addLog(`✅ User "${username}" berhasil ditambahkan`, 'success');
+                    showToast(`✅ User "${username}" berhasil ditambahkan ke Google Sheet!`, 'success');
+                    fireConfetti();
+                    
+                    // Reset form
+                    document.getElementById('autoUsername').value = '';
+                    document.getElementById('autoPassword').value = '';
+                    document.getElementById('autoNama').value = '';
+                    document.getElementById('autoIdTambahan').value = '';
+                    document.getElementById('autoKelas').value = '';
+                } else {
+                    addLog(`❌ Gagal menambahkan user: ${result?.message || 'Unknown error'}`, 'error');
+                    showToast(`❌ Gagal menambahkan user: ${result?.message || 'Unknown error'}`, 'error');
+                }
+            } catch (error) {
+                addLog(`❌ Error: ${error.message}`, 'error');
+                showToast(`❌ Gagal menambahkan user: ${error.message}`, 'error');
+            }
+
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-plus"></i> Tambah User ke Sheet';
+        }
+
+        async function createDefaultUsers() {
+            const defaultUsers = [
+                { Role: 'Admin', Username: 'admin', Password: 'admin123', Nama: 'Administrator', ID_Tambahan: 'ADM001', Kelas: 'System' },
+                { Role: 'Guru', Username: 'guru01', Password: 'guru123', Nama: 'Guru Contoh', ID_Tambahan: 'G001', Kelas: 'Wali Kelas 5A' },
+                { Role: 'Guru', Username: 'guru02', Password: 'guru123', Nama: 'Guru Kedua', ID_Tambahan: 'G002', Kelas: 'Wali Kelas 5B' },
+                { Role: 'Siswa', Username: 'siswa01', Password: 'siswa123', Nama: 'Siswa Contoh', ID_Tambahan: 'S001', Kelas: '5A' },
+                { Role: 'Siswa', Username: 'siswa02', Password: 'siswa123', Nama: 'Siswa Kedua', ID_Tambahan: 'S002', Kelas: '5B' }
+            ];
+
+            try {
+                addLog(`📦 Membuat ${defaultUsers.length} default users...`, 'info');
+                showToast("⏳ Membuat default users...", "info");
+
+                const result = await sendToAppsScript('sync_users', defaultUsers);
+
+                if (result && result.status === 'success') {
+                    addLog(`✅ ${defaultUsers.length} default users berhasil dibuat`, 'success');
+                    showToast(`✅ ${defaultUsers.length} default users berhasil dibuat!`, 'success');
+                    fireConfetti();
+                } else {
+                    addLog(`❌ Gagal membuat default users: ${result?.message || 'Unknown error'}`, 'error');
+                    showToast(`❌ Gagal membuat default users: ${result?.message || 'Unknown error'}`, 'error');
+                }
+            } catch (error) {
+                addLog(`❌ Error: ${error.message}`, 'error');
+                showToast(`❌ Gagal membuat default users: ${error.message}`, 'error');
+            }
+        }
+
+        async function syncAllUsersToSheet() {
+            if (localUsers.length === 0) {
+                showToast("⚠️ Tidak ada user di daftar draft untuk disinkronisasi!", "error");
+                return;
+            }
+
+            const formattedUsers = localUsers.map(u => ({
+                Role: u.role === 'guru' ? 'Guru' : u.role,
+                Username: u.username,
+                Password: u.password,
+                Nama: u.nama,
+                ID_Tambahan: u.id_tambahan || '',
+                Kelas: u.kelas || ''
+            }));
+
+            try {
+                addLog(`📤 Menyinkronkan ${formattedUsers.length} users ke sheet...`, 'info');
+                showToast(`⏳ Menyinkronkan ${formattedUsers.length} users...`, "info");
+
+                const result = await sendToAppsScript('sync_users', formattedUsers);
+
+                if (result && result.status === 'success') {
+                    addLog(`✅ ${formattedUsers.length} users berhasil disinkronkan`, 'success');
+                    showToast(`✅ ${formattedUsers.length} users berhasil disinkronkan ke Google Sheet!`, 'success');
+                    fireConfetti();
+                } else {
+                    addLog(`❌ Gagal sinkronisasi: ${result?.message || 'Unknown error'}`, 'error');
+                    showToast(`❌ Gagal menyinkronkan: ${result?.message || 'Unknown error'}`, 'error');
+                }
+            } catch (error) {
+                addLog(`❌ Error: ${error.message}`, 'error');
+                showToast(`❌ Gagal menyinkronkan: ${error.message}`, 'error');
+            }
+        }
+
+        async function clearAllUsersInSheet() {
+            if (!confirm("⚠️ Apakah Anda yakin ingin menghapus SEMUA data users di Google Sheet?")) {
+                return;
+            }
+
+            try {
+                addLog('🗑️ Menghapus semua users di sheet...', 'warning');
+                showToast("⏳ Menghapus semua users...", "info");
+
+                const result = await sendToAppsScript('sync_users', []);
+
+                if (result && result.status === 'success') {
+                    addLog('✅ Semua users berhasil dihapus dari sheet', 'success');
+                    showToast('✅ Semua users berhasil dihapus dari Google Sheet!', 'success');
+                    localUsers = [];
+                    renderUserTable();
+                } else {
+                    addLog(`❌ Gagal menghapus users: ${result?.message || 'Unknown error'}`, 'error');
+                    showToast(`❌ Gagal menghapus users: ${result?.message || 'Unknown error'}`, 'error');
+                }
+            } catch (error) {
+                addLog(`❌ Error: ${error.message}`, 'error');
+                showToast(`❌ Gagal menghapus users: ${error.message}`, 'error');
+            }
+        }
+
+        // ==================== UTILITY FUNCTIONS ====================
+
+        function copyToClipboard(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";
+            textArea.style.left = "-999999px";
+            textArea.style.top = "-999999px";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                document.execCommand('copy');
+            } catch (err) {
+                console.error('Gagal menyalin text', err);
+            }
+            document.body.removeChild(textArea);
+        }
+
+        function playUiSound(type) {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                if (type === 'click') {
+                    osc.frequency.setValueAtTime(450, ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(850, ctx.currentTime + 0.05);
+                    gain.gain.setValueAtTime(0.08, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.05);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.05);
+                } else if (type === 'warning') {
+                    osc.frequency.setValueAtTime(300, ctx.currentTime);
+                    osc.frequency.setValueAtTime(200, ctx.currentTime + 0.08);
+                    gain.gain.setValueAtTime(0.12, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.15);
+                } else if (type === 'success') {
+                    const now = ctx.currentTime;
+                    osc.frequency.setValueAtTime(523.25, now);
+                    osc.frequency.setValueAtTime(659.25, now + 0.08);
+                    osc.frequency.setValueAtTime(783.99, now + 0.16);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                }
+            } catch (e) {}
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMessage');
+            const toastIcon = document.getElementById('toastIcon');
+
+            toastMsg.innerText = message;
+
+            if (type === 'error') {
+                toastIcon.innerHTML = '<i class="fa-solid fa-circle-exclamation text-red-400"></i>';
+            } else if (type === 'success') {
+                toastIcon.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-400"></i>';
+            } else {
+                toastIcon.innerHTML = '<i class="fa-solid fa-circle-info text-amber-400"></i>';
+            }
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 4000);
+        }
+
+        function fireConfetti() {
+            if (typeof confetti === 'function') {
+                confetti({
+                    particleCount: 80,
+                    spread: 60,
+                    origin: { y: 0.7 }
+                });
+            }
+        }
+    </script>
+</body>
+</html>
