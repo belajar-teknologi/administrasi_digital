@@ -1737,7 +1737,7 @@ function handleGetData(e) {
 }
 
 // ============================================================
-// ========== FUNGSI SYNC USERS ==========
+// ========== FUNGSI SYNC USERS - PERBAIKAN ==========
 // ============================================================
 function syncUsers(data) {
     try {
@@ -1751,20 +1751,22 @@ function syncUsers(data) {
             sheet = ss.insertSheet('Users');
         }
         
-        // **PERBAIKAN: HAPUS SEMUA DATA SISWA TAPI PERTAHANKAN DATA GURU**
-        const allData = sheet.getDataRange().getValues();
         const headers = ['Role', 'Username', 'Password', 'Nama', 'ID_Tambahan', 'Kelas'];
         
-        // Cari data guru yang sudah ada (Role = 'guru')
-        let guruData = [];
+        // Cari data guru dan admin yang sudah ada
+        let protectedData = [];
+        const allData = sheet.getDataRange().getValues();
         if (allData.length > 1) {
             const headerRow = allData[0];
             for (let i = 1; i < allData.length; i++) {
                 const row = allData[i];
-                // Cek apakah role-nya guru
                 const roleIndex = headerRow.indexOf('Role');
-                if (roleIndex !== -1 && row[roleIndex] && row[roleIndex].toLowerCase() === 'guru') {
-                    guruData.push(row);
+                if (roleIndex !== -1 && row[roleIndex]) {
+                    const role = row[roleIndex].toLowerCase();
+                    // Pertahankan data dengan role 'guru' atau 'admin'
+                    if (role === 'guru' || role === 'admin') {
+                        protectedData.push(row);
+                    }
                 }
             }
         }
@@ -1773,35 +1775,36 @@ function syncUsers(data) {
         sheet.clear();
         sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
         
-        // Tulis ulang data guru yang sudah ada
-        if (guruData.length > 0) {
-            console.log(`🔄 Mempertahankan ${guruData.length} data guru`);
-            // Pastikan data guru memiliki format yang benar
-            const guruRows = guruData.map(row => {
-                // Ambil nilai berdasarkan indeks atau kosong jika tidak ada
+        // Tulis ulang data guru dan admin yang sudah ada dengan password "123456"
+        if (protectedData.length > 0) {
+            console.log(`🔄 Mempertahankan ${protectedData.length} data guru/admin`);
+            const protectedRows = protectedData.map(row => {
                 const getVal = (idx) => row[idx] || '';
+                const role = getVal(0).toLowerCase();
+                // Password untuk admin dan guru diubah menjadi 123456
+                const password = '123456';
                 return [
-                    getVal(0) || 'guru',
+                    getVal(0) || '',
                     getVal(1) || '',
-                    getVal(2) || '',
+                    password,
                     getVal(3) || '',
                     getVal(4) || '',
                     getVal(5) || ''
                 ];
             });
-            if (guruRows.length > 0) {
-                sheet.getRange(2, 1, guruRows.length, headers.length).setValues(guruRows);
+            if (protectedRows.length > 0) {
+                sheet.getRange(2, 1, protectedRows.length, headers.length).setValues(protectedRows);
             }
         }
         
-        // Kemudian tulis data siswa baru (data yang dikirim dari client)
+        // **PERBAIKAN: Hanya tulis data siswa (role = 'siswa') dari client**
         if (data && data.length > 0) {
             // Filter data yang role-nya 'siswa'
             const siswaData = data.filter(item => item.Role === 'siswa');
             console.log(`📝 Menambahkan ${siswaData.length} data siswa baru`);
             
             if (siswaData.length > 0) {
-                const startRow = 2 + guruData.length;
+                const startRow = 2 + protectedData.length;
                 const rows = siswaData.map(item => [
                     item.Role || 'siswa',
                     item.Username || '',
@@ -1820,7 +1823,7 @@ function syncUsers(data) {
         return ContentService
             .createTextOutput(JSON.stringify({
                 status: 'success',
-                message: 'Data Users berhasil disinkronisasi (' + (data ? data.length : 0) + ' records, ' + (guruData.length) + ' guru dipertahankan)'
+                message: 'Data Users berhasil disinkronisasi (' + (data ? data.length : 0) + ' records, ' + (protectedData.length) + ' guru/admin dipertahankan dengan password 123456)'
             }))
             .setMimeType(ContentService.MimeType.JSON);
         
@@ -3720,6 +3723,10 @@ function onDeploy() {
         });
     }
 
+    // ============================================================
+    // FUNGSI SYNC DATA KE APPS SCRIPT
+    // ============================================================
+    
     async function syncDataToAppScript(type, rawData) {
         const url = localStorage.getItem('app_script_url');
         if (!url) return;
@@ -3728,7 +3735,6 @@ function onDeploy() {
             let payloadData = [];
             
             if (type === 'users') {
-                // **PERBAIKAN: Kirim semua data users (termasuk guru)**
                 payloadData = (Array.isArray(rawData) ? rawData : Object.values(rawData)).map(user => ({
                     Role: user.role || '', 
                     Username: user.username || '', 
@@ -3811,7 +3817,7 @@ function onDeploy() {
         
         Swal.fire({
             title: 'Menyinkronkan Data...',
-            text: 'Mengirimkan semua data ke Google Sheets.\nData guru akan tetap dipertahankan.',
+            text: 'Mengirimkan semua data ke Google Sheets.\nData guru/admin akan dipertahankan dengan password 123456.',
             showConfirmButton: false,
             didOpen: () => Swal.showLoading()
         });
@@ -3823,7 +3829,7 @@ function onDeploy() {
             syncDataToAppScript('nilai', nilaiDb),
             syncDataToAppScript('jurnal', jurnalDb)
         ]).then(() => {
-            Swal.fire('Sukses!', 'Semua data telah disinkronisasi. Data guru tetap dipertahankan.', 'success');
+            Swal.fire('Sukses!', 'Semua data telah disinkronisasi. Data guru/admin tetap dipertahankan dengan password 123456.', 'success');
         }).catch((error) => {
             console.error('Error sinkronisasi:', error);
             Swal.fire('Error', 'Terjadi kesalahan saat sinkronisasi.', 'error');
