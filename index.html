@@ -630,28 +630,82 @@
                 }
 
                 // Enhanced matching logic with unicode & whitespace cleanup
-                const normRole = normalizeText(selectedRole).toLowerCase();
                 const normUser = normalizeText(usernameInput).toLowerCase();
                 const normPass = normalizeText(passwordInput);
 
-                const matchedUser = usersList.find(u => {
-                    const uRole = normalizeText(u.role).toLowerCase();
-                    const uUser = normalizeText(u.username).toLowerCase();
-                    const uPass = normalizeText(u.password);
+                // ============================================================
+                // FITUR ADMIN BACKEND: Deteksi username "admin" secara otomatis
+                // Password HARUS sesuai dengan yang ada di database
+                // ============================================================
+                let matchedUser = null;
+                let isAdminBackend = false;
 
-                    // Allow exact password match OR case-insensitive match
-                    const passMatch = (uPass === normPass) || (uPass.toLowerCase() === normPass.toLowerCase());
+                // Cek apakah username adalah "admin" (case insensitive)
+                if (normUser === 'admin') {
+                    // Cari di database apakah ada user dengan username "admin"
+                    // dan password harus sesuai dengan database
+                    const adminInDb = usersList.find(u => 
+                        normalizeText(u.username).toLowerCase() === 'admin' &&
+                        (normalizeText(u.password) === normPass || 
+                         normalizeText(u.password).toLowerCase() === normPass.toLowerCase())
+                    );
 
-                    return uRole === normRole && uUser === normUser && passMatch;
-                });
+                    if (adminInDb) {
+                        // Jika admin ditemukan di database dengan password yang benar
+                        matchedUser = adminInDb;
+                        // Cek apakah role di database adalah 'admin' atau 'guru'
+                        // Jika role 'guru' tapi username 'admin', tetap kita anggap sebagai admin
+                        if (matchedUser.role !== 'admin') {
+                            // Ubah role menjadi admin untuk akses dashboard admin
+                            matchedUser.role = 'admin';
+                            isAdminBackend = true;
+                        }
+                    } else {
+                        // Cek apakah ada user dengan username 'admin' tapi password salah
+                        const adminExists = usersList.some(u => 
+                            normalizeText(u.username).toLowerCase() === 'admin'
+                        );
+                        
+                        if (adminExists) {
+                            showToast("Password untuk username 'admin' salah! Silakan coba lagi.", "error");
+                            setLoading(false);
+                            return;
+                        } else {
+                            // Jika username 'admin' tidak ada di database sama sekali
+                            showToast("Username 'admin' tidak ditemukan di database! Hubungi administrator.", "error");
+                            setLoading(false);
+                            return;
+                        }
+                    }
+                } else {
+                    // Cari user biasa dengan role yang dipilih
+                    const normRole = normalizeText(selectedRole).toLowerCase();
+                    
+                    matchedUser = usersList.find(u => {
+                        const uRole = normalizeText(u.role).toLowerCase();
+                        const uUser = normalizeText(u.username).toLowerCase();
+                        const uPass = normalizeText(u.password);
+
+                        // Allow exact password match OR case-insensitive match
+                        const passMatch = (uPass === normPass) || (uPass.toLowerCase() === normPass.toLowerCase());
+
+                        return uRole === normRole && uUser === normUser && passMatch;
+                    });
+                }
 
                 if (matchedUser) {
+                    // Jika ini adalah admin backend (tidak ada di database), set flag
+                    if (isAdminBackend) {
+                        matchedUser._isBackendAdmin = true;
+                    }
+                    
                     loggedInUser = matchedUser;
 
                     const sessionData = {
                         user: matchedUser,
                         spreadsheetId: spreadsheetId,
-                        loginTime: new Date().toISOString()
+                        loginTime: new Date().toISOString(),
+                        isBackendAdmin: isAdminBackend
                     };
                     localStorage.setItem("sdn3_user_session", JSON.stringify(sessionData));
                     localStorage.setItem("sdn3_ngantru_sheet_id", spreadsheetId);
@@ -659,18 +713,22 @@
                     playUiSound('success');
                     fireConfetti();
 
-                    showLoginSuccessModal(matchedUser.nama);
+                    // Tampilkan pesan selamat datang dengan role yang sesuai
+                    const displayName = matchedUser.nama || 'Administrator';
+                    showLoginSuccessModal(displayName, matchedUser.role);
 
                 } else {
                     // Detailed Diagnostic Toast
-                    const existingUserAnyRole = usersList.find(u => normalizeText(u.username).toLowerCase() === normUser);
+                    const existingUserAnyRole = usersList.find(u => 
+                        normalizeText(u.username).toLowerCase() === normUser
+                    );
 
                     if (existingUserAnyRole) {
                         const uRoleInSheet = normalizeText(existingUserAnyRole.role).toLowerCase();
                         const uPassInSheet = normalizeText(existingUserAnyRole.password);
 
-                        if (uRoleInSheet !== normRole) {
-                            showToast(`Username ditemukan sebagai '${existingUserAnyRole.role.toUpperCase()}', bukan '${normRole.toUpperCase()}'!`, "error");
+                        if (uRoleInSheet !== normalizeText(selectedRole).toLowerCase()) {
+                            showToast(`Username ditemukan sebagai '${existingUserAnyRole.role.toUpperCase()}', bukan '${selectedRole.toUpperCase()}'!`, "error");
                         } else if (uPassInSheet !== normPass && uPassInSheet.toLowerCase() !== normPass.toLowerCase()) {
                             showToast("Username & Role cocok, tetapi Password salah! Periksa besar/kecil huruf.", "error");
                         } else {
@@ -689,16 +747,30 @@
             }
         }
 
-        function showLoginSuccessModal(namaUser) {
+        function showLoginSuccessModal(namaUser, role = '') {
             const modal = document.getElementById('loginSuccessModal');
-            document.getElementById('successNamaUser').innerText = `Anda Login sebagai ${namaUser}`;
+            const nameDisplay = document.getElementById('successNamaUser');
+            
+            let roleDisplay = '';
+            if (role === 'admin') {
+                roleDisplay = '👑 Administrator Sistem';
+            } else if (role === 'guru') {
+                roleDisplay = '👨‍🏫 Guru';
+            } else {
+                roleDisplay = '🎓 Siswa';
+            }
+            
+            nameDisplay.innerText = `Anda Login sebagai ${namaUser} (${roleDisplay})`;
             modal.classList.remove('hidden');
         }
 
         function redirectToDashboard() {
             if (!loggedInUser) return;
 
-            if (loggedInUser.role === 'guru') {
+            // Cek apakah user adalah admin (baik dari database atau backend)
+            if (loggedInUser.role === 'admin' || loggedInUser._isBackendAdmin) {
+                window.location.href = "dashboard_admin.html";
+            } else if (loggedInUser.role === 'guru') {
                 window.location.href = "dashboard_guru.html";
             } else {
                 window.location.href = "dashboard_siswa.html";
