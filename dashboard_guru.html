@@ -231,6 +231,17 @@
       transform: rotate(180deg);
     }
 
+    /* Alert untuk mode lokal */
+    .local-mode-alert {
+      background: #fef3c7;
+      border: 1px solid #f59e0b;
+      color: #92400e;
+      border-radius: 8px;
+      padding: 10px 15px;
+      font-size: 0.85rem;
+      margin-bottom: 10px;
+    }
+
     @media (max-width: 992px) {
       .mobile-topbar { display: flex !important; }
       body { padding-top: 56px; }
@@ -242,30 +253,50 @@
 </head>
 <body class="theme-default">
 
-  <!-- CEK AKSES: HANYA BISA DIAKSES DARI INDEX -->
+  <!-- SESSION CHECK - Redirect ke login jika session expired -->
   <script>
     (function() {
-      // Cek apakah halaman diakses dari file index.html
-      // Jika tidak, redirect ke index.html
-      const currentPath = window.location.pathname;
-      const currentFile = currentPath.split('/').pop();
+      // **PERBAIKAN: Deteksi apakah dijalankan dari file://**
+      const isFileProtocol = window.location.protocol === 'file:';
       
-      // Jika halaman ini diakses langsung (bukan dari index)
-      if (currentFile === 'dashboard_guru.html' || currentFile === '') {
-        // Cek apakah ada referer dari index.html
-        const referer = document.referrer || '';
-        const isFromIndex = referer.includes('index.html') || referer.includes('index');
-        
-        // Jika tidak ada referer atau bukan dari index, redirect
-        if (!isFromIndex && !sessionStorage.getItem('from_index')) {
-          // Coba redirect ke index
-          window.location.href = 'index.html';
-          return;
-        }
-        
-        // Tandai bahwa pengguna datang dari index
-        sessionStorage.setItem('from_index', 'true');
+      // Jika dari file://, bypass session check dan langsung masuk ke dashboard
+      if (isFileProtocol) {
+        console.log('⚠️ Mode Lokal (file://) - Bypass session check');
+        // Set session agar tidak redirect
+        localStorage.setItem('app_logged_in', 'true');
+        localStorage.setItem('app_login_time', String(Date.now()));
+        // Tampilkan peringatan di UI nanti
+        return;
       }
+      
+      const SESSION_TIMEOUT = 2 * 60 * 60 * 1000; // 2 jam dalam milidetik
+      
+      // Cek session login
+      const loginTime = localStorage.getItem('app_login_time');
+      const isLoggedIn = localStorage.getItem('app_logged_in') === 'true';
+      
+      if (!isLoggedIn || !loginTime) {
+        // Belum login, redirect ke index
+        window.location.href = 'index.html';
+        return;
+      }
+      
+      // Cek apakah session sudah expired (2 jam)
+      const currentTime = Date.now();
+      const elapsedTime = currentTime - parseInt(loginTime);
+      
+      if (elapsedTime > SESSION_TIMEOUT) {
+        // Session expired, hapus session dan redirect ke index
+        localStorage.removeItem('app_logged_in');
+        localStorage.removeItem('app_login_time');
+        localStorage.removeItem('app_nama_guru');
+        localStorage.removeItem('app_foto_guru');
+        window.location.href = 'index.html';
+        return;
+      }
+      
+      // Session masih valid, perbarui waktu login (refresh session)
+      localStorage.setItem('app_login_time', String(currentTime));
     })();
   </script>
 
@@ -333,6 +364,14 @@
           </button>
           <span class="badge bg-secondary py-2 px-3" id="cloud-status-badge"><i class="fa-solid fa-database me-1"></i> Lokal Only</span>
         </div>
+      </div>
+
+      <!-- ALERT MODE LOKAL -->
+      <div id="localModeAlert" class="local-mode-alert d-none">
+        <i class="fa-solid fa-triangle-exclamation me-2"></i>
+        <strong>Mode Lokal Aktif:</strong> Anda membuka file dari <code>file://</code>. 
+        Fitur sinkronisasi dengan Google Sheets <strong>tidak akan berfungsi</strong> karena batasan keamanan browser.
+        Untuk menggunakan fitur cloud, jalankan melalui <strong>server lokal</strong> (seperti Live Server di VS Code) atau <strong>hosting</strong>.
       </div>
 
       <!-- SECTION: DASHBOARD -->
@@ -1744,30 +1783,76 @@ function syncUsers(data) {
             sheet = ss.insertSheet('Users');
         }
         
-        sheet.clear();
+        // **PERBAIKAN: HAPUS SEMUA DATA SISWA TAPI PERTAHANKAN DATA GURU**
+        const allData = sheet.getDataRange().getValues();
         const headers = ['Role', 'Username', 'Password', 'Nama', 'ID_Tambahan', 'Kelas'];
+        
+        // Cari data guru yang sudah ada (Role = 'guru')
+        let guruData = [];
+        if (allData.length > 1) {
+            const headerRow = allData[0];
+            for (let i = 1; i < allData.length; i++) {
+                const row = allData[i];
+                // Cek apakah role-nya guru
+                const roleIndex = headerRow.indexOf('Role');
+                if (roleIndex !== -1 && row[roleIndex] && row[roleIndex].toLowerCase() === 'guru') {
+                    guruData.push(row);
+                }
+            }
+        }
+        
+        // Clear sheet
+        sheet.clear();
         sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
         
+        // Tulis ulang data guru yang sudah ada
+        if (guruData.length > 0) {
+            console.log(`🔄 Mempertahankan ${guruData.length} data guru`);
+            // Pastikan data guru memiliki format yang benar
+            const guruRows = guruData.map(row => {
+                // Ambil nilai berdasarkan indeks atau kosong jika tidak ada
+                const getVal = (idx) => row[idx] || '';
+                return [
+                    getVal(0) || 'guru',
+                    getVal(1) || '',
+                    getVal(2) || '',
+                    getVal(3) || '',
+                    getVal(4) || '',
+                    getVal(5) || ''
+                ];
+            });
+            if (guruRows.length > 0) {
+                sheet.getRange(2, 1, guruRows.length, headers.length).setValues(guruRows);
+            }
+        }
+        
+        // Kemudian tulis data siswa baru (data yang dikirim dari client)
         if (data && data.length > 0) {
-            const rows = data.map(item => [
-                item.Role || '',
-                item.Username || '',
-                item.Password || '',
-                item.Nama || '',
-                item.ID_Tambahan || '',
-                item.Kelas || ''
-            ]);
+            // Filter data yang role-nya 'siswa'
+            const siswaData = data.filter(item => item.Role === 'siswa');
+            console.log(`📝 Menambahkan ${siswaData.length} data siswa baru`);
             
-            if (rows.length > 0) {
-                sheet.getRange(2, 1, rows.length, headers.length).setValues(rows);
-                console.log(`✅ ${rows.length} baris data Users tersimpan`);
+            if (siswaData.length > 0) {
+                const startRow = 2 + guruData.length;
+                const rows = siswaData.map(item => [
+                    item.Role || 'siswa',
+                    item.Username || '',
+                    item.Password || '123',
+                    item.Nama || '',
+                    item.ID_Tambahan || '',
+                    item.Kelas || ''
+                ]);
+                if (rows.length > 0) {
+                    sheet.getRange(startRow, 1, rows.length, headers.length).setValues(rows);
+                    console.log(`✅ ${rows.length} baris data Siswa tersimpan`);
+                }
             }
         }
         
         return ContentService
             .createTextOutput(JSON.stringify({
                 status: 'success',
-                message: 'Data Users berhasil disinkronisasi (' + (data ? data.length : 0) + ' records)'
+                message: 'Data Users berhasil disinkronisasi (' + (data ? data.length : 0) + ' records, ' + (guruData.length) + ' guru dipertahankan)'
             }))
             .setMimeType(ContentService.MimeType.JSON);
         
@@ -2137,6 +2222,9 @@ function onDeploy() {
 
     let nilaiChartInstance = null;
     let absenChartInstance = null;
+    
+    // **PERBAIKAN: Deteksi mode lokal**
+    const IS_LOCAL_MODE = window.location.protocol === 'file:';
 
     // ============================================================
     // FUNGSI LOGOUT - KEMBALI KE INDEX
@@ -2155,6 +2243,8 @@ function onDeploy() {
         }).then((result) => {
             if (result.isConfirmed) {
                 // Hapus session dan redirect ke index
+                localStorage.removeItem('app_logged_in');
+                localStorage.removeItem('app_login_time');
                 sessionStorage.removeItem('from_index');
                 sessionStorage.removeItem('logged_in');
                 window.location.href = 'index.html';
@@ -2167,8 +2257,13 @@ function onDeploy() {
     // ============================================================
     
     window.onload = function() {
-        // Cek akses lagi
-        checkAccessFromIndex();
+        // **PERBAIKAN: Tampilkan alert mode lokal jika dari file://**
+        if (IS_LOCAL_MODE) {
+            document.getElementById('localModeAlert').classList.remove('d-none');
+            document.getElementById('cloud-status-badge').className = 'badge bg-warning py-2 px-3';
+            document.getElementById('cloud-status-badge').innerHTML = '<i class="fa-solid fa-triangle-exclamation me-1"></i> Mode Lokal';
+        }
+        
         initDefaultData();
         initAppData();
         loadSettingsFromStorage();
@@ -2179,30 +2274,37 @@ function onDeploy() {
         checkCloudStatus();
         showSection('dashboard');
         updateDashboard();
-    };
-
-    function checkAccessFromIndex() {
-        const currentPath = window.location.pathname;
-        const currentFile = currentPath.split('/').pop();
         
-        if (currentFile === 'dashboard_guru.html' || currentFile === '') {
-            const referer = document.referrer || '';
-            const isFromIndex = referer.includes('index.html') || referer.includes('index');
-            
-            if (!isFromIndex && !sessionStorage.getItem('from_index')) {
-                window.location.href = 'index.html';
-                return;
+        // Refresh session timeout setiap 5 menit (perpanjang session)
+        setInterval(function() {
+            if (localStorage.getItem('app_logged_in') === 'true') {
+                localStorage.setItem('app_login_time', String(Date.now()));
             }
-            sessionStorage.setItem('from_index', 'true');
+        }, 5 * 60 * 1000);
+        
+        // **PERBAIKAN: Load AppScript URL dari localStorage saat startup**
+        const savedUrl = localStorage.getItem('app_script_url');
+        if (savedUrl && document.getElementById('setting-appscript-url')) {
+            document.getElementById('setting-appscript-url').value = savedUrl;
         }
-    }
+    };
 
     function initDefaultData() {
         if (!localStorage.getItem('app_users_db')) {
-            usersDb = [];
+            // Inisialisasi dengan data guru default jika belum ada
+            const defaultGuru = [
+                { role: 'guru', username: 'guru', password: '123', nama: 'Guru Pengajar', id_tambahan: '', kelas: '' }
+            ];
+            usersDb = defaultGuru;
             localStorage.setItem('app_users_db', JSON.stringify(usersDb));
         } else {
             usersDb = JSON.parse(localStorage.getItem('app_users_db'));
+            // Pastikan ada setidaknya 1 guru
+            const hasGuru = usersDb.some(u => u.role === 'guru');
+            if (!hasGuru) {
+                usersDb.push({ role: 'guru', username: 'guru', password: '123', nama: 'Guru Pengajar', id_tambahan: '', kelas: '' });
+                localStorage.setItem('app_users_db', JSON.stringify(usersDb));
+            }
         }
         updateSidebarProfile();
     }
@@ -2241,7 +2343,8 @@ function onDeploy() {
         populateJurnalMapel();
         populateSiswaForCetak();
         
-        if (syncType) {
+        // **PERBAIKAN: Cek mode lokal sebelum sync**
+        if (syncType && !IS_LOCAL_MODE) {
             let dataToSync = null;
             if(syncType === 'absensi') dataToSync = absensiDb;
             if(syncType === 'nilai') dataToSync = nilaiDb;
@@ -2249,6 +2352,8 @@ function onDeploy() {
             if(syncType === 'users') dataToSync = usersDb;
             if(syncType === 'jurnal') dataToSync = jurnalDb;
             if(dataToSync) syncDataToAppScript(syncType, dataToSync);
+        } else if (syncType && IS_LOCAL_MODE) {
+            console.log('⚠️ Mode lokal: Sinkronisasi dinonaktifkan');
         }
 
         updateDashboard();
@@ -2291,7 +2396,18 @@ function onDeploy() {
     // ============================================================
     
     function loadProfilGuru() {
-        const namaGuru = localStorage.getItem('app_nama_guru') || 'Guru Pengajar';
+        // Coba ambil dari usersDb terlebih dahulu
+        const guru = usersDb.find(u => u.role === 'guru');
+        let namaGuru = localStorage.getItem('app_nama_guru');
+        
+        if (guru && guru.nama) {
+            namaGuru = guru.nama;
+            localStorage.setItem('app_nama_guru', namaGuru);
+        } else if (!namaGuru) {
+            namaGuru = 'Guru Pengajar';
+            localStorage.setItem('app_nama_guru', namaGuru);
+        }
+        
         document.getElementById('setting-nama-guru').value = namaGuru;
         document.getElementById('sidebar-user-name').innerText = namaGuru;
         document.getElementById('welcome-name').innerText = namaGuru;
@@ -2304,7 +2420,17 @@ function onDeploy() {
             Swal.fire('Peringatan', 'Nama guru tidak boleh kosong!', 'warning');
             return;
         }
+        
+        // Update di usersDb
+        const guru = usersDb.find(u => u.role === 'guru');
+        if (guru) {
+            guru.nama = nama;
+        } else {
+            usersDb.push({ role: 'guru', username: 'guru', password: '123', nama: nama, id_tambahan: '', kelas: '' });
+        }
+        
         localStorage.setItem('app_nama_guru', nama);
+        localStorage.setItem('app_users_db', JSON.stringify(usersDb));
         loadProfilGuru();
         updateSidebarProfile();
         Swal.fire('Sukses', 'Profil guru berhasil disimpan.', 'success');
@@ -2412,7 +2538,13 @@ function onDeploy() {
             confirmButtonText: 'Ya, Reset Data'
         }).then((res) => {
             if(res.isConfirmed) {
+                // Pertahankan data guru saat reset
+                const guruData = usersDb.filter(u => u.role === 'guru');
                 localStorage.clear();
+                if (guruData.length > 0) {
+                    usersDb = guruData;
+                    localStorage.setItem('app_users_db', JSON.stringify(usersDb));
+                }
                 location.reload();
             }
         });
@@ -2689,8 +2821,11 @@ function onDeploy() {
         renderSiswaTable();
         populateSiswaForCetak();
         updateDashboard();
-        const url = localStorage.getItem('app_script_url');
-        if (url) syncDataToAppScript('users', usersDb);
+        // **PERBAIKAN: Cek mode lokal sebelum sync**
+        if (!IS_LOCAL_MODE) {
+            const url = localStorage.getItem('app_script_url');
+            if (url) syncDataToAppScript('users', usersDb);
+        }
     }
 
     function renderSiswaTable() {
@@ -3393,6 +3528,12 @@ function onDeploy() {
     }
 
     async function testAppScriptConnection() {
+        // **PERBAIKAN: Cek mode lokal**
+        if (IS_LOCAL_MODE) {
+            Swal.fire('Mode Lokal', 'Fitur ini tidak tersedia saat membuka file dari file://. Gunakan server lokal (Live Server) atau hosting.', 'warning');
+            return;
+        }
+        
         const url = document.getElementById('setting-appscript-url').value.trim() || localStorage.getItem('app_script_url');
         if(!url) {
             Swal.fire('Error', 'URL Google Apps Script belum diisi', 'error');
@@ -3422,7 +3563,7 @@ function onDeploy() {
                 Swal.fire('Gagal Koneksi', json.message || 'Koneksi ditolak.', 'error');
             }
         } catch(e) { 
-            Swal.fire('Error', 'Pastikan Web App ter-Deploy sebagai "Anyone".', 'error'); 
+            Swal.fire('Error', 'Pastikan Web App ter-Deploy sebagai "Anyone" dan URL benar.', 'error'); 
         }
     }
 
@@ -3431,6 +3572,12 @@ function onDeploy() {
     // ============================================================
     
     async function pullDataFromSheet() {
+        // **PERBAIKAN: Cek mode lokal**
+        if (IS_LOCAL_MODE) {
+            Swal.fire('Mode Lokal', 'Fitur Tarik Data tidak tersedia saat membuka file dari file://. Gunakan server lokal (Live Server) atau hosting.', 'warning');
+            return;
+        }
+        
         const url = localStorage.getItem('app_script_url');
         if (!url) {
             Swal.fire('Error', 'URL Apps Script belum diatur. Silakan atur di menu Setting.', 'error');
@@ -3461,14 +3608,20 @@ function onDeploy() {
                 const data = result.data;
                 let importedCount = 0;
 
-                // Import Users
+                // **PERBAIKAN: Import Users - Pertahankan data guru yang sudah ada**
                 if (data.users && data.users.length > 0) {
+                    // Buat set username yang sudah ada
                     const existingUsernames = new Set(usersDb.map(u => u.username));
                     let newUsers = [];
+                    
+                    // Ambil data guru yang sudah ada untuk dipertahankan
+                    const existingGuru = usersDb.filter(u => u.role === 'guru');
+                    
                     data.users.forEach(row => {
-                        if (row.Username && !existingUsernames.has(row.Username)) {
+                        // Hanya import siswa baru (role = 'siswa' dan belum ada)
+                        if (row.Role === 'siswa' && row.Username && !existingUsernames.has(row.Username)) {
                             newUsers.push({
-                                role: row.Role || 'siswa',
+                                role: 'siswa',
                                 username: row.Username,
                                 password: row.Password || '123',
                                 nama: row.Nama || row.Username,
@@ -3478,9 +3631,23 @@ function onDeploy() {
                             existingUsernames.add(row.Username);
                         }
                     });
+                    
+                    // Hapus semua siswa yang ada (tapi pertahankan guru)
+                    usersDb = usersDb.filter(u => u.role === 'guru');
+                    
+                    // Tambahkan siswa baru
                     if (newUsers.length > 0) {
                         usersDb = usersDb.concat(newUsers);
                         importedCount += newUsers.length;
+                    }
+                    
+                    // Pastikan data guru tetap ada
+                    const hasGuru = usersDb.some(u => u.role === 'guru');
+                    if (!hasGuru && existingGuru.length > 0) {
+                        usersDb = usersDb.concat(existingGuru);
+                    } else if (!hasGuru) {
+                        // Tambahkan guru default jika belum ada
+                        usersDb.push({ role: 'guru', username: 'guru', password: '123', nama: 'Guru Pengajar', id_tambahan: '', kelas: '' });
                     }
                 }
 
@@ -3578,7 +3745,7 @@ function onDeploy() {
 
                 Swal.fire({
                     title: 'Tarik Data Berhasil!',
-                    text: `Berhasil mengimpor ${importedCount} data baru dari Google Sheets.\nData telah diperbarui secara lokal.`,
+                    text: `Berhasil mengimpor ${importedCount} data baru dari Google Sheets.\nData guru tetap dipertahankan.`,
                     icon: 'success'
                 });
 
@@ -3614,6 +3781,12 @@ function onDeploy() {
     }
 
     async function syncDataToAppScript(type, rawData) {
+        // **PERBAIKAN: Cek mode lokal**
+        if (IS_LOCAL_MODE) {
+            console.log('⚠️ Mode lokal: Sinkronisasi ke AppScript dinonaktifkan');
+            return;
+        }
+        
         const url = localStorage.getItem('app_script_url');
         if (!url) return;
 
@@ -3621,13 +3794,21 @@ function onDeploy() {
             let payloadData = [];
             
             if (type === 'users') {
+                // **PERBAIKAN: Kirim semua data users (termasuk guru)**
                 payloadData = (Array.isArray(rawData) ? rawData : Object.values(rawData)).map(user => ({
-                    Role: user.role || '', Username: user.username || '', Password: user.password || '',
-                    Nama: user.nama || '', ID_Tambahan: user.id_tambahan || '', Kelas: user.kelas || ''
+                    Role: user.role || '', 
+                    Username: user.username || '', 
+                    Password: user.password || '',
+                    Nama: user.nama || '', 
+                    ID_Tambahan: user.id_tambahan || '', 
+                    Kelas: user.kelas || ''
                 }));
             } else if (type === 'mapel') {
                 payloadData = (Array.isArray(rawData) ? rawData : Object.values(rawData)).map(mapel => ({
-                    ID: mapel.id || '', Kode: mapel.kode || '', Nama: mapel.nama || '', KKM: mapel.kkm || 75
+                    ID: mapel.id || '', 
+                    Kode: mapel.kode || '', 
+                    Nama: mapel.nama || '', 
+                    KKM: mapel.kkm || 75
                 }));
             } else if (type === 'absensi' && !Array.isArray(rawData)) {
                 for (const key in rawData) {
@@ -3689,6 +3870,12 @@ function onDeploy() {
     }
 
     function promptSync() {
+        // **PERBAIKAN: Cek mode lokal**
+        if (IS_LOCAL_MODE) {
+            Swal.fire('Mode Lokal', 'Fitur Sinkronisasi tidak tersedia saat membuka file dari file://. Gunakan server lokal (Live Server) atau hosting.', 'warning');
+            return;
+        }
+        
         const url = localStorage.getItem('app_script_url');
         if(!url) {
             return Swal.fire('Error', 'Atur URL Apps Script terlebih dahulu di menu Setting.', 'error');
@@ -3696,7 +3883,7 @@ function onDeploy() {
         
         Swal.fire({
             title: 'Menyinkronkan Data...',
-            text: 'Mengirimkan semua data ke Google Sheets.',
+            text: 'Mengirimkan semua data ke Google Sheets.\nData guru akan tetap dipertahankan.',
             showConfirmButton: false,
             didOpen: () => Swal.showLoading()
         });
@@ -3708,7 +3895,7 @@ function onDeploy() {
             syncDataToAppScript('nilai', nilaiDb),
             syncDataToAppScript('jurnal', jurnalDb)
         ]).then(() => {
-            Swal.fire('Sukses!', 'Semua data telah disinkronisasi.', 'success');
+            Swal.fire('Sukses!', 'Semua data telah disinkronisasi. Data guru tetap dipertahankan.', 'success');
         }).catch((error) => {
             console.error('Error sinkronisasi:', error);
             Swal.fire('Error', 'Terjadi kesalahan saat sinkronisasi.', 'error');
@@ -3741,7 +3928,12 @@ function onDeploy() {
         reader.onload = function(e) {
             try {
                 const data = JSON.parse(e.target.result);
-                if(data.users) usersDb = data.users;
+                if(data.users) {
+                    // Pertahankan data guru yang ada
+                    const existingGuru = usersDb.filter(u => u.role === 'guru');
+                    const newUsers = data.users.filter(u => u.role === 'siswa');
+                    usersDb = [...existingGuru, ...newUsers];
+                }
                 if(data.mapel) mapelDb = data.mapel;
                 if(data.absensi) absensiDb = data.absensi;
                 if(data.nilai) nilaiDb = data.nilai;
@@ -3765,6 +3957,13 @@ function onDeploy() {
     function checkCloudStatus() {
         const url = localStorage.getItem('app_script_url');
         const badge = document.getElementById('cloud-status-badge');
+        
+        if (IS_LOCAL_MODE) {
+            badge.className = "badge bg-warning py-2 px-3";
+            badge.innerHTML = '<i class="fa-solid fa-triangle-exclamation me-1"></i> Mode Lokal';
+            return;
+        }
+        
         if (url) {
             badge.className = "badge bg-success py-2 px-3";
             badge.innerHTML = '<i class="fa-solid fa-cloud-check me-1"></i> Cloud Ready';
