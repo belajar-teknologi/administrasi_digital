@@ -2,7 +2,7 @@
 <html lang="id" class="h-full">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">pas
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Pengaturan & Panduan Apps Script - SD NEGERI 3 NGANTRU</title>
     
     <!-- Tailwind CSS CDN -->
@@ -119,6 +119,74 @@
             opacity: 0.7;
             pointer-events: none;
         }
+
+        /* Modal/Popup Styles */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            z-index: 999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-box {
+            background: #1e293b;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 24px;
+            padding: 32px;
+            max-width: 440px;
+            width: 90%;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+            animation: scaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .modal-box h3 {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #f1f5f9;
+            margin-bottom: 8px;
+        }
+        .modal-box p {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            line-height: 1.6;
+        }
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            justify-content: flex-end;
+        }
+        .modal-actions button {
+            padding: 10px 24px;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: none;
+        }
+        .modal-actions .btn-cancel {
+            background: #334155;
+            color: #94a3b8;
+        }
+        .modal-actions .btn-cancel:hover {
+            background: #475569;
+            color: #fff;
+        }
+        .modal-actions .btn-confirm {
+            background: #6366f1;
+            color: #fff;
+            box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
+        }
+        .modal-actions .btn-confirm:hover {
+            background: #4f46e5;
+            transform: scale(0.97);
+        }
     </style>
 </head>
 
@@ -142,7 +210,7 @@
                         <span class="px-2 py-0.5 text-[10px] font-extrabold bg-brand-500/20 text-brand-300 rounded-md uppercase tracking-wider border border-brand-500/30">
                             PANDUAN & KONEKTOR
                         </span>
-                        <span class="text-xs text-slate-400 font-medium">SDN 3 NGANTRU</span>
+                        <span class="text-xs text-slate-400 font-medium">Setting data base</span>
                     </div>
                     <h1 class="text-base sm:text-lg font-black text-white tracking-tight">
                         Pengaturan Spreadsheet & Kode Apps Script
@@ -165,15 +233,15 @@
 
     <main class="relative z-10 max-w-7xl mx-auto px-4 py-4 flex-grow w-full space-y-6">
 
-        <!-- Navigation Tabs -->
+        <!-- Navigation Tabs - URUTAN DIUBAH: 1. Panduan, 2. Kode, 3. Spreadsheet ID, 4. Kelola Users -->
         <div class="flex items-center justify-start sm:justify-center gap-2 overflow-x-auto pb-2 scrollbar-none">
             <button 
-                onclick="switchTab('tab-config')" 
-                id="btn-tab-config"
+                onclick="switchTab('tab-guide')" 
+                id="btn-tab-guide"
                 class="tab-btn px-5 py-3 rounded-2xl text-xs font-bold transition flex items-center gap-2 cursor-pointer bg-brand-600 text-white shadow-lg shadow-brand-600/30 border border-brand-500/50"
             >
-                <i class="fa-solid fa-database"></i>
-                <span>1. Spreadsheet ID & Tambah Akun Guru</span>
+                <i class="fa-solid fa-book-bookmark"></i>
+                <span>1. Panduan Langkah Demi Langkah</span>
             </button>
 
             <button 
@@ -186,12 +254,12 @@
             </button>
 
             <button 
-                onclick="switchTab('tab-guide')" 
-                id="btn-tab-guide"
+                onclick="switchTab('tab-config')" 
+                id="btn-tab-config"
                 class="tab-btn px-5 py-3 rounded-2xl text-xs font-bold transition flex items-center gap-2 cursor-pointer bg-slate-800/80 text-slate-400 hover:text-white border border-white/5"
             >
-                <i class="fa-solid fa-book-bookmark"></i>
-                <span>3. Panduan Langkah Demi Langkah</span>
+                <i class="fa-solid fa-database"></i>
+                <span>3. Spreadsheet ID & Tambah Akun Guru</span>
             </button>
 
             <button 
@@ -204,310 +272,113 @@
             </button>
         </div>
 
-        <!-- ================= TAB 1: SPREADSHEET ID & USER CREATION ================= -->
-        <div id="tab-config" class="tab-content block space-y-6 animate-scale-up">
+        <!-- ================= TAB 1: STEP BY STEP GUIDE (URUTAN PERTAMA) ================= -->
+        <div id="tab-guide" class="tab-content block space-y-6 animate-scale-up">
             
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                
-                <!-- Left Column: Spreadsheet ID Setup -->
-                <div class="lg:col-span-5 space-y-6">
-                    
-                    <div class="glass-card p-6 rounded-3xl relative overflow-hidden">
-                        <div class="flex items-center gap-3 mb-4">
-                            <div class="p-3 bg-amber-500/20 text-amber-400 rounded-2xl border border-amber-500/30">
-                                <i class="fa-solid fa-key text-lg"></i>
-                            </div>
-                            <div>
-                                <h2 class="text-base font-extrabold text-white">Simpan Kode Akses</h2>
-                                <p class="text-xs text-slate-400">Data tersimpan di LocalStorage Browser</p>
-                            </div>
-                        </div>
-
-                        <div class="space-y-4">
-                            <!-- Spreadsheet ID -->
-                            <div>
-                                <label for="spreadsheetIdInput" class="block text-xs font-bold text-slate-300 mb-1.5 flex items-center justify-between">
-                                    <span>Google Spreadsheet ID</span>
-                                    <span class="text-[10px] text-amber-400 font-normal">*Wajib Diisi</span>
-                                </label>
-                                <div class="relative">
-                                    <input 
-                                        type="text" 
-                                        id="spreadsheetIdInput" 
-                                        placeholder="Contoh: 1ipPMDkHLDBdJJWb5G-GfxTKAxrlelh0fevjSCAWW_0w" 
-                                        class="w-full px-4 py-3 bg-slate-900/90 border border-slate-700 rounded-2xl text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500 transition shadow-inner"
-                                    >
-                                </div>
-                                <p class="text-[11px] text-slate-400 mt-2 leading-relaxed">
-                                    Dapatkan ID ini dari URL browser Google Sheet Anda: <br>
-                                    <code class="bg-slate-900 px-1.5 py-0.5 rounded text-amber-300 text-[10px] border border-slate-800">docs.google.com/spreadsheets/d/<strong class="underline">SPREADSHEET_ID</strong>/edit</code>
-                                </p>
-                            </div>
-
-                            <!-- AppScript URL -->
-                            <div>
-                                <label for="appScriptUrlInput" class="block text-xs font-bold text-slate-300 mb-1.5 flex items-center justify-between">
-                                    <span>URL Web App (Apps Script)</span>
-                                    <span class="text-[10px] text-emerald-400 font-normal">*Wajib Diisi</span>
-                                </label>
-                                <div class="relative">
-                                    <input 
-                                        type="text" 
-                                        id="appScriptUrlInput" 
-                                        placeholder="Contoh: https://script.google.com/macros/s/AKfycby.../exec" 
-                                        class="w-full px-4 py-3 bg-slate-900/90 border border-slate-700 rounded-2xl text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500 transition shadow-inner"
-                                    >
-                                </div>
-                                <p class="text-[11px] text-slate-400 mt-2 leading-relaxed">
-                                    Salin URL dari hasil Deploy Web App di Apps Script Editor.
-                                </p>
-                            </div>
-
-                            <!-- API Key (Opsional) -->
-                            <div>
-                                <label for="apiKeyInput" class="block text-xs font-bold text-slate-300 mb-1.5 flex items-center justify-between">
-                                    <span>API Key (Opsional)</span>
-                                    <span class="text-[10px] text-slate-500 font-normal">(Kosongkan jika tidak digunakan)</span>
-                                </label>
-                                <div class="relative">
-                                    <input 
-                                        type="text" 
-                                        id="apiKeyInput" 
-                                        placeholder="Contoh: AIzaSyD... (Google API Key)" 
-                                        class="w-full px-4 py-3 bg-slate-900/90 border border-slate-700 rounded-2xl text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500 transition shadow-inner"
-                                    >
-                                    <i class="fa-solid fa-key absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
-                                </div>
-                                <p class="text-[11px] text-slate-400 mt-2 leading-relaxed">
-                                    Digunakan untuk autentikasi tambahan jika diperlukan.
-                                </p>
-                            </div>
-
-                            <div class="flex items-center gap-2 pt-2">
-                                <button 
-                                    onclick="saveAllCredentials()" 
-                                    class="flex-1 py-3 px-4 bg-brand-600 hover:bg-brand-500 active:scale-95 text-white font-extrabold text-xs rounded-2xl shadow-lg shadow-brand-600/30 transition flex items-center justify-center gap-2 cursor-pointer"
-                                >
-                                    <i class="fa-solid fa-floppy-disk"></i>
-                                    <span>Simpan Semua Kode Akses</span>
-                                </button>
-                                
-                                <button 
-                                    onclick="testConnection()" 
-                                    class="py-3 px-4 bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-200 font-bold text-xs rounded-2xl border border-slate-700 transition flex items-center gap-2 cursor-pointer"
-                                    title="Uji Koneksi Sheet"
-                                >
-                                    <i class="fa-solid fa-plug text-emerald-400"></i>
-                                    <span>Tes</span>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Credentials Status Banner -->
-                        <div id="idStatusBanner" class="mt-4 p-3.5 rounded-2xl bg-slate-900/80 border border-slate-800 flex items-center gap-3 text-xs">
-                            <i id="statusIcon" class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>
-                            <div class="flex-1 min-w-0">
-                                <span class="block text-[10px] text-slate-400 uppercase tracking-wider font-bold">Status Tersimpan</span>
-                                <span id="statusText" class="font-mono text-emerald-300 font-semibold truncate block max-w-[220px]">Menunggu input...</span>
-                            </div>
-                        </div>
-
+            <div class="glass-card p-6 sm:p-8 rounded-3xl">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="p-3 bg-amber-500/20 text-amber-400 rounded-2xl border border-amber-500/30">
+                        <i class="fa-solid fa-book-bookmark text-xl"></i>
                     </div>
-
-                    <!-- Visual Helper Box -->
-                    <div class="glass-card p-5 rounded-3xl border-amber-500/20 bg-amber-500/5">
-                        <h3 class="text-xs font-bold text-amber-300 mb-2 flex items-center gap-2">
-                            <i class="fa-solid fa-lightbulb text-amber-400"></i>
-                            <span>Format Tab Sheet di Google Sheets:</span>
-                        </h3>
-                        <p class="text-xs text-slate-300 leading-relaxed mb-3">
-                            Sistem memerlukan tab bernama <strong class="text-white">Users</strong> di spreadsheet Anda dengan header kolom persis seperti berikut:
-                        </p>
-                        <div class="bg-slate-950 p-3 rounded-xl border border-amber-500/30 font-mono text-[11px] text-slate-300 overflow-x-auto">
-                            Role | Username | Password | Nama | ID_Tambahan | Kelas
-                        </div>
+                    <div>
+                        <h2 class="text-lg font-black text-white">Panduan Integrasi Google Sheets & Apps Script</h2>
+                        <p class="text-xs text-slate-400">Langkah mudah menghubungkan portal website ke Google Sheets sekolah Anda</p>
                     </div>
-
                 </div>
 
-                <!-- Right Column: Account Creation Tool -->
-                <div class="lg:col-span-7 space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     
-                    <div class="glass-card p-6 rounded-3xl">
-                        
-                        <div class="flex items-center justify-between mb-5">
-                            <div class="flex items-center gap-3">
-                                <div class="p-3 bg-brand-500/20 text-brand-400 rounded-2xl border border-brand-500/30">
-                                    <i class="fa-solid fa-user-plus text-lg"></i>
-                                </div>
-                                <div>
-                                    <h2 class="text-base font-extrabold text-white">Buat / Form Akun Guru Baru</h2>
-                                    <p class="text-xs text-slate-400">Tambahkan akun Guru baru untuk dimasukkan ke Spreadsheet</p>
-                                </div>
-                            </div>
+                    <!-- Step 1 -->
+                    <div class="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-3 glass-card-hover">
+                        <div class="flex items-center justify-between">
+                            <span class="w-8 h-8 rounded-xl bg-brand-600 text-white font-black text-xs flex items-center justify-center">1</span>
+                            <span class="text-[10px] font-bold text-brand-300 uppercase tracking-wider bg-brand-500/10 px-2 py-0.5 rounded">Google Sheets</span>
                         </div>
-
-                        <form id="addUserForm" onsubmit="handleAddUser(event)" class="space-y-4">
-                            
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <!-- Role Selection (LOCKED TO GURU ONLY) -->
-                                <div>
-                                    <label class="block text-xs font-bold text-slate-300 mb-1.5 flex items-center justify-between">
-                                        <span>Peran / Role <span class="text-red-400">*</span></span>
-                                        <span class="text-[10px] text-brand-300 font-medium">(Khusus Guru)</span>
-                                    </label>
-                                    <select 
-                                        id="userRole" 
-                                        disabled
-                                        class="w-full px-4 py-3 bg-slate-900/80 border border-slate-700 rounded-2xl text-xs font-bold text-brand-400 cursor-not-allowed focus:outline-none transition shadow-inner"
-                                    >
-                                        <option value="guru" selected>Guru</option>
-                                    </select>
-                                </div>
-
-                                <!-- Username Input -->
-                                <div>
-                                    <label class="block text-xs font-bold text-slate-300 mb-1.5">
-                                        Username / NIP <span class="text-red-400">*</span>
-                                    </label>
-                                    <input 
-                                        type="text" 
-                                        id="userUsername" 
-                                        required 
-                                        placeholder="Contoh: guru01 atau 19850101..." 
-                                        class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-2xl text-xs font-semibold text-white focus:ring-2 focus:ring-brand-500 focus:outline-none transition"
-                                    >
-                                </div>
-                            </div>
-
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <!-- Password Input (STRICTLY NUMERIC) -->
-                                <div>
-                                    <label class="block text-xs font-bold text-slate-300 mb-1.5 flex items-center justify-between">
-                                        <span>Password <span class="text-red-400">*</span></span>
-                                        <span class="text-[10px] text-amber-400 font-extrabold uppercase">WAJIB HANYA ANGKA</span>
-                                    </label>
-                                    <div class="relative">
-                                        <input 
-                                            type="text" 
-                                            id="userPassword" 
-                                            required 
-                                            inputmode="numeric"
-                                            pattern="[0-9]*"
-                                            oninput="validateNumericPassword(this)"
-                                            placeholder="Contoh: 123456" 
-                                            class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-2xl text-xs font-mono font-bold text-amber-300 focus:ring-2 focus:ring-brand-500 focus:outline-none transition tracking-widest"
-                                        >
-                                        <i class="fa-solid fa-hashtag absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
-                                    </div>
-                                    <p id="passWarning" class="text-[10px] text-red-400 mt-1 hidden font-bold">
-                                        <i class="fa-solid fa-circle-exclamation"></i> Password hanya boleh berisi angka (0-9)!
-                                    </p>
-                                </div>
-
-                                <!-- Full Name Input -->
-                                <div>
-                                    <label class="block text-xs font-bold text-slate-300 mb-1.5">
-                                        Nama Lengkap Guru <span class="text-red-400">*</span>
-                                    </label>
-                                    <input 
-                                        type="text" 
-                                        id="userNama" 
-                                        required 
-                                        placeholder="Contoh: Dra. Siti Rahma, M.Pd" 
-                                        class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-2xl text-xs font-semibold text-white focus:ring-2 focus:ring-brand-500 focus:outline-none transition"
-                                    >
-                                </div>
-                            </div>
-
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <!-- Additional ID -->
-                                <div>
-                                    <label class="block text-xs font-bold text-slate-300 mb-1.5">
-                                        ID Tambahan / Kode Kode Guru (Opsional)
-                                    </label>
-                                    <input 
-                                        type="text" 
-                                        id="userIdTambahan" 
-                                        placeholder="Contoh: G-001" 
-                                        class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-2xl text-xs font-semibold text-white focus:ring-2 focus:ring-brand-500 focus:outline-none transition"
-                                    >
-                                </div>
-
-                                <!-- Class or Mapel -->
-                                <div>
-                                    <label class="block text-xs font-bold text-slate-300 mb-1.5">
-                                        Jabatan / Wali Kelas / Mapel
-                                    </label>
-                                    <input 
-                                        type="text" 
-                                        id="userKelas" 
-                                        placeholder="Contoh: Wali Kelas 5A / Guru PJOK" 
-                                        class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-2xl text-xs font-semibold text-white focus:ring-2 focus:ring-brand-500 focus:outline-none transition"
-                                    >
-                                </div>
-                            </div>
-
-                            <div class="pt-2 flex items-center justify-end gap-3">
-                                <button 
-                                    type="submit" 
-                                    class="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 active:scale-95 text-white font-extrabold text-xs rounded-2xl shadow-lg shadow-emerald-600/25 transition flex items-center justify-center gap-2 cursor-pointer"
-                                >
-                                    <i class="fa-solid fa-plus"></i>
-                                    <span>Tambahkan Akun Guru ke Daftar</span>
-                                </button>
-                            </div>
-
-                        </form>
-
+                        <h3 class="text-sm font-bold text-white">Buat Spreadsheet Baru</h3>
+                        <p class="text-xs text-slate-400 leading-relaxed">
+                            Buka <a href="https://sheets.new" target="_blank" class="text-brand-400 underline font-bold">sheets.new</a> di browser Anda. Beri nama file, misalnya <strong>Database SDN 3 Ngantru</strong>. Buat tab bernama <code class="text-amber-300 bg-slate-950 px-1 py-0.5 rounded">Users</code>.
+                        </p>
                     </div>
 
-                    <!-- User Draft Table -->
-                    <div class="glass-card p-6 rounded-3xl">
-                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
-                            <div>
-                                <h3 class="text-sm font-extrabold text-white flex items-center gap-2">
-                                    <i class="fa-solid fa-users text-brand-400"></i>
-                                    <span>Daftar Akun Guru Siap Ditempel (Copy-Paste)</span>
-                                </h3>
-                                <p class="text-xs text-slate-400">Salin baris di bawah dan tempel langsung ke Google Sheet "Users"</p>
-                            </div>
+                    <!-- Step 2 -->
+                    <div class="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-3 glass-card-hover">
+                        <div class="flex items-center justify-between">
+                            <span class="w-8 h-8 rounded-xl bg-brand-600 text-white font-black text-xs flex items-center justify-center">2</span>
+                            <span class="text-[10px] font-bold text-amber-300 uppercase tracking-wider bg-amber-500/10 px-2 py-0.5 rounded">Spreadsheet ID</span>
+                        </div>
+                        <h3 class="text-sm font-bold text-white">Dapatkan Spreadsheet ID</h3>
+                        <p class="text-xs text-slate-400 leading-relaxed">
+                            Lihat alamat URL browser Google Sheet Anda. Salin deretan kode unik di antara <code class="text-amber-300 bg-slate-950 px-1 py-0.5 rounded">/d/</code> dan <code class="text-amber-300 bg-slate-950 px-1 py-0.5 rounded">/edit</code>. Tempelkan kode ini di Tab 3.
+                        </p>
+                    </div>
 
-                            <div class="flex items-center gap-2 w-full sm:w-auto">
-                                <button 
-                                    onclick="copyUsersForSheet()" 
-                                    class="flex-1 sm:flex-none px-3.5 py-2 bg-brand-600/80 hover:bg-brand-600 text-white text-xs font-bold rounded-xl border border-brand-400/30 transition flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
-                                >
-                                    <i class="fa-solid fa-copy"></i>
-                                    <span>Salin Semua untuk Google Sheet</span>
-                                </button>
-                                <button 
-                                    onclick="clearUserList()" 
-                                    class="px-3 py-2 bg-slate-800 hover:bg-red-500/20 text-slate-400 hover:text-red-400 text-xs font-bold rounded-xl border border-slate-700 transition cursor-pointer"
-                                    title="Bersihkan daftar"
-                                >
-                                    <i class="fa-solid fa-trash"></i>
-                                </button>
+                    <!-- Step 3 -->
+                    <div class="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-3 glass-card-hover">
+                        <div class="flex items-center justify-between">
+                            <span class="w-8 h-8 rounded-xl bg-brand-600 text-white font-black text-xs flex items-center justify-center">3</span>
+                            <span class="text-[10px] font-bold text-emerald-300 uppercase tracking-wider bg-emerald-500/10 px-2 py-0.5 rounded">Apps Script Editor</span>
+                        </div>
+                        <h3 class="text-sm font-bold text-white">Buka Google Apps Script</h3>
+                        <p class="text-xs text-slate-400 leading-relaxed">
+                            Di Google Sheets, klik menu top-bar: <strong class="text-white">Ekstensi (Extensions) &rarr; Apps Script</strong>. Hapus seluruh isi kode bawaan yang ada di editor tersebut.
+                        </p>
+                    </div>
+
+                    <!-- Step 4 -->
+                    <div class="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-3 glass-card-hover">
+                        <div class="flex items-center justify-between">
+                            <span class="w-8 h-8 rounded-xl bg-brand-600 text-white font-black text-xs flex items-center justify-center">4</span>
+                            <span class="text-[10px] font-bold text-indigo-300 uppercase tracking-wider bg-indigo-500/10 px-2 py-0.5 rounded">Paste & Save</span>
+                        </div>
+                        <h3 class="text-sm font-bold text-white">Tempelkan Kode Script</h3>
+                        <p class="text-xs text-slate-400 leading-relaxed">
+                            Buka <strong>Tab 2 (Salin Kode Apps Script)</strong> di halaman ini, klik tombol salin. Tempelkan kode ke editor Apps Script. Pastikan <code class="text-amber-300 bg-slate-950 px-1 py-0.5 rounded">SPREADSHEET_ID</code> telah diganti. Klik ikon Simpan.
+                        </p>
+                    </div>
+
+                    <!-- Step 5 -->
+                    <div class="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-3 glass-card-hover md:col-span-2">
+                        <div class="flex items-center justify-between">
+                            <span class="w-8 h-8 rounded-xl bg-emerald-600 text-white font-black text-xs flex items-center justify-center">5</span>
+                            <span class="text-[10px] font-bold text-emerald-300 uppercase tracking-wider bg-emerald-500/20 px-2 py-0.5 rounded">Deploy Web App</span>
+                        </div>
+                        <h3 class="text-sm font-bold text-white">Terapkan Sebagai Aplikasi Web (Deploy)</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-slate-300 pt-2">
+                            <div class="p-3 bg-slate-950 rounded-xl border border-slate-800">
+                                <strong class="text-brand-400 block mb-1">A. Klik Terapkan</strong>
+                                Pilih <strong class="text-white">Terapkan (Deploy) &rarr; Penerapan baru (New deployment)</strong>.
+                            </div>
+                            <div class="p-3 bg-slate-950 rounded-xl border border-slate-800">
+                                <strong class="text-brand-400 block mb-1">B. Pilih Jenis Web App</strong>
+                                Klik ikon gerigi <i class="fa-solid fa-gear text-amber-400"></i> &rarr; Pilih <strong class="text-white">Aplikasi Web (Web app)</strong>.
+                            </div>
+                            <div class="p-3 bg-slate-950 rounded-xl border border-slate-800">
+                                <strong class="text-brand-400 block mb-1">C. Izin Akses (Wajib!)</strong>
+                                Pada bagian <em>Who has access (Siapa yang memiliki akses)</em>, pilih: <strong class="text-emerald-400">Siapa saja (Anyone)</strong>.
                             </div>
                         </div>
+                    </div>
 
-                        <div class="overflow-x-auto rounded-2xl border border-slate-800 bg-slate-950">
-                            <table class="w-full text-left text-xs font-sans">
-                                <thead>
-                                    <tr class="bg-slate-900 border-b border-slate-800 text-slate-400 uppercase text-[10px] tracking-wider font-bold">
-                                        <th class="p-3">Role</th>
-                                        <th class="p-3">Username</th>
-                                        <th class="p-3">Password (Angka)</th>
-                                        <th class="p-3">Nama Guru</th>
-                                        <th class="p-3">ID Tambahan</th>
-                                        <th class="p-3">Tugas / Kelas</th>
-                                        <th class="p-3 text-center">Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="userTableBody" class="divide-y divide-slate-800 text-slate-300 font-medium">
-                                    <!-- Dynamic rows inserted here -->
-                                </tbody>
-                            </table>
+                    <!-- Step 6 - TEST -->
+                    <div class="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-3 glass-card-hover md:col-span-2">
+                        <div class="flex items-center justify-between">
+                            <span class="w-8 h-8 rounded-xl bg-amber-600 text-white font-black text-xs flex items-center justify-center">6</span>
+                            <span class="text-[10px] font-bold text-amber-300 uppercase tracking-wider bg-amber-500/20 px-2 py-0.5 rounded">Testing & Sinkronisasi</span>
+                        </div>
+                        <h3 class="text-sm font-bold text-white">Uji Koneksi & Sinkronisasi Users</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-slate-300 pt-2">
+                            <div class="p-3 bg-slate-950 rounded-xl border border-slate-800">
+                                <strong class="text-emerald-400 block mb-1">1. Simpan Kredensial</strong>
+                                Di Tab 3, isi Spreadsheet ID dan URL Web App, lalu klik <strong class="text-white">Simpan</strong>.
+                            </div>
+                            <div class="p-3 bg-slate-950 rounded-xl border border-slate-800">
+                                <strong class="text-emerald-400 block mb-1">2. Uji Koneksi</strong>
+                                Klik tombol <strong class="text-white">Tes</strong> di Tab 3 untuk memastikan koneksi ke Spreadsheet berhasil.
+                            </div>
+                            <div class="p-3 bg-slate-950 rounded-xl border border-slate-800">
+                                <strong class="text-emerald-400 block mb-1">3. Buat Users</strong>
+                                Buka Tab 4, klik <strong class="text-white">Buat Default Users</strong> untuk mengisi data ke Google Sheet.
+                            </div>
                         </div>
                     </div>
 
@@ -677,9 +548,9 @@ function initializeSheets() {
             
             // Tambahkan data default users
             const defaultUsers = [
-                ["Admin", "admin", "123456", "Administrator", "ADM001", "System"],
-                ["Guru", "guru01", "123456", "Guru Contoh", "G001", "Wali Kelas 5A"],
-                ["Guru", "guru02", "guru123", "Guru Kedua", "G002", "Wali Kelas 5B"],
+                ["Admin", "admin", "123", "Administrator", "ADM001", "System"],
+                ["Guru", "guru", "123", "Guru Pengajar", "G001", "Wali Kelas"],
+                ["Guru", "guru2", "123", "Guru Pengajar Kedua", "G002", "Wali Kelas"],
                 ["Siswa", "siswa01", "siswa123", "Siswa Contoh", "S001", "5A"],
                 ["Siswa", "siswa02", "siswa123", "Siswa Kedua", "S002", "5B"]
             ];
@@ -2003,113 +1874,310 @@ function onDeploy() {
 
         </div>
 
-        <!-- ================= TAB 3: STEP BY STEP GUIDE ================= -->
-        <div id="tab-guide" class="tab-content hidden space-y-6 animate-scale-up">
+        <!-- ================= TAB 3: SPREADSHEET ID & USER CREATION ================= -->
+        <div id="tab-config" class="tab-content hidden space-y-6 animate-scale-up">
             
-            <div class="glass-card p-6 sm:p-8 rounded-3xl">
-                <div class="flex items-center gap-3 mb-6">
-                    <div class="p-3 bg-amber-500/20 text-amber-400 rounded-2xl border border-amber-500/30">
-                        <i class="fa-solid fa-book-bookmark text-xl"></i>
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                
+                <!-- Left Column: Spreadsheet ID Setup -->
+                <div class="lg:col-span-5 space-y-6">
+                    
+                    <div class="glass-card p-6 rounded-3xl relative overflow-hidden">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="p-3 bg-amber-500/20 text-amber-400 rounded-2xl border border-amber-500/30">
+                                <i class="fa-solid fa-key text-lg"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-base font-extrabold text-white">Simpan Kode Akses</h2>
+                                <p class="text-xs text-slate-400">Data tersimpan di LocalStorage Browser</p>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <!-- Spreadsheet ID -->
+                            <div>
+                                <label for="spreadsheetIdInput" class="block text-xs font-bold text-slate-300 mb-1.5 flex items-center justify-between">
+                                    <span>Google Spreadsheet ID</span>
+                                    <span class="text-[10px] text-amber-400 font-normal">*Wajib Diisi</span>
+                                </label>
+                                <div class="relative">
+                                    <input 
+                                        type="text" 
+                                        id="spreadsheetIdInput" 
+                                        placeholder="Contoh: 1akldnvilorhfkjfod8nfkd" 
+                                        class="w-full px-4 py-3 bg-slate-900/90 border border-slate-700 rounded-2xl text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500 transition shadow-inner"
+                                    >
+                                </div>
+                                <p class="text-[11px] text-slate-400 mt-2 leading-relaxed">
+                                    Dapatkan ID ini dari URL browser Google Sheet Anda: <br>
+                                    <code class="bg-slate-900 px-1.5 py-0.5 rounded text-amber-300 text-[10px] border border-slate-800">docs.google.com/spreadsheets/d/<strong class="underline">SPREADSHEET_ID</strong>/edit</code>
+                                </p>
+                            </div>
+
+                            <!-- AppScript URL -->
+                            <div>
+                                <label for="appScriptUrlInput" class="block text-xs font-bold text-slate-300 mb-1.5 flex items-center justify-between">
+                                    <span>URL Web App (Apps Script)</span>
+                                    <span class="text-[10px] text-emerald-400 font-normal">*Wajib Diisi</span>
+                                </label>
+                                <div class="relative">
+                                    <input 
+                                        type="text" 
+                                        id="appScriptUrlInput" 
+                                        placeholder="Contoh: https://script.google.com/macros/s/AKfycby.../exec" 
+                                        class="w-full px-4 py-3 bg-slate-900/90 border border-slate-700 rounded-2xl text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500 transition shadow-inner"
+                                    >
+                                </div>
+                                <p class="text-[11px] text-slate-400 mt-2 leading-relaxed">
+                                    Salin URL dari hasil Deploy Web App di Apps Script Editor.
+                                </p>
+                            </div>
+
+                            <!-- API Key (Opsional) -->
+                            <div>
+                                <label for="apiKeyInput" class="block text-xs font-bold text-slate-300 mb-1.5 flex items-center justify-between">
+                                    <span>API Key (Opsional)</span>
+                                    <span class="text-[10px] text-slate-500 font-normal">(Kosongkan jika tidak digunakan)</span>
+                                </label>
+                                <div class="relative">
+                                    <input 
+                                        type="text" 
+                                        id="apiKeyInput" 
+                                        placeholder="Contoh: AIzaSyD... (Google API Key)" 
+                                        class="w-full px-4 py-3 bg-slate-900/90 border border-slate-700 rounded-2xl text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500 transition shadow-inner"
+                                    >
+                                    <i class="fa-solid fa-key absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+                                </div>
+                                <p class="text-[11px] text-slate-400 mt-2 leading-relaxed">
+                                    Digunakan untuk autentikasi tambahan jika diperlukan.
+                                </p>
+                            </div>
+
+                            <div class="flex items-center gap-2 pt-2">
+                                <button 
+                                    onclick="saveAllCredentials()" 
+                                    class="flex-1 py-3 px-4 bg-brand-600 hover:bg-brand-500 active:scale-95 text-white font-extrabold text-xs rounded-2xl shadow-lg shadow-brand-600/30 transition flex items-center justify-center gap-2 cursor-pointer"
+                                >
+                                    <i class="fa-solid fa-floppy-disk"></i>
+                                    <span>Simpan Semua Kode Akses</span>
+                                </button>
+                                
+                                <button 
+                                    onclick="testConnection()" 
+                                    class="py-3 px-4 bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-200 font-bold text-xs rounded-2xl border border-slate-700 transition flex items-center gap-2 cursor-pointer"
+                                    title="Uji Koneksi Sheet"
+                                >
+                                    <i class="fa-solid fa-plug text-emerald-400"></i>
+                                    <span>Tes</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Credentials Status Banner -->
+                        <div id="idStatusBanner" class="mt-4 p-3.5 rounded-2xl bg-slate-900/80 border border-slate-800 flex items-center gap-3 text-xs">
+                            <i id="statusIcon" class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>
+                            <div class="flex-1 min-w-0">
+                                <span class="block text-[10px] text-slate-400 uppercase tracking-wider font-bold">Status Tersimpan</span>
+                                <span id="statusText" class="font-mono text-emerald-300 font-semibold truncate block max-w-[220px]">Menunggu input...</span>
+                            </div>
+                        </div>
+
                     </div>
-                    <div>
-                        <h2 class="text-lg font-black text-white">Panduan Integrasi Google Sheets & Apps Script</h2>
-                        <p class="text-xs text-slate-400">Langkah mudah menghubungkan portal website ke Google Sheets sekolah Anda</p>
+
+                    <!-- Visual Helper Box -->
+                    <div class="glass-card p-5 rounded-3xl border-amber-500/20 bg-amber-500/5">
+                        <h3 class="text-xs font-bold text-amber-300 mb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-lightbulb text-amber-400"></i>
+                            <span>Format Tab Sheet di Google Sheets:</span>
+                        </h3>
+                        <p class="text-xs text-slate-300 leading-relaxed mb-3">
+                            Sistem memerlukan tab bernama <strong class="text-white">Users</strong> di spreadsheet Anda dengan header kolom persis seperti berikut:
+                        </p>
+                        <div class="bg-slate-950 p-3 rounded-xl border border-amber-500/30 font-mono text-[11px] text-slate-300 overflow-x-auto">
+                            Role | Username | Password | Nama | ID_Tambahan | Kelas
+                        </div>
                     </div>
+
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Right Column: Account Creation Tool -->
+                <div class="lg:col-span-7 space-y-6">
                     
-                    <!-- Step 1 -->
-                    <div class="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-3 glass-card-hover">
-                        <div class="flex items-center justify-between">
-                            <span class="w-8 h-8 rounded-xl bg-brand-600 text-white font-black text-xs flex items-center justify-center">1</span>
-                            <span class="text-[10px] font-bold text-brand-300 uppercase tracking-wider bg-brand-500/10 px-2 py-0.5 rounded">Google Sheets</span>
+                    <div class="glass-card p-6 rounded-3xl">
+                        
+                        <div class="flex items-center justify-between mb-5">
+                            <div class="flex items-center gap-3">
+                                <div class="p-3 bg-brand-500/20 text-brand-400 rounded-2xl border border-brand-500/30">
+                                    <i class="fa-solid fa-user-plus text-lg"></i>
+                                </div>
+                                <div>
+                                    <h2 class="text-base font-extrabold text-white">Buat / Form Akun Guru Baru</h2>
+                                    <p class="text-xs text-slate-400">Tambahkan akun Guru baru untuk dimasukkan ke Spreadsheet</p>
+                                </div>
+                            </div>
                         </div>
-                        <h3 class="text-sm font-bold text-white">Buat Spreadsheet Baru</h3>
-                        <p class="text-xs text-slate-400 leading-relaxed">
-                            Buka <a href="https://sheets.new" target="_blank" class="text-brand-400 underline font-bold">sheets.new</a> di browser Anda. Beri nama file, misalnya <strong>Database SDN 3 Ngantru</strong>. Buat tab bernama <code class="text-amber-300 bg-slate-950 px-1 py-0.5 rounded">Users</code>.
-                        </p>
+
+                        <form id="addUserForm" onsubmit="handleAddUser(event)" class="space-y-4">
+                            
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <!-- Role Selection (LOCKED TO GURU ONLY) -->
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-300 mb-1.5 flex items-center justify-between">
+                                        <span>Peran / Role <span class="text-red-400">*</span></span>
+                                        <span class="text-[10px] text-brand-300 font-medium">(Khusus Guru)</span>
+                                    </label>
+                                    <select 
+                                        id="userRole" 
+                                        disabled
+                                        class="w-full px-4 py-3 bg-slate-900/80 border border-slate-700 rounded-2xl text-xs font-bold text-brand-400 cursor-not-allowed focus:outline-none transition shadow-inner"
+                                    >
+                                        <option value="guru" selected>Guru</option>
+                                    </select>
+                                </div>
+
+                                <!-- Username Input -->
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-300 mb-1.5">
+                                        Username / NIP <span class="text-red-400">*</span>
+                                    </label>
+                                    <input 
+                                        type="text" 
+                                        id="userUsername" 
+                                        required 
+                                        placeholder="Contoh: guru01 atau 19850101..." 
+                                        class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-2xl text-xs font-semibold text-white focus:ring-2 focus:ring-brand-500 focus:outline-none transition"
+                                    >
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <!-- Password Input (STRICTLY NUMERIC) -->
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-300 mb-1.5 flex items-center justify-between">
+                                        <span>Password <span class="text-red-400">*</span></span>
+                                        <span class="text-[10px] text-amber-400 font-extrabold uppercase">WAJIB HANYA ANGKA</span>
+                                    </label>
+                                    <div class="relative">
+                                        <input 
+                                            type="text" 
+                                            id="userPassword" 
+                                            required 
+                                            inputmode="numeric"
+                                            pattern="[0-9]*"
+                                            oninput="validateNumericPassword(this)"
+                                            placeholder="Contoh: 123456" 
+                                            class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-2xl text-xs font-mono font-bold text-amber-300 focus:ring-2 focus:ring-brand-500 focus:outline-none transition tracking-widest"
+                                        >
+                                        <i class="fa-solid fa-hashtag absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+                                    </div>
+                                    <p id="passWarning" class="text-[10px] text-red-400 mt-1 hidden font-bold">
+                                        <i class="fa-solid fa-circle-exclamation"></i> Password hanya boleh berisi angka (0-9)!
+                                    </p>
+                                </div>
+
+                                <!-- Full Name Input -->
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-300 mb-1.5">
+                                        Nama Lengkap Guru <span class="text-red-400">*</span>
+                                    </label>
+                                    <input 
+                                        type="text" 
+                                        id="userNama" 
+                                        required 
+                                        placeholder="Contoh: Dra. Siti Rahma, M.Pd" 
+                                        class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-2xl text-xs font-semibold text-white focus:ring-2 focus:ring-brand-500 focus:outline-none transition"
+                                    >
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <!-- Additional ID -->
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-300 mb-1.5">
+                                        ID Tambahan / Kode Kode Guru (Opsional)
+                                    </label>
+                                    <input 
+                                        type="text" 
+                                        id="userIdTambahan" 
+                                        placeholder="Contoh: G-001" 
+                                        class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-2xl text-xs font-semibold text-white focus:ring-2 focus:ring-brand-500 focus:outline-none transition"
+                                    >
+                                </div>
+
+                                <!-- Class or Mapel -->
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-300 mb-1.5">
+                                        Jabatan / Wali Kelas / Mapel
+                                    </label>
+                                    <input 
+                                        type="text" 
+                                        id="userKelas" 
+                                        placeholder="Contoh: Wali Kelas 5A / Guru PJOK" 
+                                        class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-2xl text-xs font-semibold text-white focus:ring-2 focus:ring-brand-500 focus:outline-none transition"
+                                    >
+                                </div>
+                            </div>
+
+                            <div class="pt-2 flex items-center justify-end gap-3">
+                                <button 
+                                    type="submit" 
+                                    class="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 active:scale-95 text-white font-extrabold text-xs rounded-2xl shadow-lg shadow-emerald-600/25 transition flex items-center justify-center gap-2 cursor-pointer"
+                                >
+                                    <i class="fa-solid fa-plus"></i>
+                                    <span>Tambahkan Akun Guru ke Daftar</span>
+                                </button>
+                            </div>
+
+                        </form>
+
                     </div>
 
-                    <!-- Step 2 -->
-                    <div class="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-3 glass-card-hover">
-                        <div class="flex items-center justify-between">
-                            <span class="w-8 h-8 rounded-xl bg-brand-600 text-white font-black text-xs flex items-center justify-center">2</span>
-                            <span class="text-[10px] font-bold text-amber-300 uppercase tracking-wider bg-amber-500/10 px-2 py-0.5 rounded">Spreadsheet ID</span>
-                        </div>
-                        <h3 class="text-sm font-bold text-white">Dapatkan Spreadsheet ID</h3>
-                        <p class="text-xs text-slate-400 leading-relaxed">
-                            Lihat alamat URL browser Google Sheet Anda. Salin deretan kode unik di antara <code class="text-amber-300 bg-slate-950 px-1 py-0.5 rounded">/d/</code> dan <code class="text-amber-300 bg-slate-950 px-1 py-0.5 rounded">/edit</code>. Tempelkan kode ini di Tab 1.
-                        </p>
-                    </div>
+                    <!-- User Draft Table -->
+                    <div class="glass-card p-6 rounded-3xl">
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
+                            <div>
+                                <h3 class="text-sm font-extrabold text-white flex items-center gap-2">
+                                    <i class="fa-solid fa-users text-brand-400"></i>
+                                    <span>Daftar Akun Guru Siap Ditempel (Copy-Paste)</span>
+                                </h3>
+                                <p class="text-xs text-slate-400">Salin baris di bawah dan tempel langsung ke Google Sheet "Users"</p>
+                            </div>
 
-                    <!-- Step 3 -->
-                    <div class="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-3 glass-card-hover">
-                        <div class="flex items-center justify-between">
-                            <span class="w-8 h-8 rounded-xl bg-brand-600 text-white font-black text-xs flex items-center justify-center">3</span>
-                            <span class="text-[10px] font-bold text-emerald-300 uppercase tracking-wider bg-emerald-500/10 px-2 py-0.5 rounded">Apps Script Editor</span>
+                            <div class="flex items-center gap-2 w-full sm:w-auto">
+                                <button 
+                                    onclick="copyUsersForSheet()" 
+                                    class="flex-1 sm:flex-none px-3.5 py-2 bg-brand-600/80 hover:bg-brand-600 text-white text-xs font-bold rounded-xl border border-brand-400/30 transition flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
+                                >
+                                    <i class="fa-solid fa-copy"></i>
+                                    <span>Salin Semua untuk Google Sheet</span>
+                                </button>
+                                <button 
+                                    onclick="clearUserList()" 
+                                    class="px-3 py-2 bg-slate-800 hover:bg-red-500/20 text-slate-400 hover:text-red-400 text-xs font-bold rounded-xl border border-slate-700 transition cursor-pointer"
+                                    title="Bersihkan daftar"
+                                >
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
                         </div>
-                        <h3 class="text-sm font-bold text-white">Buka Google Apps Script</h3>
-                        <p class="text-xs text-slate-400 leading-relaxed">
-                            Di Google Sheets, klik menu top-bar: <strong class="text-white">Ekstensi (Extensions) &rarr; Apps Script</strong>. Hapus seluruh isi kode bawaan yang ada di editor tersebut.
-                        </p>
-                    </div>
 
-                    <!-- Step 4 -->
-                    <div class="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-3 glass-card-hover">
-                        <div class="flex items-center justify-between">
-                            <span class="w-8 h-8 rounded-xl bg-brand-600 text-white font-black text-xs flex items-center justify-center">4</span>
-                            <span class="text-[10px] font-bold text-indigo-300 uppercase tracking-wider bg-indigo-500/10 px-2 py-0.5 rounded">Paste & Save</span>
-                        </div>
-                        <h3 class="text-sm font-bold text-white">Tempelkan Kode Script</h3>
-                        <p class="text-xs text-slate-400 leading-relaxed">
-                            Buka <strong>Tab 2 (Salin Kode Apps Script)</strong> di halaman ini, klik tombol salin. Tempelkan kode ke editor Apps Script. Pastikan <code class="text-amber-300 bg-slate-950 px-1 py-0.5 rounded">SPREADSHEET_ID</code> telah diganti. Klik ikon Simpan.
-                        </p>
-                    </div>
-
-                    <!-- Step 5 -->
-                    <div class="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-3 glass-card-hover md:col-span-2">
-                        <div class="flex items-center justify-between">
-                            <span class="w-8 h-8 rounded-xl bg-emerald-600 text-white font-black text-xs flex items-center justify-center">5</span>
-                            <span class="text-[10px] font-bold text-emerald-300 uppercase tracking-wider bg-emerald-500/20 px-2 py-0.5 rounded">Deploy Web App</span>
-                        </div>
-                        <h3 class="text-sm font-bold text-white">Terapkan Sebagai Aplikasi Web (Deploy)</h3>
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-slate-300 pt-2">
-                            <div class="p-3 bg-slate-950 rounded-xl border border-slate-800">
-                                <strong class="text-brand-400 block mb-1">A. Klik Terapkan</strong>
-                                Pilih <strong class="text-white">Terapkan (Deploy) &rarr; Penerapan baru (New deployment)</strong>.
-                            </div>
-                            <div class="p-3 bg-slate-950 rounded-xl border border-slate-800">
-                                <strong class="text-brand-400 block mb-1">B. Pilih Jenis Web App</strong>
-                                Klik ikon gerigi <i class="fa-solid fa-gear text-amber-400"></i> &rarr; Pilih <strong class="text-white">Aplikasi Web (Web app)</strong>.
-                            </div>
-                            <div class="p-3 bg-slate-950 rounded-xl border border-slate-800">
-                                <strong class="text-brand-400 block mb-1">C. Izin Akses (Wajib!)</strong>
-                                Pada bagian <em>Who has access (Siapa yang memiliki akses)</em>, pilih: <strong class="text-emerald-400">Siapa saja (Anyone)</strong>.
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Step 6 - TEST -->
-                    <div class="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-3 glass-card-hover md:col-span-2">
-                        <div class="flex items-center justify-between">
-                            <span class="w-8 h-8 rounded-xl bg-amber-600 text-white font-black text-xs flex items-center justify-center">6</span>
-                            <span class="text-[10px] font-bold text-amber-300 uppercase tracking-wider bg-amber-500/20 px-2 py-0.5 rounded">Testing</span>
-                        </div>
-                        <h3 class="text-sm font-bold text-white">Uji Koneksi & Sinkronisasi</h3>
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-slate-300 pt-2">
-                            <div class="p-3 bg-slate-950 rounded-xl border border-slate-800">
-                                <strong class="text-emerald-400 block mb-1">1. Simpan Kredensial</strong>
-                                Di Tab 1, isi Spreadsheet ID dan URL Web App, lalu klik <strong class="text-white">Simpan</strong>.
-                            </div>
-                            <div class="p-3 bg-slate-950 rounded-xl border border-slate-800">
-                                <strong class="text-emerald-400 block mb-1">2. Uji Koneksi</strong>
-                                Klik tombol <strong class="text-white">Tes</strong> di Tab 1 untuk memastikan koneksi ke Spreadsheet berhasil.
-                            </div>
-                            <div class="p-3 bg-slate-950 rounded-xl border border-slate-800">
-                                <strong class="text-emerald-400 block mb-1">3. Buat Users</strong>
-                                Buka Tab 4, klik <strong class="text-white">Buat Default Users</strong> untuk mengisi data ke Google Sheet.
-                            </div>
+                        <div class="overflow-x-auto rounded-2xl border border-slate-800 bg-slate-950">
+                            <table class="w-full text-left text-xs font-sans">
+                                <thead>
+                                    <tr class="bg-slate-900 border-b border-slate-800 text-slate-400 uppercase text-[10px] tracking-wider font-bold">
+                                        <th class="p-3">Role</th>
+                                        <th class="p-3">Username</th>
+                                        <th class="p-3">Password (Angka)</th>
+                                        <th class="p-3">Nama Guru</th>
+                                        <th class="p-3">ID Tambahan</th>
+                                        <th class="p-3">Tugas / Kelas</th>
+                                        <th class="p-3 text-center">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="userTableBody" class="divide-y divide-slate-800 text-slate-300 font-medium">
+                                    <!-- Dynamic rows inserted here -->
+                                </tbody>
+                            </table>
                         </div>
                     </div>
 
@@ -2188,9 +2256,9 @@ function onDeploy() {
                             <span>Aksi Cepat</span>
                         </h3>
                         <div class="space-y-3">
-                            <button onclick="createDefaultUsers()" class="w-full py-2.5 bg-amber-600/80 hover:bg-amber-500 active:scale-95 text-white font-bold text-xs rounded-xl shadow-lg shadow-amber-600/20 transition flex items-center justify-center gap-2 cursor-pointer">
+                            <button onclick="showDefaultUsersModal()" class="w-full py-2.5 bg-amber-600/80 hover:bg-amber-500 active:scale-95 text-white font-bold text-xs rounded-xl shadow-lg shadow-amber-600/20 transition flex items-center justify-center gap-2 cursor-pointer">
                                 <i class="fa-solid fa-users"></i>
-                                <span>Buat Default Users (5 Akun)</span>
+                                <span>Buat Default Users (2 Akun: guru & admin)</span>
                             </button>
                             <button onclick="syncAllUsersToSheet()" class="w-full py-2.5 bg-brand-600 hover:bg-brand-500 active:scale-95 text-white font-bold text-xs rounded-xl shadow-lg shadow-brand-600/25 transition flex items-center justify-center gap-2 cursor-pointer">
                                 <i class="fa-solid fa-cloud-upload-alt"></i>
@@ -2223,6 +2291,39 @@ function onDeploy() {
 
     </main>
 
+    <!-- ========== MODAL / POPUP KONFIRMASI DEFAULT USERS ========== -->
+    <div id="defaultUsersModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="flex items-center gap-3 mb-3">
+                <div class="p-2.5 bg-amber-500/20 text-amber-400 rounded-xl border border-amber-500/30">
+                    <i class="fa-solid fa-users text-xl"></i>
+                </div>
+                <h3>Buat Akun Default</h3>
+            </div>
+            <p>
+                Akun default yang akan dibuat:
+            </p>
+            <div class="bg-slate-950 p-3 rounded-xl my-3 border border-slate-700 font-mono text-xs text-slate-300">
+                <div class="text-emerald-400">👤 Admin</div>
+                <div>Username: <strong class="text-white">admin</strong></div>
+                <div>Password: <strong class="text-amber-300">123</strong></div>
+                <div class="h-px bg-slate-700 my-2"></div>
+                <div class="text-emerald-400">👤 Guru</div>
+                <div>Username: <strong class="text-white">guru</strong></div>
+                <div>Password: <strong class="text-amber-300">123</strong></div>
+            </div>
+            <p class="text-xs text-slate-400">
+                ⚠️ Data Users yang sudah ada di Sheet akan dihapus dan diganti dengan akun baru ini.
+            </p>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeDefaultUsersModal()">Batal</button>
+                <button class="btn-confirm" onclick="confirmCreateDefaultUsers()">
+                    <i class="fa-solid fa-check"></i> Ya, Buat
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast Notification -->
     <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 max-w-xs sm:max-w-sm bg-slate-900 text-white p-4 rounded-2xl shadow-2xl border border-slate-700 flex items-center gap-3">
         <div id="toastIcon" class="text-amber-400 text-lg">
@@ -2235,15 +2336,15 @@ function onDeploy() {
 
     <!-- Footer -->
     <footer class="relative z-10 w-full py-6 text-center text-slate-500 text-[11px] font-medium border-t border-slate-800/60 mt-10 bg-slate-950/60">
-        <p>&copy; 2026 SD NEGERI 3 NGANTRU. Portal Manajemen Terpadu.</p>
+        <p>&copy; 2026 lubisbima@gmail.com . Portal Manajemen Terpadu.</p>
     </footer>
 
     <script>
-        const DEFAULT_SHEET_ID = "1ipPMDkHLDBdJJWb5G-GfxTKAxrlelh0fevjSCAWW_0w";
+        const DEFAULT_SHEET_ID = "(paste)";
         const DEFAULT_APPSCRIPT_URL = "https://script.google.com/macros/s/AKfycby.../exec";
         let localUsers = [
-            { role: 'guru', username: 'admin', password: '123', nama: 'Administrator Guru', id_tambahan: 'G01', kelas: 'Wali Kelas' },
-            { role: 'guru', username: 'guru01', password: '123', nama: 'Guru Contoh', id_tambahan: 'G02', kelas: 'Kelas 5A' }
+            { role: 'guru', username: 'admin', password: '123', nama: 'Administrator', id_tambahan: 'G01', kelas: 'System' },
+            { role: 'guru', username: 'guru', password: '123', nama: 'Guru Pengajar', id_tambahan: 'G02', kelas: 'Wali Kelas' }
         ];
 
         const STORAGE_KEYS = {
@@ -2260,12 +2361,25 @@ function onDeploy() {
 
         function switchTab(tabId) {
             playUiSound('click');
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            
+            // Sembunyikan semua tab content
+            document.querySelectorAll('.tab-content').forEach(el => {
+                el.classList.add('hidden');
+            });
+            
+            // Reset semua tombol tab ke style tidak aktif
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.className = "tab-btn px-5 py-3 rounded-2xl text-xs font-bold transition flex items-center gap-2 cursor-pointer bg-slate-800/80 text-slate-400 hover:text-white border border-white/5";
             });
 
-            document.getElementById(tabId).classList.remove('hidden');
+            // Tampilkan tab yang dipilih
+            const targetTab = document.getElementById(tabId);
+            if (targetTab) {
+                targetTab.classList.remove('hidden');
+                targetTab.classList.add('block');
+            }
+
+            // Set tombol yang aktif
             const activeBtn = document.getElementById('btn-' + tabId);
             if (activeBtn) {
                 activeBtn.className = "tab-btn px-5 py-3 rounded-2xl text-xs font-bold transition flex items-center gap-2 cursor-pointer bg-brand-600 text-white shadow-lg shadow-brand-600/30 border border-brand-500/50";
@@ -2490,6 +2604,28 @@ function onDeploy() {
             }, 3000);
         }
 
+        // ==================== MODAL DEFAULT USERS ====================
+
+        function showDefaultUsersModal() {
+            document.getElementById('defaultUsersModal').classList.add('active');
+        }
+
+        function closeDefaultUsersModal() {
+            document.getElementById('defaultUsersModal').classList.remove('active');
+        }
+
+        // Tutup modal jika klik di luar box
+        document.getElementById('defaultUsersModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeDefaultUsersModal();
+            }
+        });
+
+        function confirmCreateDefaultUsers() {
+            closeDefaultUsersModal();
+            createDefaultUsers();
+        }
+
         // ==================== TAB 4 FUNCTIONS ====================
 
         function addLog(message, type = 'info') {
@@ -2532,7 +2668,7 @@ function onDeploy() {
             try {
                 const response = await fetch(webAppUrl, {
                     method: 'POST',
-                    mode: 'cors', // Ubah ke cors agar bisa baca response
+                    mode: 'cors',
                     headers: {
                         'Content-Type': 'application/json',
                     },
@@ -2608,7 +2744,6 @@ function onDeploy() {
                     showToast(`✅ User "${username}" berhasil ditambahkan ke Google Sheet!`, 'success');
                     fireConfetti();
                     
-                    // Reset form
                     document.getElementById('autoUsername').value = '';
                     document.getElementById('autoPassword').value = '';
                     document.getElementById('autoNama').value = '';
@@ -2628,12 +2763,10 @@ function onDeploy() {
         }
 
         async function createDefaultUsers() {
+            // Hanya 2 akun: Admin dan Guru dengan password 123
             const defaultUsers = [
-                { Role: 'Admin', Username: 'admin', Password: 'admin123', Nama: 'Administrator', ID_Tambahan: 'ADM001', Kelas: 'System' },
-                { Role: 'Guru', Username: 'guru01', Password: 'guru123', Nama: 'Guru Contoh', ID_Tambahan: 'G001', Kelas: 'Wali Kelas 5A' },
-                { Role: 'Guru', Username: 'guru02', Password: 'guru123', Nama: 'Guru Kedua', ID_Tambahan: 'G002', Kelas: 'Wali Kelas 5B' },
-                { Role: 'Siswa', Username: 'siswa01', Password: 'siswa123', Nama: 'Siswa Contoh', ID_Tambahan: 'S001', Kelas: '5A' },
-                { Role: 'Siswa', Username: 'siswa02', Password: 'siswa123', Nama: 'Siswa Kedua', ID_Tambahan: 'S002', Kelas: '5B' }
+                { Role: 'Admin', Username: 'admin', Password: '123', Nama: 'Administrator', ID_Tambahan: 'ADM001', Kelas: 'System' },
+                { Role: 'Guru', Username: 'guru', Password: '123', Nama: 'Guru Utama', ID_Tambahan: 'G001', Kelas: 'Wali Kelas' }
             ];
 
             try {
@@ -2643,8 +2776,8 @@ function onDeploy() {
                 const result = await sendToAppsScript('sync_users', defaultUsers);
 
                 if (result && result.status === 'success') {
-                    addLog(`✅ ${defaultUsers.length} default users berhasil dibuat`, 'success');
-                    showToast(`✅ ${defaultUsers.length} default users berhasil dibuat!`, 'success');
+                    addLog(`✅ ${defaultUsers.length} default users berhasil dibuat (admin & guru)`, 'success');
+                    showToast(`✅ Akun default berhasil dibuat: admin / guru (password: 123)`, 'success');
                     fireConfetti();
                 } else {
                     addLog(`❌ Gagal membuat default users: ${result?.message || 'Unknown error'}`, 'error');
