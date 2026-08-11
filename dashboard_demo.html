@@ -233,7 +233,7 @@
 
     <main class="relative z-10 max-w-7xl mx-auto px-4 py-4 flex-grow w-full space-y-6">
 
-        <!-- Navigation Tabs - URUTAN DIUBAH: 1. Panduan, 2. Kode, 3. Spreadsheet ID, 4. Kelola Users -->
+        <!-- Navigation Tabs -->
         <div class="flex items-center justify-start sm:justify-center gap-2 overflow-x-auto pb-2 scrollbar-none">
             <button 
                 onclick="switchTab('tab-guide')" 
@@ -259,7 +259,7 @@
                 class="tab-btn px-5 py-3 rounded-2xl text-xs font-bold transition flex items-center gap-2 cursor-pointer bg-slate-800/80 text-slate-400 hover:text-white border border-white/5"
             >
                 <i class="fa-solid fa-database"></i>
-                <span>3. Spreadsheet ID & Tambah Akun Guru</span>
+                <span>3. Spreadsheet ID</span>
             </button>
 
             <button 
@@ -268,11 +268,11 @@
                 class="tab-btn px-5 py-3 rounded-2xl text-xs font-bold transition flex items-center gap-2 cursor-pointer bg-slate-800/80 text-slate-400 hover:text-white border border-white/5"
             >
                 <i class="fa-solid fa-users-gear"></i>
-                <span>4. Kelola Users Otomatis</span>
+                <span>4. Kelola Users</span>
             </button>
         </div>
 
-        <!-- ================= TAB 1: STEP BY STEP GUIDE (URUTAN PERTAMA) ================= -->
+        <!-- ================= TAB 1: STEP BY STEP GUIDE ================= -->
         <div id="tab-guide" class="tab-content block space-y-6 animate-scale-up">
             
             <div class="glass-card p-6 sm:p-8 rounded-3xl">
@@ -952,15 +952,15 @@ function handleSaveKuis(data) {
                 }
             }
             
-            console.log(`✅ ${successCount} dari ${rows.length} soal berhasil disimpan`);
+            console.log(`✅ ${successCount} dari ${questions.length} soal berhasil disimpan`);
             
             // Verifikasi data tersimpan
             const newLastRow = sheet.getLastRow();
             console.log(`📝 LastRow setelah simpan: ${newLastRow}`);
         }
 
-        return createResponse(true, `Berhasil menyimpan ${rows.length} soal kuis`, {
-            total: rows.length,
+        return createResponse(true, `Berhasil menyimpan ${questions.length} soal kuis`, {
+            total: questions.length,
             timestamp: new Date().toISOString()
         });
         
@@ -1874,118 +1874,113 @@ function onDeploy() {
 
         </div>
 
-        <!-- ================= TAB 3: SPREADSHEET ID & USER CREATION ================= -->
+        <!-- ================= TAB 3: SPREADSHEET ID ONLY ================= -->
         <div id="tab-config" class="tab-content hidden space-y-6 animate-scale-up">
             
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div class="max-w-2xl mx-auto">
                 
-                <!-- Left Column: Spreadsheet ID Setup -->
-                <div class="lg:col-span-5 space-y-6">
-                    
-                    <div class="glass-card p-6 rounded-3xl relative overflow-hidden">
-                        <div class="flex items-center gap-3 mb-4">
-                            <div class="p-3 bg-amber-500/20 text-amber-400 rounded-2xl border border-amber-500/30">
-                                <i class="fa-solid fa-key text-lg"></i>
-                            </div>
-                            <div>
-                                <h2 class="text-base font-extrabold text-white">Simpan Kode Akses</h2>
-                                <p class="text-xs text-slate-400">Data tersimpan di LocalStorage Browser</p>
-                            </div>
+                <div class="glass-card p-6 rounded-3xl relative overflow-hidden">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="p-3 bg-amber-500/20 text-amber-400 rounded-2xl border border-amber-500/30">
+                            <i class="fa-solid fa-key text-lg"></i>
                         </div>
+                        <div>
+                            <h2 class="text-base font-extrabold text-white">Simpan Kode Akses</h2>
+                            <p class="text-xs text-slate-400">Data tersimpan di LocalStorage Browser</p>
+                        </div>
+                    </div>
 
-                        <div class="space-y-4">
-                            <!-- Spreadsheet ID -->
-                            <div>
-                                <label for="spreadsheetIdInput" class="block text-xs font-bold text-slate-300 mb-1.5 flex items-center justify-between">
-                                    <span>Google Spreadsheet ID</span>
-                                    <span class="text-[10px] text-amber-400 font-normal">*Wajib Diisi</span>
-                                </label>
-                                <div class="relative">
-                                    <input 
-                                        type="text" 
-                                        id="spreadsheetIdInput" 
-                                        placeholder="Contoh: 1akldnvilorhfkjfod8nfkd" 
-                                        class="w-full px-4 py-3 bg-slate-900/90 border border-slate-700 rounded-2xl text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500 transition shadow-inner"
-                                    >
-                                </div>
-                                <p class="text-[11px] text-slate-400 mt-2 leading-relaxed">
-                                    Dapatkan ID ini dari URL browser Google Sheet Anda: <br>
-                                    <code class="bg-slate-900 px-1.5 py-0.5 rounded text-amber-300 text-[10px] border border-slate-800">docs.google.com/spreadsheets/d/<strong class="underline">SPREADSHEET_ID</strong>/edit</code>
-                                </p>
-                            </div>
-
-                            <!-- AppScript URL -->
-                            <div>
-                                <label for="appScriptUrlInput" class="block text-xs font-bold text-slate-300 mb-1.5 flex items-center justify-between">
-                                    <span>URL Web App (Apps Script)</span>
-                                    <span class="text-[10px] text-emerald-400 font-normal">*Wajib Diisi</span>
-                                </label>
-                                <div class="relative">
-                                    <input 
-                                        type="text" 
-                                        id="appScriptUrlInput" 
-                                        placeholder="Contoh: https://script.google.com/macros/s/AKfycby.../exec" 
-                                        class="w-full px-4 py-3 bg-slate-900/90 border border-slate-700 rounded-2xl text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500 transition shadow-inner"
-                                    >
-                                </div>
-                                <p class="text-[11px] text-slate-400 mt-2 leading-relaxed">
-                                    Salin URL dari hasil Deploy Web App di Apps Script Editor.
-                                </p>
-                            </div>
-
-                            <!-- API Key (Opsional) -->
-                            <div>
-                                <label for="apiKeyInput" class="block text-xs font-bold text-slate-300 mb-1.5 flex items-center justify-between">
-                                    <span>API Key (Opsional)</span>
-                                    <span class="text-[10px] text-slate-500 font-normal">(Kosongkan jika tidak digunakan)</span>
-                                </label>
-                                <div class="relative">
-                                    <input 
-                                        type="text" 
-                                        id="apiKeyInput" 
-                                        placeholder="Contoh: AIzaSyD... (Google API Key)" 
-                                        class="w-full px-4 py-3 bg-slate-900/90 border border-slate-700 rounded-2xl text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500 transition shadow-inner"
-                                    >
-                                    <i class="fa-solid fa-key absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
-                                </div>
-                                <p class="text-[11px] text-slate-400 mt-2 leading-relaxed">
-                                    Digunakan untuk autentikasi tambahan jika diperlukan.
-                                </p>
-                            </div>
-
-                            <div class="flex items-center gap-2 pt-2">
-                                <button 
-                                    onclick="saveAllCredentials()" 
-                                    class="flex-1 py-3 px-4 bg-brand-600 hover:bg-brand-500 active:scale-95 text-white font-extrabold text-xs rounded-2xl shadow-lg shadow-brand-600/30 transition flex items-center justify-center gap-2 cursor-pointer"
+                    <div class="space-y-4">
+                        <!-- Spreadsheet ID -->
+                        <div>
+                            <label for="spreadsheetIdInput" class="block text-xs font-bold text-slate-300 mb-1.5 flex items-center justify-between">
+                                <span>Google Spreadsheet ID</span>
+                                <span class="text-[10px] text-amber-400 font-normal">*Wajib Diisi</span>
+                            </label>
+                            <div class="relative">
+                                <input 
+                                    type="text" 
+                                    id="spreadsheetIdInput" 
+                                    placeholder="Contoh: 1akldnvilorhfkjfod8nfkd" 
+                                    class="w-full px-4 py-3 bg-slate-900/90 border border-slate-700 rounded-2xl text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500 transition shadow-inner"
                                 >
-                                    <i class="fa-solid fa-floppy-disk"></i>
-                                    <span>Simpan Semua Kode Akses</span>
-                                </button>
-                                
-                                <button 
-                                    onclick="testConnection()" 
-                                    class="py-3 px-4 bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-200 font-bold text-xs rounded-2xl border border-slate-700 transition flex items-center gap-2 cursor-pointer"
-                                    title="Uji Koneksi Sheet"
+                            </div>
+                            <p class="text-[11px] text-slate-400 mt-2 leading-relaxed">
+                                Dapatkan ID ini dari URL browser Google Sheet Anda: <br>
+                                <code class="bg-slate-900 px-1.5 py-0.5 rounded text-amber-300 text-[10px] border border-slate-800">docs.google.com/spreadsheets/d/<strong class="underline">SPREADSHEET_ID</strong>/edit</code>
+                            </p>
+                        </div>
+
+                        <!-- AppScript URL -->
+                        <div>
+                            <label for="appScriptUrlInput" class="block text-xs font-bold text-slate-300 mb-1.5 flex items-center justify-between">
+                                <span>URL Web App (Apps Script)</span>
+                                <span class="text-[10px] text-emerald-400 font-normal">*Wajib Diisi</span>
+                            </label>
+                            <div class="relative">
+                                <input 
+                                    type="text" 
+                                    id="appScriptUrlInput" 
+                                    placeholder="Contoh: https://script.google.com/macros/s/AKfycby.../exec" 
+                                    class="w-full px-4 py-3 bg-slate-900/90 border border-slate-700 rounded-2xl text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500 transition shadow-inner"
                                 >
-                                    <i class="fa-solid fa-plug text-emerald-400"></i>
-                                    <span>Tes</span>
-                                </button>
                             </div>
+                            <p class="text-[11px] text-slate-400 mt-2 leading-relaxed">
+                                Salin URL dari hasil Deploy Web App di Apps Script Editor.
+                            </p>
                         </div>
 
-                        <!-- Credentials Status Banner -->
-                        <div id="idStatusBanner" class="mt-4 p-3.5 rounded-2xl bg-slate-900/80 border border-slate-800 flex items-center gap-3 text-xs">
-                            <i id="statusIcon" class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>
-                            <div class="flex-1 min-w-0">
-                                <span class="block text-[10px] text-slate-400 uppercase tracking-wider font-bold">Status Tersimpan</span>
-                                <span id="statusText" class="font-mono text-emerald-300 font-semibold truncate block max-w-[220px]">Menunggu input...</span>
+                        <!-- API Key (Opsional) -->
+                        <div>
+                            <label for="apiKeyInput" class="block text-xs font-bold text-slate-300 mb-1.5 flex items-center justify-between">
+                                <span>API Key (Opsional)</span>
+                                <span class="text-[10px] text-slate-500 font-normal">(Kosongkan jika tidak digunakan)</span>
+                            </label>
+                            <div class="relative">
+                                <input 
+                                    type="text" 
+                                    id="apiKeyInput" 
+                                    placeholder="Contoh: AIzaSyD... (Google API Key)" 
+                                    class="w-full px-4 py-3 bg-slate-900/90 border border-slate-700 rounded-2xl text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500 transition shadow-inner"
+                                >
+                                <i class="fa-solid fa-key absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
                             </div>
+                            <p class="text-[11px] text-slate-400 mt-2 leading-relaxed">
+                                Digunakan untuk autentikasi tambahan jika diperlukan.
+                            </p>
                         </div>
 
+                        <div class="flex items-center gap-2 pt-2">
+                            <button 
+                                onclick="saveAllCredentials()" 
+                                class="flex-1 py-3 px-4 bg-brand-600 hover:bg-brand-500 active:scale-95 text-white font-extrabold text-xs rounded-2xl shadow-lg shadow-brand-600/30 transition flex items-center justify-center gap-2 cursor-pointer"
+                            >
+                                <i class="fa-solid fa-floppy-disk"></i>
+                                <span>Simpan Semua Kode Akses</span>
+                            </button>
+                            
+                            <button 
+                                onclick="testConnection()" 
+                                class="py-3 px-4 bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-200 font-bold text-xs rounded-2xl border border-slate-700 transition flex items-center gap-2 cursor-pointer"
+                                title="Uji Koneksi Sheet"
+                            >
+                                <i class="fa-solid fa-plug text-emerald-400"></i>
+                                <span>Tes</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Credentials Status Banner -->
+                    <div id="idStatusBanner" class="mt-4 p-3.5 rounded-2xl bg-slate-900/80 border border-slate-800 flex items-center gap-3 text-xs">
+                        <i id="statusIcon" class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>
+                        <div class="flex-1 min-w-0">
+                            <span class="block text-[10px] text-slate-400 uppercase tracking-wider font-bold">Status Tersimpan</span>
+                            <span id="statusText" class="font-mono text-emerald-300 font-semibold truncate block max-w-[220px]">Menunggu input...</span>
+                        </div>
                     </div>
 
                     <!-- Visual Helper Box -->
-                    <div class="glass-card p-5 rounded-3xl border-amber-500/20 bg-amber-500/5">
+                    <div class="mt-4 glass-card p-5 rounded-3xl border-amber-500/20 bg-amber-500/5">
                         <h3 class="text-xs font-bold text-amber-300 mb-2 flex items-center gap-2">
                             <i class="fa-solid fa-lightbulb text-amber-400"></i>
                             <span>Format Tab Sheet di Google Sheets:</span>
@@ -2000,194 +1995,11 @@ function onDeploy() {
 
                 </div>
 
-                <!-- Right Column: Account Creation Tool -->
-                <div class="lg:col-span-7 space-y-6">
-                    
-                    <div class="glass-card p-6 rounded-3xl">
-                        
-                        <div class="flex items-center justify-between mb-5">
-                            <div class="flex items-center gap-3">
-                                <div class="p-3 bg-brand-500/20 text-brand-400 rounded-2xl border border-brand-500/30">
-                                    <i class="fa-solid fa-user-plus text-lg"></i>
-                                </div>
-                                <div>
-                                    <h2 class="text-base font-extrabold text-white">Buat / Form Akun Guru Baru</h2>
-                                    <p class="text-xs text-slate-400">Tambahkan akun Guru baru untuk dimasukkan ke Spreadsheet</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <form id="addUserForm" onsubmit="handleAddUser(event)" class="space-y-4">
-                            
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <!-- Role Selection (LOCKED TO GURU ONLY) -->
-                                <div>
-                                    <label class="block text-xs font-bold text-slate-300 mb-1.5 flex items-center justify-between">
-                                        <span>Peran / Role <span class="text-red-400">*</span></span>
-                                        <span class="text-[10px] text-brand-300 font-medium">(Khusus Guru)</span>
-                                    </label>
-                                    <select 
-                                        id="userRole" 
-                                        disabled
-                                        class="w-full px-4 py-3 bg-slate-900/80 border border-slate-700 rounded-2xl text-xs font-bold text-brand-400 cursor-not-allowed focus:outline-none transition shadow-inner"
-                                    >
-                                        <option value="guru" selected>Guru</option>
-                                    </select>
-                                </div>
-
-                                <!-- Username Input -->
-                                <div>
-                                    <label class="block text-xs font-bold text-slate-300 mb-1.5">
-                                        Username / NIP <span class="text-red-400">*</span>
-                                    </label>
-                                    <input 
-                                        type="text" 
-                                        id="userUsername" 
-                                        required 
-                                        placeholder="Contoh: guru01 atau 19850101..." 
-                                        class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-2xl text-xs font-semibold text-white focus:ring-2 focus:ring-brand-500 focus:outline-none transition"
-                                    >
-                                </div>
-                            </div>
-
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <!-- Password Input (STRICTLY NUMERIC) -->
-                                <div>
-                                    <label class="block text-xs font-bold text-slate-300 mb-1.5 flex items-center justify-between">
-                                        <span>Password <span class="text-red-400">*</span></span>
-                                        <span class="text-[10px] text-amber-400 font-extrabold uppercase">WAJIB HANYA ANGKA</span>
-                                    </label>
-                                    <div class="relative">
-                                        <input 
-                                            type="text" 
-                                            id="userPassword" 
-                                            required 
-                                            inputmode="numeric"
-                                            pattern="[0-9]*"
-                                            oninput="validateNumericPassword(this)"
-                                            placeholder="Contoh: 123456" 
-                                            class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-2xl text-xs font-mono font-bold text-amber-300 focus:ring-2 focus:ring-brand-500 focus:outline-none transition tracking-widest"
-                                        >
-                                        <i class="fa-solid fa-hashtag absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
-                                    </div>
-                                    <p id="passWarning" class="text-[10px] text-red-400 mt-1 hidden font-bold">
-                                        <i class="fa-solid fa-circle-exclamation"></i> Password hanya boleh berisi angka (0-9)!
-                                    </p>
-                                </div>
-
-                                <!-- Full Name Input -->
-                                <div>
-                                    <label class="block text-xs font-bold text-slate-300 mb-1.5">
-                                        Nama Lengkap Guru <span class="text-red-400">*</span>
-                                    </label>
-                                    <input 
-                                        type="text" 
-                                        id="userNama" 
-                                        required 
-                                        placeholder="Contoh: Dra. Siti Rahma, M.Pd" 
-                                        class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-2xl text-xs font-semibold text-white focus:ring-2 focus:ring-brand-500 focus:outline-none transition"
-                                    >
-                                </div>
-                            </div>
-
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <!-- Additional ID -->
-                                <div>
-                                    <label class="block text-xs font-bold text-slate-300 mb-1.5">
-                                        ID Tambahan / Kode Kode Guru (Opsional)
-                                    </label>
-                                    <input 
-                                        type="text" 
-                                        id="userIdTambahan" 
-                                        placeholder="Contoh: G-001" 
-                                        class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-2xl text-xs font-semibold text-white focus:ring-2 focus:ring-brand-500 focus:outline-none transition"
-                                    >
-                                </div>
-
-                                <!-- Class or Mapel -->
-                                <div>
-                                    <label class="block text-xs font-bold text-slate-300 mb-1.5">
-                                        Jabatan / Wali Kelas / Mapel
-                                    </label>
-                                    <input 
-                                        type="text" 
-                                        id="userKelas" 
-                                        placeholder="Contoh: Wali Kelas 5A / Guru PJOK" 
-                                        class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-2xl text-xs font-semibold text-white focus:ring-2 focus:ring-brand-500 focus:outline-none transition"
-                                    >
-                                </div>
-                            </div>
-
-                            <div class="pt-2 flex items-center justify-end gap-3">
-                                <button 
-                                    type="submit" 
-                                    class="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 active:scale-95 text-white font-extrabold text-xs rounded-2xl shadow-lg shadow-emerald-600/25 transition flex items-center justify-center gap-2 cursor-pointer"
-                                >
-                                    <i class="fa-solid fa-plus"></i>
-                                    <span>Tambahkan Akun Guru ke Daftar</span>
-                                </button>
-                            </div>
-
-                        </form>
-
-                    </div>
-
-                    <!-- User Draft Table -->
-                    <div class="glass-card p-6 rounded-3xl">
-                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
-                            <div>
-                                <h3 class="text-sm font-extrabold text-white flex items-center gap-2">
-                                    <i class="fa-solid fa-users text-brand-400"></i>
-                                    <span>Daftar Akun Guru Siap Ditempel (Copy-Paste)</span>
-                                </h3>
-                                <p class="text-xs text-slate-400">Salin baris di bawah dan tempel langsung ke Google Sheet "Users"</p>
-                            </div>
-
-                            <div class="flex items-center gap-2 w-full sm:w-auto">
-                                <button 
-                                    onclick="copyUsersForSheet()" 
-                                    class="flex-1 sm:flex-none px-3.5 py-2 bg-brand-600/80 hover:bg-brand-600 text-white text-xs font-bold rounded-xl border border-brand-400/30 transition flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
-                                >
-                                    <i class="fa-solid fa-copy"></i>
-                                    <span>Salin Semua untuk Google Sheet</span>
-                                </button>
-                                <button 
-                                    onclick="clearUserList()" 
-                                    class="px-3 py-2 bg-slate-800 hover:bg-red-500/20 text-slate-400 hover:text-red-400 text-xs font-bold rounded-xl border border-slate-700 transition cursor-pointer"
-                                    title="Bersihkan daftar"
-                                >
-                                    <i class="fa-solid fa-trash"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="overflow-x-auto rounded-2xl border border-slate-800 bg-slate-950">
-                            <table class="w-full text-left text-xs font-sans">
-                                <thead>
-                                    <tr class="bg-slate-900 border-b border-slate-800 text-slate-400 uppercase text-[10px] tracking-wider font-bold">
-                                        <th class="p-3">Role</th>
-                                        <th class="p-3">Username</th>
-                                        <th class="p-3">Password (Angka)</th>
-                                        <th class="p-3">Nama Guru</th>
-                                        <th class="p-3">ID Tambahan</th>
-                                        <th class="p-3">Tugas / Kelas</th>
-                                        <th class="p-3 text-center">Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="userTableBody" class="divide-y divide-slate-800 text-slate-300 font-medium">
-                                    <!-- Dynamic rows inserted here -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                </div>
-
             </div>
 
         </div>
 
-        <!-- ================= TAB 4: AUTO CREATE USERS ================= -->
+        <!-- ================= TAB 4: KELOLA USERS (GURU ONLY) ================= -->
         <div id="tab-users" class="tab-content hidden space-y-6 animate-scale-up">
             
             <div class="glass-card p-6 rounded-3xl">
@@ -2197,55 +2009,50 @@ function onDeploy() {
                     </div>
                     <div>
                         <h2 class="text-lg font-black text-white">Kelola Users Otomatis</h2>
-                        <p class="text-xs text-slate-400">Buat dan sinkronisasi Users ke Google Sheets secara otomatis</p>
+                        <p class="text-xs text-slate-400">Tambah dan kelola akun Guru di Google Sheets</p>
                     </div>
                 </div>
 
-                <!-- Form Tambah User Otomatis -->
+                <!-- Form Tambah User -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                     <div class="bg-slate-900/70 p-5 rounded-2xl border border-slate-800">
                         <h3 class="text-sm font-bold text-white mb-4 flex items-center gap-2">
                             <i class="fa-solid fa-user-plus text-emerald-400"></i>
-                            <span>Tambah User Baru</span>
+                            <span>Tambah Guru Baru</span>
                         </h3>
                         <form id="autoAddUserForm" onsubmit="autoAddUser(event)" class="space-y-3">
-                            <div class="grid grid-cols-2 gap-3">
-                                <div>
-                                    <label class="block text-xs font-bold text-slate-300 mb-1">Role</label>
-                                    <select id="autoUserRole" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
-                                        <option value="Admin">Admin</option>
-                                        <option value="Guru" selected>Guru</option>
-                                        <option value="Siswa">Siswa</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-bold text-slate-300 mb-1">Username *</label>
-                                    <input type="text" id="autoUsername" required placeholder="username" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
-                                </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-300 mb-1">Role</label>
+                                <select id="autoUserRole" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                                    <option value="Guru" selected>Guru</option>
+                                </select>
+                                <p class="text-[10px] text-slate-500 mt-1">* Hanya role Guru yang tersedia</p>
                             </div>
-                            <div class="grid grid-cols-2 gap-3">
-                                <div>
-                                    <label class="block text-xs font-bold text-slate-300 mb-1">Password *</label>
-                                    <input type="text" id="autoPassword" required placeholder="password" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-bold text-slate-300 mb-1">Nama Lengkap *</label>
-                                    <input type="text" id="autoNama" required placeholder="Nama User" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
-                                </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-300 mb-1">Username *</label>
+                                <input type="text" id="autoUsername" required placeholder="Contoh: guru01" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-300 mb-1">Password *</label>
+                                <input type="text" id="autoPassword" required placeholder="Password (angka)" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-300 mb-1">Nama Lengkap Guru *</label>
+                                <input type="text" id="autoNama" required placeholder="Contoh: Dra. Siti Rahma, M.Pd" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
                             </div>
                             <div class="grid grid-cols-2 gap-3">
                                 <div>
                                     <label class="block text-xs font-bold text-slate-300 mb-1">ID Tambahan</label>
-                                    <input type="text" id="autoIdTambahan" placeholder="ID Tambahan" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                                    <input type="text" id="autoIdTambahan" placeholder="Contoh: G-001" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-bold text-slate-300 mb-1">Kelas / Tugas</label>
-                                    <input type="text" id="autoKelas" placeholder="Kelas / Tugas" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                                    <label class="block text-xs font-bold text-slate-300 mb-1">Tugas / Kelas</label>
+                                    <input type="text" id="autoKelas" placeholder="Contoh: Wali Kelas 5A" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
                                 </div>
                             </div>
                             <button type="submit" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-bold text-xs rounded-xl shadow-lg shadow-emerald-600/25 transition flex items-center justify-center gap-2 cursor-pointer">
                                 <i class="fa-solid fa-plus"></i>
-                                <span>Tambah User ke Sheet</span>
+                                <span>Tambah Guru ke Sheet</span>
                             </button>
                         </form>
                     </div>
@@ -2258,15 +2065,15 @@ function onDeploy() {
                         <div class="space-y-3">
                             <button onclick="showDefaultUsersModal()" class="w-full py-2.5 bg-amber-600/80 hover:bg-amber-500 active:scale-95 text-white font-bold text-xs rounded-xl shadow-lg shadow-amber-600/20 transition flex items-center justify-center gap-2 cursor-pointer">
                                 <i class="fa-solid fa-users"></i>
-                                <span>Buat Default Users (2 Akun: guru & admin)</span>
+                                <span>Buat Default Guru (admin & guru)</span>
                             </button>
                             <button onclick="syncAllUsersToSheet()" class="w-full py-2.5 bg-brand-600 hover:bg-brand-500 active:scale-95 text-white font-bold text-xs rounded-xl shadow-lg shadow-brand-600/25 transition flex items-center justify-center gap-2 cursor-pointer">
                                 <i class="fa-solid fa-cloud-upload-alt"></i>
-                                <span>Sinkronisasi Semua Users ke Sheet</span>
+                                <span>Sinkronisasi Semua Guru ke Sheet</span>
                             </button>
                             <button onclick="clearAllUsersInSheet()" class="w-full py-2.5 bg-red-600/80 hover:bg-red-500 active:scale-95 text-white font-bold text-xs rounded-xl shadow-lg shadow-red-600/20 transition flex items-center justify-center gap-2 cursor-pointer">
                                 <i class="fa-solid fa-trash-can"></i>
-                                <span>Hapus Semua Users di Sheet</span>
+                                <span>Hapus Semua Guru di Sheet</span>
                             </button>
                         </div>
                     </div>
@@ -2282,7 +2089,7 @@ function onDeploy() {
                         <button onclick="clearLog()" class="px-3 py-1 text-xs text-slate-400 hover:text-white transition">Clear</button>
                     </div>
                     <div id="userLog" class="h-32 overflow-y-auto bg-slate-950 rounded-xl p-3 border border-slate-800 text-xs font-mono text-slate-400 space-y-1">
-                        <div>📋 Siap untuk mengelola users...</div>
+                        <div>📋 Siap untuk mengelola guru...</div>
                     </div>
                 </div>
             </div>
@@ -2342,10 +2149,7 @@ function onDeploy() {
     <script>
         const DEFAULT_SHEET_ID = "(paste)";
         const DEFAULT_APPSCRIPT_URL = "https://script.google.com/macros/s/AKfycby.../exec";
-        let localUsers = [
-            { role: 'guru', username: 'admin', password: '123', nama: 'Administrator', id_tambahan: 'G01', kelas: 'System' },
-            { role: 'guru', username: 'guru', password: '123', nama: 'Guru Pengajar', id_tambahan: 'G02', kelas: 'Wali Kelas' }
-        ];
+        let localUsers = [];
 
         const STORAGE_KEYS = {
             SHEET_ID: 'sdn3_ngantru_sheet_id',
@@ -2355,7 +2159,6 @@ function onDeploy() {
 
         document.addEventListener('DOMContentLoaded', () => {
             loadAllCredentials();
-            renderUserTable();
             addLog('📋 Dashboard siap digunakan', 'info');
         });
 
@@ -2473,112 +2276,6 @@ function onDeploy() {
             document.head.appendChild(script);
         }
 
-        function validateNumericPassword(input) {
-            const warningEl = document.getElementById('passWarning');
-            const cleaned = input.value.replace(/\D/g, '');
-            if (input.value !== cleaned) {
-                warningEl.classList.remove('hidden');
-                input.value = cleaned;
-                playUiSound('warning');
-            } else {
-                warningEl.classList.add('hidden');
-            }
-        }
-
-        function handleAddUser(event) {
-            event.preventDefault();
-
-            const role = 'guru';
-            const username = document.getElementById('userUsername').value.trim();
-            const password = document.getElementById('userPassword').value.trim();
-            const nama = document.getElementById('userNama').value.trim();
-            const id_tambahan = document.getElementById('userIdTambahan').value.trim();
-            const kelas = document.getElementById('userKelas').value.trim();
-
-            if (!/^\d+$/.test(password)) {
-                showToast("Password WAJIB hanya berupa angka (0-9)!", "error");
-                document.getElementById('passWarning').classList.remove('hidden');
-                return;
-            }
-
-            localUsers.push({ role, username, password, nama, id_tambahan, kelas });
-            renderUserTable();
-
-            document.getElementById('userUsername').value = '';
-            document.getElementById('userPassword').value = '';
-            document.getElementById('userNama').value = '';
-            document.getElementById('userIdTambahan').value = '';
-            document.getElementById('userKelas').value = '';
-
-            playUiSound('success');
-            showToast(`Akun Guru (${nama}) berhasil ditambahkan ke daftar draft!`, "success");
-        }
-
-        function renderUserTable() {
-            const tbody = document.getElementById('userTableBody');
-            tbody.innerHTML = '';
-
-            if (localUsers.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="7" class="p-4 text-center text-slate-500 italic">
-                            Belum ada akun guru di daftar. Silakan isi form di atas.
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
-
-            localUsers.forEach((u, idx) => {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-900/60 transition";
-                tr.innerHTML = `
-                    <td class="p-3 capitalize font-bold text-indigo-400">${u.role}</td>
-                    <td class="p-3 font-mono text-white">${u.username}</td>
-                    <td class="p-3 font-mono font-bold text-amber-300">${u.password}</td>
-                    <td class="p-3 text-slate-200">${u.nama}</td>
-                    <td class="p-3 text-slate-400 font-mono">${u.id_tambahan || '-'}</td>
-                    <td class="p-3 text-slate-400">${u.kelas || '-'}</td>
-                    <td class="p-3 text-center">
-                        <button onclick="removeUser(${idx})" class="p-1.5 text-slate-500 hover:text-red-400 transition" title="Hapus">
-                            <i class="fa-solid fa-xmark text-sm"></i>
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function removeUser(index) {
-            localUsers.splice(index, 1);
-            renderUserTable();
-            showToast("Akun dihapus dari daftar draft.", "info");
-        }
-
-        function clearUserList() {
-            if (confirm("Apakah Anda yakin ingin mengosongkan seluruh daftar akun draft?")) {
-                localUsers = [];
-                renderUserTable();
-                showToast("Daftar akun dikosongkan.", "info");
-            }
-        }
-
-        function copyUsersForSheet() {
-            if (localUsers.length === 0) {
-                showToast("Daftar akun kosong!", "error");
-                return;
-            }
-
-            let textToCopy = "Role\tUsername\tPassword\tNama\tID_Tambahan\tKelas\n";
-            localUsers.forEach(u => {
-                textToCopy += `${u.role}\t${u.username}\t${u.password}\t${u.nama}\t${u.id_tambahan || ''}\t${u.kelas || ''}\n`;
-            });
-
-            copyToClipboard(textToCopy);
-            showToast("Daftar akun Guru berhasil disalin! Tinggal Paste (Ctrl+V) di Google Sheet 'Users'.", "success");
-            fireConfetti();
-        }
-
         function copyAppsScriptCode() {
             const codeText = document.getElementById('codeBlock').innerText;
             
@@ -2654,7 +2351,7 @@ function onDeploy() {
         function getWebAppUrl() {
             const url = localStorage.getItem(STORAGE_KEYS.APPSCRIPT_URL) || document.getElementById('appScriptUrlInput').value.trim();
             if (!url || url === DEFAULT_APPSCRIPT_URL) {
-                showToast("⚠️ Pastikan URL Web App sudah disimpan di Tab 1!", "error");
+                showToast("⚠️ Pastikan URL Web App sudah disimpan di Tab 3!", "error");
                 return null;
             }
             return url;
@@ -2727,8 +2424,8 @@ function onDeploy() {
             btn.innerHTML = '<span class="spinner"></span> Menyimpan...';
 
             try {
-                addLog(`Menambahkan user "${username}"...`, 'info');
-                showToast("⏳ Menambahkan user...", "info");
+                addLog(`Menambahkan guru "${username}"...`, 'info');
+                showToast("⏳ Menambahkan guru...", "info");
 
                 const result = await sendToAppsScript('sync_users', [{
                     Role: role,
@@ -2740,8 +2437,8 @@ function onDeploy() {
                 }]);
 
                 if (result && result.status === 'success') {
-                    addLog(`✅ User "${username}" berhasil ditambahkan`, 'success');
-                    showToast(`✅ User "${username}" berhasil ditambahkan ke Google Sheet!`, 'success');
+                    addLog(`✅ Guru "${username}" berhasil ditambahkan`, 'success');
+                    showToast(`✅ Guru "${username}" berhasil ditambahkan ke Google Sheet!`, 'success');
                     fireConfetti();
                     
                     document.getElementById('autoUsername').value = '';
@@ -2750,16 +2447,16 @@ function onDeploy() {
                     document.getElementById('autoIdTambahan').value = '';
                     document.getElementById('autoKelas').value = '';
                 } else {
-                    addLog(`❌ Gagal menambahkan user: ${result?.message || 'Unknown error'}`, 'error');
-                    showToast(`❌ Gagal menambahkan user: ${result?.message || 'Unknown error'}`, 'error');
+                    addLog(`❌ Gagal menambahkan guru: ${result?.message || 'Unknown error'}`, 'error');
+                    showToast(`❌ Gagal menambahkan guru: ${result?.message || 'Unknown error'}`, 'error');
                 }
             } catch (error) {
                 addLog(`❌ Error: ${error.message}`, 'error');
-                showToast(`❌ Gagal menambahkan user: ${error.message}`, 'error');
+                showToast(`❌ Gagal menambahkan guru: ${error.message}`, 'error');
             }
 
             btn.disabled = false;
-            btn.innerHTML = '<i class="fa-solid fa-plus"></i> Tambah User ke Sheet';
+            btn.innerHTML = '<i class="fa-solid fa-plus"></i> Tambah Guru ke Sheet';
         }
 
         async function createDefaultUsers() {
@@ -2790,29 +2487,37 @@ function onDeploy() {
         }
 
         async function syncAllUsersToSheet() {
-            if (localUsers.length === 0) {
-                showToast("⚠️ Tidak ada user di daftar draft untuk disinkronisasi!", "error");
+            // Gunakan data dari form input secara langsung (tidak pakai localUsers)
+            const username = document.getElementById('autoUsername').value.trim();
+            const password = document.getElementById('autoPassword').value.trim();
+            const nama = document.getElementById('autoNama').value.trim();
+            const role = document.getElementById('autoUserRole').value;
+            const id_tambahan = document.getElementById('autoIdTambahan').value.trim();
+            const kelas = document.getElementById('autoKelas').value.trim();
+
+            if (!username || !password || !nama) {
+                showToast("⚠️ Tambahkan guru terlebih dahulu melalui form di atas!", "error");
                 return;
             }
 
-            const formattedUsers = localUsers.map(u => ({
-                Role: u.role === 'guru' ? 'Guru' : u.role,
-                Username: u.username,
-                Password: u.password,
-                Nama: u.nama,
-                ID_Tambahan: u.id_tambahan || '',
-                Kelas: u.kelas || ''
-            }));
+            const formattedUsers = [{
+                Role: role,
+                Username: username,
+                Password: password,
+                Nama: nama,
+                ID_Tambahan: id_tambahan || '',
+                Kelas: kelas || ''
+            }];
 
             try {
-                addLog(`📤 Menyinkronkan ${formattedUsers.length} users ke sheet...`, 'info');
-                showToast(`⏳ Menyinkronkan ${formattedUsers.length} users...`, "info");
+                addLog(`📤 Menyinkronkan ${formattedUsers.length} guru ke sheet...`, 'info');
+                showToast(`⏳ Menyinkronkan ${formattedUsers.length} guru...`, "info");
 
                 const result = await sendToAppsScript('sync_users', formattedUsers);
 
                 if (result && result.status === 'success') {
-                    addLog(`✅ ${formattedUsers.length} users berhasil disinkronkan`, 'success');
-                    showToast(`✅ ${formattedUsers.length} users berhasil disinkronkan ke Google Sheet!`, 'success');
+                    addLog(`✅ ${formattedUsers.length} guru berhasil disinkronkan`, 'success');
+                    showToast(`✅ ${formattedUsers.length} guru berhasil disinkronkan ke Google Sheet!`, 'success');
                     fireConfetti();
                 } else {
                     addLog(`❌ Gagal sinkronisasi: ${result?.message || 'Unknown error'}`, 'error');
@@ -2838,8 +2543,6 @@ function onDeploy() {
                 if (result && result.status === 'success') {
                     addLog('✅ Semua users berhasil dihapus dari sheet', 'success');
                     showToast('✅ Semua users berhasil dihapus dari Google Sheet!', 'success');
-                    localUsers = [];
-                    renderUserTable();
                 } else {
                     addLog(`❌ Gagal menghapus users: ${result?.message || 'Unknown error'}`, 'error');
                     showToast(`❌ Gagal menghapus users: ${result?.message || 'Unknown error'}`, 'error');
