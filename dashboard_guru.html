@@ -3916,7 +3916,7 @@ function onDeploy() {
             syncDataToAppScript('nilai', nilaiDb),
             syncDataToAppScript('jurnal', jurnalDb)
         ]).then(() => {
-            Swal.fire('Sukses!', 'Semua data telah disinkronisasi. Data guru/admin tetap dipertahankan dengan password 123456.', 'success');
+            Swal.fire('Sukses!', 'Semua data telah disinkronisasi dengan databse.', 'success');
         }).catch((error) => {
             console.error('Error sinkronisasi:', error);
             Swal.fire('Error', 'Terjadi kesalahan saat sinkronisasi.', 'error');
