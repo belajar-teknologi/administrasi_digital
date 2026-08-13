@@ -547,12 +547,16 @@ function initializeSheets() {
             }
             
             // Tambahkan data default users
+            // Admin: Username akan diisi dari URL Web App
+            const defaultAdminUsername = 'admin';
+            const defaultGuruUsername = 'guru';
+            const defaultSiswaUsername = 'siswa';
+            
             const defaultUsers = [
-                ["Admin", "admin", "123", "Administrator", "ADM001", "System"],
-                ["Guru", "guru", "123", "Guru Pengajar", "G001", "Wali Kelas"],
-                ["Guru", "guru2", "123", "Guru Pengajar Kedua", "G002", "Wali Kelas"],
-                ["Siswa", "siswa01", "siswa123", "Siswa Contoh", "S001", "5A"],
-                ["Siswa", "siswa02", "siswa123", "Siswa Kedua", "S002", "5B"]
+                ["Admin", defaultAdminUsername, "123", "Administrator", "ADM001", "System"],
+                ["Guru", defaultGuruUsername, "123", "Guru Pengajar", "G001", "Guru Pengajar"],
+                ["Siswa", defaultSiswaUsername, "siswa123", "Siswa Contoh", "S001", "Peserta Didik"],
+                ["Siswa", "siswa02", "siswa123", "Siswa Kedua", "S002", "Peserta Didik"]
             ];
             
             if (defaultUsers.length > 0) {
@@ -1507,15 +1511,32 @@ function syncUsers(data) {
             console.log('🗑️ Data lama dihapus');
         }
         
-        // Tambahkan data baru
-        const rows = data.map(item => [
-            item.Role || 'Guru',
-            item.Username || '',
-            item.Password || '',
-            item.Nama || '',
-            item.ID_Tambahan || '',
-            item.Kelas || ''
-        ]);
+        // Tambahkan data baru dengan pengaturan kelas otomatis
+        const rows = data.map(item => {
+            let kelas = item.Kelas || '';
+            
+            // Jika kelas kosong, tentukan berdasarkan Role
+            if (!kelas || kelas === '') {
+                if (item.Role === 'Admin') {
+                    kelas = 'System';
+                } else if (item.Role === 'Guru') {
+                    kelas = 'Guru Pengajar';
+                } else if (item.Role === 'Siswa') {
+                    kelas = 'Peserta Didik';
+                } else {
+                    kelas = 'System';
+                }
+            }
+            
+            return [
+                item.Role || 'Guru',
+                item.Username || '',
+                item.Password || '',
+                item.Nama || '',
+                item.ID_Tambahan || '',
+                kelas
+            ];
+        });
         
         if (rows.length > 0) {
             sheet.getRange(2, 1, rows.length, HEADER_USERS.length).setValues(rows);
@@ -2025,8 +2046,9 @@ function onDeploy() {
                                 <label class="block text-xs font-bold text-slate-300 mb-1">Role</label>
                                 <select id="autoUserRole" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
                                     <option value="Guru" selected>Guru</option>
+                                    <option value="Siswa">Siswa</option>
                                 </select>
-                                <p class="text-[10px] text-slate-500 mt-1">* Hanya role Guru yang tersedia</p>
+                                <p class="text-[10px] text-slate-500 mt-1">* Pilih role yang akan dibuat</p>
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-300 mb-1">Username *</label>
@@ -2037,7 +2059,7 @@ function onDeploy() {
                                 <input type="text" id="autoPassword" required placeholder="Password (angka)" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono">
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-slate-300 mb-1">Nama Lengkap Guru *</label>
+                                <label class="block text-xs font-bold text-slate-300 mb-1">Nama Lengkap *</label>
                                 <input type="text" id="autoNama" required placeholder="Contoh: Dra. Siti Rahma, M.Pd" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
                             </div>
                             <div class="grid grid-cols-2 gap-3">
@@ -2046,13 +2068,13 @@ function onDeploy() {
                                     <input type="text" id="autoIdTambahan" placeholder="Contoh: G-001" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-bold text-slate-300 mb-1">Tugas / Kelas</label>
-                                    <input type="text" id="autoKelas" placeholder="Contoh: Wali Kelas 5A" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                                    <label class="block text-xs font-bold text-slate-300 mb-1">Kelas (Opsional)</label>
+                                    <input type="text" id="autoKelas" placeholder="Kosongkan untuk otomatis" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
                                 </div>
                             </div>
                             <button type="submit" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-bold text-xs rounded-xl shadow-lg shadow-emerald-600/25 transition flex items-center justify-center gap-2 cursor-pointer">
                                 <i class="fa-solid fa-plus"></i>
-                                <span>Tambah Guru ke Sheet</span>
+                                <span>Tambah User ke Sheet</span>
                             </button>
                         </form>
                     </div>
@@ -2065,15 +2087,15 @@ function onDeploy() {
                         <div class="space-y-3">
                             <button onclick="showDefaultUsersModal()" class="w-full py-2.5 bg-amber-600/80 hover:bg-amber-500 active:scale-95 text-white font-bold text-xs rounded-xl shadow-lg shadow-amber-600/20 transition flex items-center justify-center gap-2 cursor-pointer">
                                 <i class="fa-solid fa-users"></i>
-                                <span>Buat Default Guru (admin & guru)</span>
+                                <span>Buat Default Users (Admin, Guru, Siswa)</span>
                             </button>
                             <button onclick="syncAllUsersToSheet()" class="w-full py-2.5 bg-brand-600 hover:bg-brand-500 active:scale-95 text-white font-bold text-xs rounded-xl shadow-lg shadow-brand-600/25 transition flex items-center justify-center gap-2 cursor-pointer">
                                 <i class="fa-solid fa-cloud-upload-alt"></i>
-                                <span>Sinkronisasi Semua Guru ke Sheet</span>
+                                <span>Sinkronisasi User ke Sheet</span>
                             </button>
                             <button onclick="clearAllUsersInSheet()" class="w-full py-2.5 bg-red-600/80 hover:bg-red-500 active:scale-95 text-white font-bold text-xs rounded-xl shadow-lg shadow-red-600/20 transition flex items-center justify-center gap-2 cursor-pointer">
                                 <i class="fa-solid fa-trash-can"></i>
-                                <span>Hapus Semua Guru di Sheet</span>
+                                <span>Hapus Semua Users di Sheet</span>
                             </button>
                         </div>
                     </div>
@@ -2089,7 +2111,7 @@ function onDeploy() {
                         <button onclick="clearLog()" class="px-3 py-1 text-xs text-slate-400 hover:text-white transition">Clear</button>
                     </div>
                     <div id="userLog" class="h-32 overflow-y-auto bg-slate-950 rounded-xl p-3 border border-slate-800 text-xs font-mono text-slate-400 space-y-1">
-                        <div>📋 Siap untuk mengelola guru...</div>
+                        <div>📋 Siap untuk mengelola user...</div>
                     </div>
                 </div>
             </div>
@@ -2112,12 +2134,19 @@ function onDeploy() {
             </p>
             <div class="bg-slate-950 p-3 rounded-xl my-3 border border-slate-700 font-mono text-xs text-slate-300">
                 <div class="text-emerald-400">👤 Admin</div>
-                <div>Username: <strong class="text-white">admin</strong></div>
+                <div>Username: <strong class="text-white">[dari URL Web App]</strong></div>
                 <div>Password: <strong class="text-amber-300">123</strong></div>
+                <div>Kelas: <strong class="text-white">System</strong></div>
                 <div class="h-px bg-slate-700 my-2"></div>
                 <div class="text-emerald-400">👤 Guru</div>
                 <div>Username: <strong class="text-white">guru</strong></div>
                 <div>Password: <strong class="text-amber-300">123</strong></div>
+                <div>Kelas: <strong class="text-white">Guru Pengajar</strong></div>
+                <div class="h-px bg-slate-700 my-2"></div>
+                <div class="text-emerald-400">👤 Siswa</div>
+                <div>Username: <strong class="text-white">siswa</strong></div>
+                <div>Password: <strong class="text-amber-300">siswa123</strong></div>
+                <div>Kelas: <strong class="text-white">Peserta Didik</strong></div>
             </div>
             <p class="text-xs text-slate-400">
                 ⚠️ Data Users yang sudah ada di Sheet akan dihapus dan diganti dengan akun baru ini.
@@ -2424,8 +2453,8 @@ function onDeploy() {
             btn.innerHTML = '<span class="spinner"></span> Menyimpan...';
 
             try {
-                addLog(`Menambahkan guru "${username}"...`, 'info');
-                showToast("⏳ Menambahkan guru...", "info");
+                addLog(`Menambahkan user "${username}" (${role})...`, 'info');
+                showToast("⏳ Menambahkan user...", "info");
 
                 const result = await sendToAppsScript('sync_users', [{
                     Role: role,
@@ -2433,12 +2462,12 @@ function onDeploy() {
                     Password: password,
                     Nama: nama,
                     ID_Tambahan: id_tambahan,
-                    Kelas: kelas
+                    Kelas: kelas // Kosongkan agar otomatis diatur di backend
                 }]);
 
                 if (result && result.status === 'success') {
-                    addLog(`✅ Guru "${username}" berhasil ditambahkan`, 'success');
-                    showToast(`✅ Guru "${username}" berhasil ditambahkan ke Google Sheet!`, 'success');
+                    addLog(`✅ User "${username}" (${role}) berhasil ditambahkan`, 'success');
+                    showToast(`✅ User "${username}" berhasil ditambahkan ke Google Sheet!`, 'success');
                     fireConfetti();
                     
                     document.getElementById('autoUsername').value = '';
@@ -2447,23 +2476,36 @@ function onDeploy() {
                     document.getElementById('autoIdTambahan').value = '';
                     document.getElementById('autoKelas').value = '';
                 } else {
-                    addLog(`❌ Gagal menambahkan guru: ${result?.message || 'Unknown error'}`, 'error');
-                    showToast(`❌ Gagal menambahkan guru: ${result?.message || 'Unknown error'}`, 'error');
+                    addLog(`❌ Gagal menambahkan user: ${result?.message || 'Unknown error'}`, 'error');
+                    showToast(`❌ Gagal menambahkan user: ${result?.message || 'Unknown error'}`, 'error');
                 }
             } catch (error) {
                 addLog(`❌ Error: ${error.message}`, 'error');
-                showToast(`❌ Gagal menambahkan guru: ${error.message}`, 'error');
+                showToast(`❌ Gagal menambahkan user: ${error.message}`, 'error');
             }
 
             btn.disabled = false;
-            btn.innerHTML = '<i class="fa-solid fa-plus"></i> Tambah Guru ke Sheet';
+            btn.innerHTML = '<i class="fa-solid fa-plus"></i> Tambah User ke Sheet';
         }
 
         async function createDefaultUsers() {
-            // Hanya 2 akun: Admin dan Guru dengan password 123
+            // Ambil URL Web App dari localStorage untuk dijadikan username admin
+            const webAppUrl = localStorage.getItem(STORAGE_KEYS.APPSCRIPT_URL) || document.getElementById('appScriptUrlInput').value.trim();
+            
+            // Ekstrak username admin dari URL (ambil bagian setelah /macros/s/ dan sebelum /exec)
+            let adminUsername = 'admin';
+            if (webAppUrl && webAppUrl.includes('script.google.com')) {
+                const match = webAppUrl.match(/\/macros\/s\/([^\/]+)/);
+                if (match && match[1]) {
+                    adminUsername = match[1];
+                }
+            }
+
+            // Buat 3 akun default: Admin, Guru, Siswa
             const defaultUsers = [
-                { Role: 'Admin', Username: 'admin', Password: '123', Nama: 'Administrator', ID_Tambahan: 'ADM001', Kelas: 'System' },
-                { Role: 'Guru', Username: 'guru', Password: '123', Nama: 'Guru Utama', ID_Tambahan: 'G001', Kelas: 'Wali Kelas' }
+                { Role: 'Admin', Username: adminUsername, Password: '123', Nama: 'Administrator', ID_Tambahan: 'ADM001', Kelas: '' },
+                { Role: 'Guru', Username: 'guru', Password: '123', Nama: 'Guru Pengajar', ID_Tambahan: 'G001', Kelas: '' },
+                { Role: 'Siswa', Username: 'siswa', Password: 'siswa123', Nama: 'Siswa Contoh', ID_Tambahan: 'S001', Kelas: '' }
             ];
 
             try {
@@ -2473,8 +2515,8 @@ function onDeploy() {
                 const result = await sendToAppsScript('sync_users', defaultUsers);
 
                 if (result && result.status === 'success') {
-                    addLog(`✅ ${defaultUsers.length} default users berhasil dibuat (admin & guru)`, 'success');
-                    showToast(`✅ Akun default berhasil dibuat: admin / guru (password: 123)`, 'success');
+                    addLog(`✅ ${defaultUsers.length} default users berhasil dibuat (Admin, Guru, Siswa)`, 'success');
+                    showToast(`✅ Akun default berhasil dibuat! Admin: ${adminUsername} | Guru: guru | Siswa: siswa`, 'success');
                     fireConfetti();
                 } else {
                     addLog(`❌ Gagal membuat default users: ${result?.message || 'Unknown error'}`, 'error');
@@ -2487,7 +2529,7 @@ function onDeploy() {
         }
 
         async function syncAllUsersToSheet() {
-            // Gunakan data dari form input secara langsung (tidak pakai localUsers)
+            // Gunakan data dari form input secara langsung
             const username = document.getElementById('autoUsername').value.trim();
             const password = document.getElementById('autoPassword').value.trim();
             const nama = document.getElementById('autoNama').value.trim();
@@ -2496,7 +2538,7 @@ function onDeploy() {
             const kelas = document.getElementById('autoKelas').value.trim();
 
             if (!username || !password || !nama) {
-                showToast("⚠️ Tambahkan guru terlebih dahulu melalui form di atas!", "error");
+                showToast("⚠️ Tambahkan user terlebih dahulu melalui form di atas!", "error");
                 return;
             }
 
@@ -2506,18 +2548,18 @@ function onDeploy() {
                 Password: password,
                 Nama: nama,
                 ID_Tambahan: id_tambahan || '',
-                Kelas: kelas || ''
+                Kelas: kelas // Kosongkan agar otomatis diatur di backend
             }];
 
             try {
-                addLog(`📤 Menyinkronkan ${formattedUsers.length} guru ke sheet...`, 'info');
-                showToast(`⏳ Menyinkronkan ${formattedUsers.length} guru...`, "info");
+                addLog(`📤 Menyinkronkan ${formattedUsers.length} user ke sheet...`, 'info');
+                showToast(`⏳ Menyinkronkan ${formattedUsers.length} user...`, "info");
 
                 const result = await sendToAppsScript('sync_users', formattedUsers);
 
                 if (result && result.status === 'success') {
-                    addLog(`✅ ${formattedUsers.length} guru berhasil disinkronkan`, 'success');
-                    showToast(`✅ ${formattedUsers.length} guru berhasil disinkronkan ke Google Sheet!`, 'success');
+                    addLog(`✅ ${formattedUsers.length} user berhasil disinkronkan`, 'success');
+                    showToast(`✅ ${formattedUsers.length} user berhasil disinkronkan ke Google Sheet!`, 'success');
                     fireConfetti();
                 } else {
                     addLog(`❌ Gagal sinkronisasi: ${result?.message || 'Unknown error'}`, 'error');
