@@ -493,11 +493,11 @@
             
             <div class="space-y-3 text-xs">
                 <div>
-                    <label class="text-[10px] text-slate-500 font-bold uppercase block mb-1">Apps Script Web App URL</label>
+                    <label class="text-[10px] text-slate-500 font-bold uppercase block mb-1">APPS SCRIPT WEB APP URL</label>
                     <input type="text" id="teacherScriptUrl" placeholder="https://script.google.com/macros/s/..." class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono">
                 </div>
                 <div>
-                    <label class="text-[10px] text-slate-500 font-bold uppercase block mb-1">Spreadsheet ID</label>
+                    <label class="text-[10px] text-slate-500 font-bold uppercase block mb-1">SPREADSHEET ID</label>
                     <input type="text" id="teacherSpreadsheetId" placeholder="Spreadsheet ID..." class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono">
                 </div>
             </div>
@@ -540,19 +540,19 @@
         }
 
         function getSavedSpreadsheetId() {
-            const rawId = localStorage.getItem('app_spreadsheet_id') || localStorage.getItem('spreadsheet_id') || '18oMNI72cQkOVqhubmljP5caxhQWhTDOiyD05_9gICs';
+            const rawId = localStorage.getItem('app_spreadsheet_id') || localStorage.getItem('spreadsheet_id') || '';
             return extractSpreadsheetId(rawId);
         }
 
         function getSavedScriptUrl() {
-            return localStorage.getItem('app_script_url') || localStorage.getItem('URL_Script_App') || '';
+            return localStorage.getItem('app_script_url') || localStorage.getItem('URL_Script_App') || detectedScriptUrl || '';
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             initAutoFill();
             setupAntiCheat();
             setupSearchListeners();
-            restoreQuizSession(); // Restore session jika ada
+            restoreQuizSession();
         });
 
         // ============================================================
@@ -565,7 +565,6 @@
             try {
                 const state = JSON.parse(savedState);
                 if (state.isQuizActive && state.quizQuestions && state.quizQuestions.length > 0) {
-                    // Restore state
                     quizQuestions = state.quizQuestions;
                     userAnswers = state.userAnswers || {};
                     flaggedQuestions = state.flaggedQuestions || {};
@@ -573,37 +572,31 @@
                     cheatCount = state.cheatCount || 0;
                     isQuizActive = state.isQuizActive;
 
-                    // Restore waktu dari localStorage
                     const savedTime = localStorage.getItem('quiz_remaining_seconds');
                     if (savedTime) {
                         remainingSeconds = parseInt(savedTime);
                     }
 
-                    // Tampilkan UI Quiz
                     document.getElementById('configSection').classList.add('hidden');
                     document.getElementById('quizSection').classList.remove('hidden');
                     document.getElementById('mobileBottomBar').classList.remove('hidden');
+                    document.getElementById('topMobileTimer').classList.remove('hidden');
                     document.getElementById('sidebarPreQuiz').classList.add('hidden');
                     document.getElementById('sidebarActiveQuiz').classList.remove('hidden');
                     document.getElementById('sidePreQuizFooter').classList.add('hidden');
                     document.getElementById('sideActiveQuizFooter').classList.remove('hidden');
-                    document.getElementById('topMobileTimer').classList.remove('hidden');
 
-                    // Restore sidebar info
                     document.getElementById('sideStudentName').innerText = localStorage.getItem('app_nama_lengkap') || 'Siswa';
                     document.getElementById('sideStudentClass').innerText = localStorage.getItem('app_kelas') || 'Siswa';
                     document.getElementById('sideStudentNo').innerText = localStorage.getItem('app_username') || '-';
                     document.getElementById('sideCheatCounter').innerText = `${cheatCount} / ${maxCheats}`;
 
-                    // Render soal
                     renderQuestionGrid();
                     renderQuestion(currentQuestionIndex);
 
-                    // Lanjutkan timer
                     if (remainingSeconds > 0) {
                         startTimer(remainingSeconds);
                     } else {
-                        // Timer habis, submit otomatis
                         submitQuiz();
                     }
 
@@ -616,9 +609,6 @@
             }
         }
 
-        // ============================================================
-        // 3. SAVE QUIZ SESSION ke LOCAL STORAGE
-        // ============================================================
         function saveQuizSession() {
             if (!isQuizActive) return;
 
@@ -636,17 +626,15 @@
         }
 
         // ============================================================
-        // 4. AUTO FILL & FETCH USERS
+        // 3. AUTO FILL & FETCH USERS dari Sheet "Users"
         // ============================================================
         async function initAutoFill(forceReload = false) {
-            // A. Auto-fill Spreadsheet ID dari LocalStorage
             const spreadsheetId = getSavedSpreadsheetId();
             const sheetIdInput = document.getElementById('spreadsheetIdInput');
-            if (sheetIdInput) {
+            if (sheetIdInput && spreadsheetId) {
                 sheetIdInput.value = spreadsheetId;
             }
 
-            // B. Auto-fill Nama dari LocalStorage
             let loggedNama = localStorage.getItem('app_nama_lengkap') || localStorage.getItem('app_user_nama') || '';
             let loggedUsername = localStorage.getItem('app_username') || localStorage.getItem('app_user_username') || '';
             let loggedKelas = localStorage.getItem('app_kelas') || '';
@@ -659,12 +647,10 @@
             if (loggedKelas && classInput) classInput.value = loggedKelas;
             if (loggedUsername && noInput) noInput.value = loggedUsername;
 
-            // C. OTOMATIS: Tarik seluruh data dari Tab 'Users'
             if (spreadsheetId) {
                 await fetchUserDataFromSheet(spreadsheetId, loggedUsername);
             }
 
-            // D. Cek Jadwal Kuis secara otomatis jika ID sudah ada
             if (spreadsheetId) {
                 checkQuizSchedule();
             }
@@ -678,7 +664,6 @@
             if (syncText) syncText.innerText = "Mengambil daftar siswa...";
 
             try {
-                // Tarik data tab 'Users' via Google Visualization (GViz) API
                 const urlJson = `https://docs.google.com/spreadsheets/d/${cleanId}/gviz/tq?tqx=out:json&sheet=Users`;
                 const response = await fetch(urlJson);
 
@@ -689,45 +674,51 @@
                     if (jsonMatch && jsonMatch[1]) {
                         const parsed = JSON.parse(jsonMatch[1]);
                         const rows = parsed.table?.rows || [];
+                        const headers = parsed.table?.cols || [];
                         
                         cachedUsersList = [];
                         detectedScriptUrl = '';
 
-                        const targetUsername = loggedUsername ? String(loggedUsername).toLowerCase().trim() : '';
-                        let matchedUser = null;
-
-                        // Cari kolom URL_Script_App (biasanya di kolom F atau G)
-                        const headers = parsed.table?.cols || [];
+                        // Deteksi kolom otomatis berdasarkan label
                         let urlColIndex = -1;
-                        let usernameColIndex = 1; // default B
-                        let namaColIndex = 3; // default D
-                        let kelasColIndex = 4; // default E
+                        let usernameColIndex = -1;
+                        let namaColIndex = -1;
+                        let kelasColIndex = -1;
 
                         headers.forEach((col, idx) => {
-                            const label = col.label || '';
-                            if (label === 'URL_Script_App' || label === 'URL Script App') {
+                            const label = (col.label || '').toLowerCase().trim();
+                            if (label === 'url_script_app' || label === 'url script app' || label === 'script_url') {
                                 urlColIndex = idx;
                             }
-                            if (label === 'Username' || label === 'NIS') {
+                            if (label === 'username' || label === 'nis' || label === 'no_absen') {
                                 usernameColIndex = idx;
                             }
-                            if (label === 'Nama' || label === 'Nama Lengkap') {
+                            if (label === 'nama' || label === 'nama lengkap' || label === 'nama_siswa') {
                                 namaColIndex = idx;
                             }
-                            if (label === 'Kelas') {
+                            if (label === 'kelas') {
                                 kelasColIndex = idx;
                             }
                         });
+
+                        // Jika tidak ditemukan berdasarkan label, gunakan indeks default
+                        if (usernameColIndex === -1) usernameColIndex = 1;
+                        if (namaColIndex === -1) namaColIndex = 3;
+                        if (kelasColIndex === -1) kelasColIndex = 4;
 
                         for (let i = 0; i < rows.length; i++) {
                             const row = rows[i];
                             if (!row || !row.c) continue;
 
-                            // Cari URL Script App di baris ini
+                            // Cari URL Script App
                             if (urlColIndex >= 0 && row.c[urlColIndex] && row.c[urlColIndex].v) {
                                 const urlVal = String(row.c[urlColIndex].v).trim();
                                 if (urlVal.includes('script.google.com/macros/s/')) {
                                     detectedScriptUrl = urlVal;
+                                    localStorage.setItem('app_script_url', urlVal);
+                                    localStorage.setItem('URL_Script_App', urlVal);
+                                    const scriptInput = document.getElementById('teacherScriptUrl');
+                                    if (scriptInput) scriptInput.value = urlVal;
                                 }
                             }
 
@@ -744,21 +735,12 @@
                                 };
                                 cachedUsersList.push(uObj);
 
-                                if (targetUsername && uVal.toLowerCase() === targetUsername) {
-                                    matchedUser = uObj;
+                                if (loggedUsername && uVal.toLowerCase() === loggedUsername.toLowerCase()) {
+                                    selectStudent(uObj, false);
                                 }
                             }
                         }
 
-                        // Simpan otomatis URL Apps Script yang ditemukan
-                        if (detectedScriptUrl) {
-                            localStorage.setItem('app_script_url', detectedScriptUrl);
-                            localStorage.setItem('URL_Script_App', detectedScriptUrl);
-                            const scriptInput = document.getElementById('teacherScriptUrl');
-                            if (scriptInput) scriptInput.value = detectedScriptUrl;
-                        }
-
-                        // Update Badge Jumlah Siswa
                         const badge = document.getElementById('userCountBadge');
                         if (badge) {
                             badge.innerText = `${cachedUsersList.length} Siswa`;
@@ -766,20 +748,17 @@
                         }
 
                         if (syncText) {
-                            syncText.innerText = detectedScriptUrl 
-                                ? `Terhubung (${cachedUsersList.length} Siswa & Script Auto)`
-                                : `Terhubung (${cachedUsersList.length} Siswa)`;
-                        }
-
-                        // Jika ada nama terdeteksi dan form belum terisi sempurna
-                        if (matchedUser) {
-                            selectStudent(matchedUser, false);
+                            if (detectedScriptUrl) {
+                                syncText.innerText = `✅ Terhubung (${cachedUsersList.length} Siswa & Script Auto)`;
+                            } else {
+                                syncText.innerText = `✅ Terhubung (${cachedUsersList.length} Siswa)`;
+                            }
                         }
                     }
                 }
             } catch (err) {
                 console.warn("Gagal mengambil data user dari sheet 'Users':", err);
-                if (syncText) syncText.innerText = "Database Offline (Lokal Mode)";
+                if (syncText) syncText.innerText = "⚠️ Database Offline (Lokal Mode)";
             }
         }
 
@@ -885,7 +864,7 @@
         }
 
         // ============================================================
-        // 5. CHECK & LOAD QUIZ
+        // 4. CHECK & LOAD QUIZ
         // ============================================================
         async function checkQuizSchedule() {
             const rawId = document.getElementById('spreadsheetIdInput')?.value || getSavedSpreadsheetId();
@@ -1021,7 +1000,7 @@
         }
 
         // ============================================================
-        // 6. START QUIZ
+        // 5. START QUIZ
         // ============================================================
         function startQuizWithValidation() {
             const name = document.getElementById('studentName')?.value.trim();
@@ -1042,12 +1021,18 @@
                 loadMockQuizData();
             }
 
-            // Simpan info ke sidebar
+            // Cek apakah URL Script sudah terdeteksi
+            const scriptUrl = getSavedScriptUrl();
+            if (scriptUrl) {
+                console.log("✅ Script URL ditemukan:", scriptUrl);
+            } else {
+                console.warn("⚠️ Script URL belum terdeteksi. Hasil akan disimpan lokal.");
+            }
+
             document.getElementById('sideStudentName').innerText = name;
             document.getElementById('sideStudentClass').innerText = studentClass || 'Siswa';
             document.getElementById('sideStudentNo').innerText = no || '-';
 
-            // Reset State
             userAnswers = {};
             flaggedQuestions = {};
             currentQuestionIndex = 0;
@@ -1055,7 +1040,6 @@
             isQuizActive = true;
             document.getElementById('sideCheatCounter').innerText = `0 / ${maxCheats}`;
 
-            // Pindah Tampilan
             document.getElementById('configSection').classList.add('hidden');
             document.getElementById('quizSection').classList.remove('hidden');
             document.getElementById('mobileBottomBar').classList.remove('hidden');
@@ -1066,24 +1050,19 @@
             document.getElementById('sidePreQuizFooter').classList.add('hidden');
             document.getElementById('sideActiveQuizFooter').classList.remove('hidden');
 
-            // Aktifkan Timer (45 Menit)
             const duration = 45 * 60;
             remainingSeconds = duration;
             startTimer(duration);
 
-            // Render Matrix & Soal Pertama
             renderQuestionGrid();
             renderQuestion(0);
 
-            // Simpan session
             saveQuizSession();
-
-            // Minta Fullscreen (Safe CBT Mode)
             requestFullScreen();
         }
 
         // ============================================================
-        // 7. TIMER
+        // 6. TIMER
         // ============================================================
         function startTimer(seconds) {
             remainingSeconds = seconds;
@@ -1094,7 +1073,6 @@
                 remainingSeconds--;
                 updateTimerDisplay();
 
-                // Simpan waktu setiap 5 detik
                 if (remainingSeconds % 5 === 0) {
                     saveQuizSession();
                 }
@@ -1119,7 +1097,7 @@
         }
 
         // ============================================================
-        // 8. QUESTION RENDER
+        // 7. QUESTION RENDER
         // ============================================================
         function renderQuestion(index) {
             if (index < 0 || index >= quizQuestions.length) return;
@@ -1150,7 +1128,6 @@
                 container.appendChild(btn);
             });
 
-            // Update Flag Button state
             const isFlagged = flaggedQuestions[q.id];
             const btnFlag = document.getElementById('btnFlag');
             const lblFlag = document.getElementById('lblFlag');
@@ -1164,7 +1141,6 @@
                 }
             }
 
-            // Update Button Disabled States
             document.getElementById('btnPrev').disabled = (index === 0);
             
             const btnNext = document.getElementById('btnNext');
@@ -1178,7 +1154,7 @@
 
             updateProgress();
             renderQuestionGrid();
-            saveQuizSession(); // Simpan setiap kali ganti soal
+            saveQuizSession();
         }
 
         function selectOption(qId, optionLabel) {
@@ -1273,7 +1249,7 @@
         }
 
         // ============================================================
-        // 9. ANTI-CHEAT
+        // 8. ANTI-CHEAT
         // ============================================================
         function setupAntiCheat() {
             document.addEventListener('visibilitychange', () => {
@@ -1308,7 +1284,7 @@
         }
 
         // ============================================================
-        // 10. SUBMIT QUIZ
+        // 9. SUBMIT QUIZ - KIRIM KE SHEET "Hasil_Kuis"
         // ============================================================
         function confirmSubmitQuiz() {
             const answered = Object.keys(userAnswers).length;
@@ -1323,11 +1299,9 @@
             isQuizActive = false;
             if (timerInterval) clearInterval(timerInterval);
 
-            // Hapus session dari localStorage
             localStorage.removeItem('quiz_session_state');
             localStorage.removeItem('quiz_remaining_seconds');
 
-            // Hitung Skor
             let correct = 0;
             quizQuestions.forEach(q => {
                 if (userAnswers[q.id] === q.key) {
@@ -1338,7 +1312,6 @@
             const wrong = quizQuestions.length - correct;
             const finalScore = Math.round((correct / quizQuestions.length) * 100);
 
-            // Tampilkan Layar Hasil
             document.getElementById('quizSection').classList.add('hidden');
             document.getElementById('mobileBottomBar').classList.add('hidden');
             document.getElementById('topMobileTimer').classList.add('hidden');
@@ -1349,24 +1322,35 @@
             document.getElementById('resWrong').innerText = wrong;
             document.getElementById('resTotal').innerText = quizQuestions.length;
 
-            // Render Pembahasan
             renderReviewList();
 
-            // Kirim Hasil ke Apps Script Backend (sheet Hasil_Kuis)
-            await sendResultToBackend(finalScore, correct);
+            await sendResultToSheet(finalScore, correct);
         }
 
-        async function sendResultToBackend(score, correct) {
+        async function sendResultToSheet(score, correct) {
             const syncBadge = document.getElementById('syncStatusBadge');
-            const scriptUrl = getSavedScriptUrl() || detectedScriptUrl;
+            
+            // Ambil URL Script dari berbagai sumber
+            let scriptUrl = getSavedScriptUrl();
+            
+            // Jika masih kosong, coba ambil dari localStorage langsung
+            if (!scriptUrl) {
+                scriptUrl = localStorage.getItem('app_script_url') || localStorage.getItem('URL_Script_App') || '';
+            }
+            
             const name = document.getElementById('studentName')?.value || 'Siswa';
             const username = document.getElementById('studentNo')?.value || 'siswa_1';
             const kelas = document.getElementById('studentClass')?.value || '';
+            const spreadsheetId = document.getElementById('spreadsheetIdInput')?.value || getSavedSpreadsheetId();
+
+            console.log("📤 Mengirim hasil ke sheet Hasil_Kuis...");
+            console.log("Script URL:", scriptUrl);
+            console.log("Data:", { name, username, kelas, score, correct });
 
             if (!scriptUrl) {
                 if (syncBadge) {
                     syncBadge.className = "inline-flex items-center gap-2 px-4 py-2 rounded-2xl text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200";
-                    syncBadge.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span>Tersimpan di Lokal HP</span>`;
+                    syncBadge.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> <span>⚠️ Script URL tidak ditemukan. Hasil tersimpan di lokal.</span>`;
                 }
                 return;
             }
@@ -1377,31 +1361,34 @@
                     Username: username,
                     Nama_Siswa: name,
                     Kelas: kelas,
+                    Spreadsheet_ID: spreadsheetId,
                     ID_Kuis: 'KUIS_SD_' + Date.now(),
                     Nilai: score,
                     Jawaban_Benar: correct,
                     Total_Soal: quizQuestions.length,
                     Tanggal: new Date().toLocaleDateString('id-ID'),
-                    Waktu_Selesai: new Date().toLocaleTimeString('id-ID')
+                    Waktu_Selesai: new Date().toLocaleTimeString('id-ID'),
+                    Jawaban_Detail: JSON.stringify(userAnswers)
                 };
 
-                // Kirim ke sheet Hasil_Kuis via Apps Script
                 const response = await fetch(scriptUrl, {
                     method: 'POST',
                     mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 
+                        'Content-Type': 'application/json'
+                    },
                     body: JSON.stringify(payload)
                 });
 
                 if (syncBadge) {
                     syncBadge.className = "inline-flex items-center gap-2 px-4 py-2 rounded-2xl text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200";
-                    syncBadge.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600"></i> <span>Hasil Berhasil Terkirim ke Guru!</span>`;
+                    syncBadge.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600"></i> <span>✅ Hasil Berhasil Terkirim ke Sheet Hasil_Kuis!</span>`;
                 }
             } catch (err) {
-                console.warn("Gagal mengirim hasil kuis ke server:", err);
+                console.error("❌ Gagal mengirim hasil kuis:", err);
                 if (syncBadge) {
-                    syncBadge.className = "inline-flex items-center gap-2 px-4 py-2 rounded-2xl text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200";
-                    syncBadge.innerHTML = `<i class="fa-solid fa-info-circle"></i> <span>Hasil Tersimpan Lokal</span>`;
+                    syncBadge.className = "inline-flex items-center gap-2 px-4 py-2 rounded-2xl text-xs font-bold bg-red-50 text-red-700 border border-red-200";
+                    syncBadge.innerHTML = `<i class="fa-solid fa-circle-xmark text-red-500"></i> <span>❌ Gagal mengirim hasil. Tersimpan lokal.</span>`;
                 }
             }
         }
@@ -1451,7 +1438,7 @@
         }
 
         // ============================================================
-        // 11. UI HELPERS
+        // 10. UI HELPERS
         // ============================================================
         function openMobileDrawer() {
             document.getElementById('appSidebar').classList.remove('translate-y-full');
@@ -1497,7 +1484,8 @@
 
         function openTeacherModal() {
             document.getElementById('teacherSpreadsheetId').value = getSavedSpreadsheetId();
-            document.getElementById('teacherScriptUrl').value = getSavedScriptUrl() || detectedScriptUrl;
+            const scriptUrl = getSavedScriptUrl() || localStorage.getItem('app_script_url') || '';
+            document.getElementById('teacherScriptUrl').value = scriptUrl;
             document.getElementById('teacherModal').classList.remove('hidden');
         }
 
@@ -1516,6 +1504,7 @@
             if (url) {
                 localStorage.setItem('app_script_url', url);
                 localStorage.setItem('URL_Script_App', url);
+                detectedScriptUrl = url;
             }
 
             closeTeacherModal();
