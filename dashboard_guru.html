@@ -843,7 +843,7 @@
 
 // ========== KONFIGURASI ==========
 // Ganti dengan ID Google Sheet Anda
-const SPREADSHEET_ID = 'paste spreedsheetID di sini';
+const SPREADSHEET_ID = 'paste_spreadsheet_ID_di_sini';
 
 // Nama sheet
 const SHEET_BUAT_KUIS = "Buat_Kuis";
@@ -863,7 +863,7 @@ const HEADER_HASIL_KUIS = [
     "Nilai", "Tanggal_Pengerjaan", "Durasi_Pengerjaan", "Status", "Timestamp"
 ];
 
-// Header untuk sheet Users - UBAH: ID_Tambahan menjadi URL_Script_App
+// Header untuk sheet Users
 const HEADER_USERS = ["Role", "Username", "Password", "Nama", "URL_Script_App", "Kelas"];
 
 // ============================================================
@@ -875,11 +875,10 @@ function initializeSheets() {
         let created = [];
         let messages = [];
         
-        // ========== BUAT SHEET "Buat_Kuis" dengan struktur Excel ==========
+        // ========== BUAT SHEET "Buat_Kuis" ==========
         let sheetBuatKuis = ss.getSheetByName(SHEET_BUAT_KUIS);
         if (!sheetBuatKuis) {
             sheetBuatKuis = ss.insertSheet(SHEET_BUAT_KUIS);
-            
             sheetBuatKuis.getRange(1, 1, 1, HEADER_BUAT_KUIS.length).setValues([HEADER_BUAT_KUIS]);
             sheetBuatKuis.getRange(1, 1, 1, HEADER_BUAT_KUIS.length).setFontWeight("bold");
             sheetBuatKuis.setFrozenRows(1);
@@ -890,24 +889,9 @@ function initializeSheets() {
             }
             
             created.push(SHEET_BUAT_KUIS);
-            messages.push(`✅ Sheet "${SHEET_BUAT_KUIS}" berhasil dibuat (struktur Excel)`);
-            console.log(`✅ Sheet "${SHEET_BUAT_KUIS}" berhasil dibuat`);
+            messages.push(`✅ Sheet "${SHEET_BUAT_KUIS}" berhasil dibuat`);
         } else {
-            const existingHeader = sheetBuatKuis.getRange(1, 1, 1, HEADER_BUAT_KUIS.length).getValues()[0];
-            let needUpdate = false;
-            for (let i = 0; i < HEADER_BUAT_KUIS.length; i++) {
-                if (existingHeader[i] !== HEADER_BUAT_KUIS[i]) {
-                    needUpdate = true;
-                    break;
-                }
-            }
-            if (needUpdate) {
-                sheetBuatKuis.getRange(1, 1, 1, HEADER_BUAT_KUIS.length).setValues([HEADER_BUAT_KUIS]);
-                sheetBuatKuis.getRange(1, 1, 1, HEADER_BUAT_KUIS.length).setFontWeight("bold");
-                messages.push(`🔄 Sheet "${SHEET_BUAT_KUIS}" diupdate dengan header baru`);
-            }
             messages.push(`ℹ️ Sheet "${SHEET_BUAT_KUIS}" sudah ada`);
-            console.log(`ℹ️ Sheet "${SHEET_BUAT_KUIS}" sudah ada`);
         }
         
         // ========== BUAT SHEET "Hasil_Kuis" ==========
@@ -925,10 +909,8 @@ function initializeSheets() {
             
             created.push(SHEET_HASIL_KUIS);
             messages.push(`✅ Sheet "${SHEET_HASIL_KUIS}" berhasil dibuat`);
-            console.log(`✅ Sheet "${SHEET_HASIL_KUIS}" berhasil dibuat`);
         } else {
             messages.push(`ℹ️ Sheet "${SHEET_HASIL_KUIS}" sudah ada`);
-            console.log(`ℹ️ Sheet "${SHEET_HASIL_KUIS}" sudah ada`);
         }
         
         // ========== BUAT SHEET "Users" ==========
@@ -946,23 +928,20 @@ function initializeSheets() {
             
             created.push(SHEET_USERS);
             messages.push(`✅ Sheet "${SHEET_USERS}" berhasil dibuat`);
-            console.log(`✅ Sheet "${SHEET_USERS}" berhasil dibuat`);
         } else {
-            const existingHeader = sheetUsers.getRange(1, 1, 1, HEADER_USERS.length).getValues()[0];
-            let needUpdate = false;
-            for (let i = 0; i < HEADER_USERS.length; i++) {
-                if (existingHeader[i] !== HEADER_USERS[i]) {
-                    needUpdate = true;
-                    break;
-                }
-            }
-            if (needUpdate) {
-                sheetUsers.getRange(1, 1, 1, HEADER_USERS.length).setValues([HEADER_USERS]);
-                sheetUsers.getRange(1, 1, 1, HEADER_USERS.length).setFontWeight("bold");
-                messages.push(`🔄 Sheet "${SHEET_USERS}" diupdate dengan header baru`);
-            }
             messages.push(`ℹ️ Sheet "${SHEET_USERS}" sudah ada`);
-            console.log(`ℹ️ Sheet "${SHEET_USERS}" sudah ada`);
+        }
+        
+        // ========== BUAT SHEET UNTUK DATA LAINNYA ==========
+        const sheetsLainnya = ['Mapel', 'Absensi', 'Nilai', 'Jurnal', 'Pengumuman'];
+        for (const sheetName of sheetsLainnya) {
+            let sheet = ss.getSheetByName(sheetName);
+            if (!sheet) {
+                sheet = ss.insertSheet(sheetName);
+                messages.push(`✅ Sheet "${sheetName}" berhasil dibuat`);
+            } else {
+                messages.push(`ℹ️ Sheet "${sheetName}" sudah ada`);
+            }
         }
         
         return {
@@ -974,7 +953,6 @@ function initializeSheets() {
         };
         
     } catch(err) {
-        console.error('❌ Error initializeSheets:', err.toString());
         return {
             status: 'error',
             message: 'Error: ' + err.toString()
@@ -1029,11 +1007,11 @@ function doGet(e) {
         return ContentService
             .createTextOutput(JSON.stringify({
                 status: 'success',
-                message: 'Server siap menerima data POST',
+                message: 'Server siap menerima data',
                 endpoints: [
                     '?action=ping - Cek koneksi',
                     '?action=init_sheets - Inisialisasi sheet',
-                    '?action=get_kuis - Ambil semua kuis (format Excel)',
+                    '?action=get_kuis - Ambil semua kuis',
                     '?action=get_data&type=all - Ambil semua data',
                     '?action=get_hasil_kuis - Ambil semua hasil kuis',
                     '?action=get_users - Ambil semua data users'
@@ -1056,10 +1034,7 @@ function doGet(e) {
 // ============================================================
 function doPost(e) {
     try {
-        console.log('📥 Menerima request POST');
-        
         if (!e || !e.postData) {
-            console.log('❌ Tidak ada postData');
             return ContentService
                 .createTextOutput(JSON.stringify({
                     status: 'error',
@@ -1068,24 +1043,16 @@ function doPost(e) {
                 .setMimeType(ContentService.MimeType.JSON);
         }
         
-        console.log('📥 Raw data length:', e.postData.contents.length);
-        
         const data = JSON.parse(e.postData.contents);
         const action = data.action || '';
         const payload = data.data || [];
         const webAppUrl = data.webAppUrl || '';
         
-        console.log(`📥 Action: ${action}, Jumlah data: ${payload.length}`);
-        console.log(`📥 WebAppUrl: ${webAppUrl}`);
-        
         if (action === 'get_data') {
-            const result = handleGetDataPost(data);
-            return ContentService
-                .createTextOutput(JSON.stringify(result))
-                .setMimeType(ContentService.MimeType.JSON);
+            return handleGetDataPost(data);
         }
         
-        if (action === 'sync_users' || action === 'sync_siswa' || action === 'sync_guru') {
+        if (action === 'sync_users') {
             return syncUsers(payload, webAppUrl);
         }
         
@@ -1101,40 +1068,20 @@ function doPost(e) {
             return syncNilai(payload);
         }
         
-        if (action === 'sync_pengumuman') {
-            return syncPengumuman(payload);
-        }
-        
         if (action === 'sync_jurnal') {
             return syncJurnal(payload);
         }
         
-        if (action === 'save_kuis' || action === 'sync_kuis') {
+        if (action === 'sync_pengumuman') {
+            return syncPengumuman(payload);
+        }
+        
+        if (action === 'save_kuis') {
             return handleSaveKuis(data);
         }
         
-        if (action === 'import_kuis') {
-            return handleImportKuis(data);
-        }
-        
-        if (action === 'save_buat_kuis') {
-            return handleSaveBuatKuisLegacy(data);
-        }
-        
-        if (action === 'save_hasil_kuis' || action === 'sync_hasil_kuis') {
+        if (action === 'save_hasil_kuis') {
             return handleSaveHasilKuis(data);
-        }
-        
-        if (action === 'update_status_kuis') {
-            return handleUpdateStatusKuis(data);
-        }
-        
-        if (action === 'delete_kuis') {
-            return handleDeleteKuis(data);
-        }
-        
-        if (action === 'clear_all_kuis') {
-            return handleClearAllKuis();
         }
         
         return ContentService
@@ -1145,7 +1092,6 @@ function doPost(e) {
             .setMimeType(ContentService.MimeType.JSON);
         
     } catch(err) {
-        console.log('❌ Error doPost:', err.toString());
         return ContentService
             .createTextOutput(JSON.stringify({
                 status: 'error',
@@ -1159,16 +1105,12 @@ function doPost(e) {
 // ========== FUNGSI RESPONSE HELPER ==========
 // ============================================================
 function createResponse(success, message, data = {}) {
-    const response = {
+    return {
         status: success ? "success" : "error",
         message: message,
         ...data,
         timestamp: new Date().toISOString()
     };
-    
-    return ContentService
-        .createTextOutput(JSON.stringify(response))
-        .setMimeType(ContentService.MimeType.JSON);
 }
 
 // ============================================================
@@ -1177,80 +1119,155 @@ function createResponse(success, message, data = {}) {
 function getSheetBuatKuis() {
     const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
     let sheet = ss.getSheetByName(SHEET_BUAT_KUIS);
-    
     if (!sheet) {
         initializeSheets();
         sheet = ss.getSheetByName(SHEET_BUAT_KUIS);
     }
-    
     return sheet;
 }
 
 function getSheetHasilKuis() {
     const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
     let sheet = ss.getSheetByName(SHEET_HASIL_KUIS);
-    
     if (!sheet) {
         initializeSheets();
         sheet = ss.getSheetByName(SHEET_HASIL_KUIS);
     }
-    
     return sheet;
 }
 
 function getSheetUsers() {
     const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
     let sheet = ss.getSheetByName(SHEET_USERS);
-    
     if (!sheet) {
         initializeSheets();
         sheet = ss.getSheetByName(SHEET_USERS);
     }
-    
     return sheet;
 }
 
+function getSheetData(sheetName, headers) {
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    const sheet = ss.getSheetByName(sheetName);
+    if (!sheet) return [];
+    const data = sheet.getDataRange().getValues();
+    if (data.length < 2) return [];
+    const headerRow = headers || data[0];
+    const rows = data.slice(1);
+    return rows.map(row => {
+        const obj = {};
+        headerRow.forEach((h, i) => {
+            obj[h] = row[i] || '';
+        });
+        return obj;
+    });
+}
+
 // ============================================================
-// ========== FUNGSI HANDLE GET USERS ==========
+// ========== FUNGSI HANDLE GET DATA ==========
 // ============================================================
 function handleGetUsers(e) {
     try {
-        const sheet = getSheetUsers();
-        const lastRow = sheet.getLastRow();
-        
-        if (lastRow < 2) {
-            return createResponse(true, "Belum ada data users", { data: [] });
-        }
-        
-        const range = sheet.getRange(2, 1, lastRow - 1, HEADER_USERS.length);
-        const values = range.getValues();
-        
-        const data = values.map(row => {
-            let obj = {};
-            HEADER_USERS.forEach((header, idx) => {
-                obj[header] = row[idx] || '';
-            });
-            return obj;
-        });
-        
-        return createResponse(true, "Data users berhasil diambil", { 
-            data: data, 
-            total: data.length 
-        });
-        
+        const data = getSheetData(SHEET_USERS, HEADER_USERS);
+        return createResponse(true, "Data users berhasil diambil", { data: data, total: data.length });
     } catch(error) {
         return createResponse(false, "Gagal mengambil data users: " + error.toString());
     }
 }
 
+function handleGetData(e) {
+    try {
+        const type = e.parameter.type || 'all';
+        const result = {};
+        
+        if (type === 'all' || type === 'users') {
+            result.users = getSheetData(SHEET_USERS, HEADER_USERS);
+        }
+        if (type === 'all' || type === 'mapel') {
+            result.mapel = getSheetData('Mapel');
+        }
+        if (type === 'all' || type === 'absensi') {
+            result.absensi = getSheetData('Absensi');
+        }
+        if (type === 'all' || type === 'nilai') {
+            result.nilai = getSheetData('Nilai');
+        }
+        if (type === 'all' || type === 'jurnal') {
+            result.jurnal = getSheetData('Jurnal');
+        }
+        if (type === 'all' || type === 'buat_kuis') {
+            result.buat_kuis = getSheetData(SHEET_BUAT_KUIS, HEADER_BUAT_KUIS);
+        }
+        if (type === 'all' || type === 'hasil_kuis') {
+            result.hasil_kuis = getSheetData(SHEET_HASIL_KUIS, HEADER_HASIL_KUIS);
+        }
+        
+        return ContentService
+            .createTextOutput(JSON.stringify({
+                status: 'success',
+                message: 'Data berhasil diambil',
+                data: result,
+                timestamp: new Date().toISOString()
+            }))
+            .setMimeType(ContentService.MimeType.JSON);
+        
+    } catch(err) {
+        return ContentService
+            .createTextOutput(JSON.stringify({
+                status: 'error',
+                message: 'Error: ' + err.toString()
+            }))
+            .setMimeType(ContentService.MimeType.JSON);
+    }
+}
+
+function handleGetDataPost(data) {
+    try {
+        const type = data.type || 'all';
+        const result = {};
+        
+        if (type === 'all' || type === 'users') {
+            result.users = getSheetData(SHEET_USERS, HEADER_USERS);
+        }
+        if (type === 'all' || type === 'mapel') {
+            result.mapel = getSheetData('Mapel');
+        }
+        if (type === 'all' || type === 'absensi') {
+            result.absensi = getSheetData('Absensi');
+        }
+        if (type === 'all' || type === 'nilai') {
+            result.nilai = getSheetData('Nilai');
+        }
+        if (type === 'all' || type === 'jurnal') {
+            result.jurnal = getSheetData('Jurnal');
+        }
+        if (type === 'all' || type === 'buat_kuis') {
+            result.buat_kuis = getSheetData(SHEET_BUAT_KUIS, HEADER_BUAT_KUIS);
+        }
+        if (type === 'all' || type === 'hasil_kuis') {
+            result.hasil_kuis = getSheetData(SHEET_HASIL_KUIS, HEADER_HASIL_KUIS);
+        }
+        
+        return {
+            status: 'success',
+            message: 'Data berhasil diambil',
+            data: result,
+            timestamp: new Date().toISOString()
+        };
+        
+    } catch(err) {
+        return {
+            status: 'error',
+            message: 'Error: ' + err.toString()
+        };
+    }
+}
+
 // ============================================================
-// ========== FUNGSI HANDLE SAVE KUIS (FORMAT EXCEL) ==========
+// ========== FUNGSI HANDLE KUIS ==========
 // ============================================================
 function handleSaveKuis(data) {
     try {
-        console.log('📝 Menyimpan data kuis ke sheet (format Excel)...');
-        console.log('📝 Data yang diterima:', JSON.stringify(data));
-        
         const sheet = getSheetBuatKuis();
         const questions = data.questions || [];
         const metadata = data.metadata || {};
@@ -1263,26 +1280,16 @@ function handleSaveKuis(data) {
         const waktuSelesai = metadata.waktu_selesai || new Date(Date.now() + 7*24*60*60*1000).toLocaleString('id-ID');
         const durasi = metadata.durasi || 30;
 
-        console.log(`📝 Waktu Mulai: ${waktuMulai}`);
-        console.log(`📝 Waktu Selesai: ${waktuSelesai}`);
-        console.log(`📝 Durasi: ${durasi}`);
-        console.log(`📝 Jumlah soal: ${questions.length}`);
-
-        const rows = questions.map((q, index) => {
+        const rows = questions.map((q) => {
             let jawaban = q.jawaban || '';
-            
             if (q.tipe === 'MENJODOHKAN' && q.jodohIndex) {
                 jawaban = q.jodohIndex.join(';');
             }
-            
             if (q.tipe === 'ISIAN' && q.jawaban_alternatif) {
                 jawaban = q.jawaban + ' | ' + q.jawaban_alternatif;
             }
-
-            const row = [
-                waktuMulai,
-                waktuSelesai,
-                durasi,
+            return [
+                waktuMulai, waktuSelesai, durasi,
                 q.tipe || 'PG',
                 q.pertanyaan || '',
                 q.pilihanA || '',
@@ -1291,38 +1298,21 @@ function handleSaveKuis(data) {
                 q.pilihanD || '',
                 jawaban
             ];
-            
-            console.log(`📝 Soal ${index + 1}:`, JSON.stringify(row));
-            return row;
         });
 
         if (rows.length > 0) {
             const lastRow = sheet.getLastRow();
-            console.log(`📝 LastRow sebelum simpan: ${lastRow}`);
-            
             if (lastRow >= 2) {
                 const lastRowData = sheet.getRange(lastRow, 1, 1, 10).getValues()[0];
                 const isEmpty = lastRowData.every(cell => cell === '');
                 if (!isEmpty) {
                     sheet.appendRow(['', '', '', '', '', '', '', '', '', '']);
-                    console.log('📝 Menambahkan baris kosong sebagai pemisah');
                 }
             }
             
-            let successCount = 0;
             for (let i = 0; i < rows.length; i++) {
-                try {
-                    sheet.appendRow(rows[i]);
-                    successCount++;
-                } catch(rowError) {
-                    console.error(`❌ Gagal menyimpan baris ${i+1}:`, rowError);
-                }
+                sheet.appendRow(rows[i]);
             }
-            
-            console.log(`✅ ${successCount} dari ${questions.length} soal berhasil disimpan`);
-            
-            const newLastRow = sheet.getLastRow();
-            console.log(`📝 LastRow setelah simpan: ${newLastRow}`);
         }
 
         return createResponse(true, `Berhasil menyimpan ${questions.length} soal kuis`, {
@@ -1331,191 +1321,48 @@ function handleSaveKuis(data) {
         });
         
     } catch(error) {
-        console.error("❌ Error save kuis:", error);
         return createResponse(false, "Terjadi kesalahan: " + error.toString());
     }
 }
 
-// ============================================================
-// ========== FUNGSI HANDLE IMPORT KUIS ==========
-// ============================================================
-function handleImportKuis(data) {
-    try {
-        console.log('📥 Mengimpor data kuis dari Excel...');
-        console.log('📥 Data yang diterima:', JSON.stringify(data));
-        
-        const sheet = getSheetBuatKuis();
-        const excelData = data.excelData || [];
-        const metadata = data.metadata || {};
-        
-        if (excelData.length === 0) {
-            return createResponse(false, "Tidak ada data Excel untuk diimpor");
-        }
-
-        const firstRow = excelData[0];
-        const waktuMulai = firstRow['Waktu Mulai'] || metadata.waktu_mulai || new Date().toLocaleString('id-ID');
-        const waktuSelesai = firstRow['Waktu Selesai'] || metadata.waktu_selesai || new Date(Date.now() + 7*24*60*60*1000).toLocaleString('id-ID');
-        const durasi = firstRow['Durasi (Menit)'] || metadata.durasi || 30;
-
-        console.log(`📝 Waktu Mulai: ${waktuMulai}`);
-        console.log(`📝 Waktu Selesai: ${waktuSelesai}`);
-        console.log(`📝 Durasi: ${durasi}`);
-        console.log(`📝 Jumlah data: ${excelData.length}`);
-
-        const rows = excelData.map((row, index) => {
-            let jawaban = row['Jawaban'] || '';
-            
-            const rowData = [
-                waktuMulai,
-                waktuSelesai,
-                durasi,
-                row['Tipe'] || 'PG',
-                row['Pertanyaan'] || '',
-                row['Pilihan A'] || '',
-                row['Pilihan B'] || '',
-                row['Pilihan C'] || '',
-                row['Pilihan D'] || '',
-                jawaban
-            ];
-            
-            console.log(`📝 Baris ${index + 1}:`, JSON.stringify(rowData));
-            return rowData;
-        });
-
-        if (rows.length > 0) {
-            const lastRow = sheet.getLastRow();
-            console.log(`📝 LastRow sebelum import: ${lastRow}`);
-            
-            if (lastRow >= 2) {
-                const lastRowData = sheet.getRange(lastRow, 1, 1, 10).getValues()[0];
-                const isEmpty = lastRowData.every(cell => cell === '');
-                if (!isEmpty) {
-                    sheet.appendRow(['', '', '', '', '', '', '', '', '', '']);
-                    console.log('📝 Menambahkan baris kosong sebagai pemisah');
-                }
-            }
-            
-            let successCount = 0;
-            for (let i = 0; i < rows.length; i++) {
-                try {
-                    sheet.appendRow(rows[i]);
-                    successCount++;
-                } catch(rowError) {
-                    console.error(`❌ Gagal mengimpor baris ${i+1}:`, rowError);
-                }
-            }
-            
-            console.log(`✅ ${successCount} dari ${rows.length} baris berhasil diimpor`);
-        }
-
-        return createResponse(true, `Berhasil mengimpor ${rows.length} soal dari Excel`, {
-            total: rows.length,
-            timestamp: new Date().toISOString()
-        });
-        
-    } catch(error) {
-        console.error("❌ Error import kuis:", error);
-        return createResponse(false, "Terjadi kesalahan: " + error.toString());
-    }
-}
-
-// ============================================================
-// ========== FUNGSI HANDLE GET KUIS (FORMAT EXCEL) ==========
-// ============================================================
 function handleGetKuis(e) {
     try {
-        const sheet = getSheetBuatKuis();
-        const lastRow = sheet.getLastRow();
-        
-        if (lastRow < 2) {
-            return createResponse(true, "Belum ada data kuis", { data: [] });
-        }
-        
-        const range = sheet.getRange(2, 1, lastRow - 1, HEADER_BUAT_KUIS.length);
-        const values = range.getValues();
-        
-        const data = values.map(row => {
-            let obj = {};
-            HEADER_BUAT_KUIS.forEach((header, idx) => {
-                obj[header] = row[idx] || '';
-            });
-            return obj;
-        });
-        
-        return createResponse(true, "Data kuis berhasil diambil", { 
-            data: data, 
-            total: data.length 
-        });
-        
+        const data = getSheetData(SHEET_BUAT_KUIS, HEADER_BUAT_KUIS);
+        return createResponse(true, "Data kuis berhasil diambil", { data: data, total: data.length });
     } catch(error) {
         return createResponse(false, "Gagal mengambil data kuis: " + error.toString());
     }
 }
 
-// ============================================================
-// ========== FUNGSI HANDLE SAVE BUAT KUIS (LEGACY) ==========
-// ============================================================
-function handleSaveBuatKuisLegacy(data) {
+function handleGetBuatKuis(e) {
+    return handleGetKuis(e);
+}
+
+function handleGetHasilKuis(e) {
     try {
-        console.log('📝 Menyimpan data kuis (legacy) ke sheet Buat_Kuis...');
-        console.log('📝 Data yang diterima:', JSON.stringify(data));
+        const data = getSheetData(SHEET_HASIL_KUIS, HEADER_HASIL_KUIS);
         
-        const sheet = getSheetBuatKuis();
-        
-        const judul = data.Judul_Kuis || data.judul || data.title || "Kuis Baru";
-        const mapel = data.Mata_Pelajaran || data.mapel || data.subject || "";
-        const kelas = data.Kelas || data.kelas || data.class || "";
-        const durasi = data.Durasi || data.durasi || "30 menit";
-        const jumlahSoal = data.Jumlah_Soal || data.jumlah_soal || data.count || 0;
-        const tipeSoal = data.Tipe_Soal || data.tipe_soal || data.type || "Pilihan Ganda";
-        const gayaBahasa = data.Gaya_Bahasa || data.gaya_bahasa || data.style || "Formal & Edukatif";
-        const status = data.Status || data.status || "Aktif";
-        
-        const questions = data.questions || [];
-        const metadata = data.metadata || {};
-        
-        if (questions.length > 0) {
-            console.log(`📝 Menyimpan ${questions.length} soal dengan format Excel...`);
-            return handleSaveKuis(data);
+        if (e && e.parameter && e.parameter.id_kuis) {
+            const idKuis = e.parameter.id_kuis;
+            const filtered = data.filter(item => item.ID_Kuis === idKuis);
+            return createResponse(true, "Data hasil kuis berhasil diambil", { 
+                data: filtered, 
+                total: filtered.length,
+                id_kuis: idKuis
+            });
         }
         
-        const waktuMulai = metadata.waktu_mulai || new Date().toLocaleString('id-ID');
-        const waktuSelesai = metadata.waktu_selesai || new Date(Date.now() + 7*24*60*60*1000).toLocaleString('id-ID');
-        const durasiNum = parseInt(durasi) || 30;
-        
-        const row = [
-            waktuMulai,
-            waktuSelesai,
-            durasiNum,
-            tipeSoal,
-            `📚 ${judul} | Mapel: ${mapel} | Kelas: ${kelas} | Gaya: ${gayaBahasa} | Status: ${status}`,
-            '', '', '', '',
-            `${jumlahSoal} soal`
-        ];
-        
-        console.log('📝 Row yang akan disimpan:', JSON.stringify(row));
-        
-        sheet.appendRow(row);
-        console.log(`✅ Data kuis "${judul}" berhasil disimpan (legacy) di baris ${sheet.getLastRow()}`);
-        
-        return createResponse(true, "Data kuis berhasil disimpan", {
-            judul: judul,
-            row: sheet.getLastRow()
+        return createResponse(true, "Data hasil kuis berhasil diambil", { 
+            data: data, 
+            total: data.length 
         });
-        
     } catch(error) {
-        console.error("❌ Error save buat kuis legacy:", error);
-        return createResponse(false, "Terjadi kesalahan: " + error.toString());
+        return createResponse(false, "Gagal mengambil data hasil kuis: " + error.toString());
     }
 }
 
-// ============================================================
-// ========== FUNGSI HANDLE HASIL KUIS ==========
-// ============================================================
 function handleSaveHasilKuis(data) {
     try {
-        console.log('📝 Menyimpan data hasil kuis ke sheet Hasil_Kuis...');
-        
         const sheet = getSheetHasilKuis();
         const lastRow = sheet.getLastRow();
         const noUrut = lastRow;
@@ -1544,303 +1391,31 @@ function handleSaveHasilKuis(data) {
         sheet.appendRow(newRow);
         sheet.getRange(lastRow + 1, 15).setNumberFormat("dd/mm/yyyy HH:mm:ss");
         
-        console.log(`✅ Hasil kuis untuk "${nama}" berhasil disimpan`);
-        
         return createResponse(true, "Data hasil kuis berhasil disimpan", { 
             id_hasil: idHasil,
             row: lastRow + 1 
         });
         
     } catch(error) {
-        console.error("❌ Error save hasil kuis:", error);
         return createResponse(false, "Terjadi kesalahan: " + error.toString());
     }
 }
 
-function handleUpdateStatusKuis(data) {
-    try {
-        const idKuis = data.ID_Kuis || data.id_kuis;
-        const statusBaru = data.Status || data.status;
-        
-        if (!idKuis || !statusBaru) {
-            return createResponse(false, "ID_Kuis dan Status baru wajib diisi");
-        }
-        
-        const sheet = getSheetBuatKuis();
-        const dataRange = sheet.getDataRange();
-        const values = dataRange.getValues();
-        
-        for (let i = 1; i < values.length; i++) {
-            const pertanyaan = values[i][4] || '';
-            if (pertanyaan.includes(idKuis)) {
-                const newPertanyaan = pertanyaan.replace(/Status: [A-Za-z]+/, `Status: ${statusBaru}`);
-                sheet.getRange(i + 1, 5).setValue(newPertanyaan);
-                
-                return createResponse(true, "Status kuis berhasil diperbarui", {
-                    id_kuis: idKuis,
-                    status: statusBaru,
-                    row: i + 1
-                });
-            }
-        }
-        
-        return createResponse(false, "Kuis dengan ID " + idKuis + " tidak ditemukan");
-        
-    } catch(error) {
-        console.error("❌ Error update status:", error);
-        return createResponse(false, "Terjadi kesalahan: " + error.toString());
-    }
-}
-
-function handleDeleteKuis(data) {
-    try {
-        const idKuis = data.ID_Kuis || data.id_kuis;
-        
-        if (!idKuis) {
-            return createResponse(false, "ID_Kuis wajib diisi");
-        }
-        
-        const sheet = getSheetBuatKuis();
-        const dataRange = sheet.getDataRange();
-        const values = dataRange.getValues();
-        
-        for (let i = 1; i < values.length; i++) {
-            const pertanyaan = values[i][4] || '';
-            if (pertanyaan.includes(idKuis)) {
-                sheet.deleteRow(i + 1);
-                return createResponse(true, "Kuis berhasil dihapus", {
-                    id_kuis: idKuis,
-                    row: i + 1
-                });
-            }
-        }
-        
-        return createResponse(false, "Kuis dengan ID " + idKuis + " tidak ditemukan");
-        
-    } catch(error) {
-        console.error("❌ Error delete kuis:", error);
-        return createResponse(false, "Terjadi kesalahan: " + error.toString());
-    }
-}
-
-function handleClearAllKuis() {
-    try {
-        const sheet = getSheetBuatKuis();
-        const lastRow = sheet.getLastRow();
-        
-        if (lastRow >= 2) {
-            sheet.deleteRows(2, lastRow - 1);
-            return createResponse(true, "Semua data kuis berhasil dihapus", {
-                deleted_rows: lastRow - 1
-            });
-        }
-        
-        return createResponse(true, "Tidak ada data kuis untuk dihapus");
-        
-    } catch(error) {
-        console.error("❌ Error clear all kuis:", error);
-        return createResponse(false, "Terjadi kesalahan: " + error.toString());
-    }
-}
-
-function handleGetBuatKuis(e) {
-    return handleGetKuis(e);
-}
-
-function handleGetHasilKuis(e) {
-    try {
-        const sheet = getSheetHasilKuis();
-        const lastRow = sheet.getLastRow();
-        
-        if (lastRow < 2) {
-            return createResponse(true, "Belum ada data hasil kuis", { data: [] });
-        }
-        
-        const range = sheet.getRange(2, 1, lastRow - 1, HEADER_HASIL_KUIS.length);
-        const values = range.getValues();
-        
-        const data = values.map(row => {
-            let obj = {};
-            HEADER_HASIL_KUIS.forEach((header, idx) => {
-                obj[header] = row[idx] || '';
-            });
-            return obj;
-        });
-        
-        if (e && e.parameter && e.parameter.id_kuis) {
-            const idKuis = e.parameter.id_kuis;
-            const filtered = data.filter(item => item.ID_Kuis === idKuis);
-            return createResponse(true, "Data hasil kuis berhasil diambil", { 
-                data: filtered, 
-                total: filtered.length,
-                id_kuis: idKuis
-            });
-        }
-        
-        return createResponse(true, "Data hasil kuis berhasil diambil", { 
-            data: data, 
-            total: data.length 
-        });
-        
-    } catch(error) {
-        return createResponse(false, "Gagal mengambil data hasil kuis: " + error.toString());
-    }
-}
-
 // ============================================================
-// ========== FUNGSI GET DATA VIA POST ==========
-// ============================================================
-function handleGetDataPost(data) {
-    try {
-        const type = data.type || 'all';
-        const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-        const result = {};
-        
-        function getSheetData(sheetName, headers) {
-            const sheet = ss.getSheetByName(sheetName);
-            if (!sheet) return [];
-            const data = sheet.getDataRange().getValues();
-            if (data.length < 2) return [];
-            const headerRow = headers || data[0];
-            const rows = data.slice(1);
-            return rows.map(row => {
-                const obj = {};
-                headerRow.forEach((h, i) => {
-                    obj[h] = row[i] || '';
-                });
-                return obj;
-            });
-        }
-        
-        if (type === 'all' || type === 'users') {
-            result.users = getSheetData(SHEET_USERS, HEADER_USERS);
-        }
-        if (type === 'all' || type === 'mapel') {
-            result.mapel = getSheetData('Mapel');
-        }
-        if (type === 'all' || type === 'absensi') {
-            result.absensi = getSheetData('Absensi');
-        }
-        if (type === 'all' || type === 'nilai') {
-            result.nilai = getSheetData('Nilai');
-        }
-        if (type === 'all' || type === 'jurnal') {
-            result.jurnal = getSheetData('Jurnal');
-        }
-        if (type === 'all' || type === 'pengumuman') {
-            result.pengumuman = getSheetData('Pengumuman');
-        }
-        if (type === 'all' || type === 'buat_kuis') {
-            result.buat_kuis = getSheetData(SHEET_BUAT_KUIS, HEADER_BUAT_KUIS);
-        }
-        if (type === 'all' || type === 'hasil_kuis') {
-            result.hasil_kuis = getSheetData(SHEET_HASIL_KUIS, HEADER_HASIL_KUIS);
-        }
-        
-        return {
-            status: 'success',
-            message: 'Data berhasil diambil',
-            data: result,
-            timestamp: new Date().toISOString()
-        };
-        
-    } catch(err) {
-        return {
-            status: 'error',
-            message: 'Error: ' + err.toString()
-        };
-    }
-}
-
-// ============================================================
-// ========== FUNGSI GET DATA VIA GET ==========
-// ============================================================
-function handleGetData(e) {
-    try {
-        const type = e.parameter.type || 'all';
-        const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-        const result = {};
-        
-        function getSheetData(sheetName, headers) {
-            const sheet = ss.getSheetByName(sheetName);
-            if (!sheet) return [];
-            const data = sheet.getDataRange().getValues();
-            if (data.length < 2) return [];
-            const headerRow = headers || data[0];
-            const rows = data.slice(1);
-            return rows.map(row => {
-                const obj = {};
-                headerRow.forEach((h, i) => {
-                    obj[h] = row[i] || '';
-                });
-                return obj;
-            });
-        }
-        
-        if (type === 'all' || type === 'users') {
-            result.users = getSheetData(SHEET_USERS, HEADER_USERS);
-        }
-        if (type === 'all' || type === 'mapel') {
-            result.mapel = getSheetData('Mapel');
-        }
-        if (type === 'all' || type === 'absensi') {
-            result.absensi = getSheetData('Absensi');
-        }
-        if (type === 'all' || type === 'nilai') {
-            result.nilai = getSheetData('Nilai');
-        }
-        if (type === 'all' || type === 'jurnal') {
-            result.jurnal = getSheetData('Jurnal');
-        }
-        if (type === 'all' || type === 'pengumuman') {
-            result.pengumuman = getSheetData('Pengumuman');
-        }
-        if (type === 'all' || type === 'buat_kuis') {
-            result.buat_kuis = getSheetData(SHEET_BUAT_KUIS, HEADER_BUAT_KUIS);
-        }
-        if (type === 'all' || type === 'hasil_kuis') {
-            result.hasil_kuis = getSheetData(SHEET_HASIL_KUIS, HEADER_HASIL_KUIS);
-        }
-        
-        return ContentService
-            .createTextOutput(JSON.stringify({
-                status: 'success',
-                message: 'Data berhasil diambil',
-                data: result,
-                timestamp: new Date().toISOString()
-            }))
-            .setMimeType(ContentService.MimeType.JSON);
-        
-    } catch(err) {
-        return ContentService
-            .createTextOutput(JSON.stringify({
-                status: 'error',
-                message: 'Error: ' + err.toString()
-            }))
-            .setMimeType(ContentService.MimeType.JSON);
-    }
-}
-
-// ============================================================
-// ========== 🚀 FUNGSI SYNC USERS (FIXED - PRIORITAS DATA DARI CLIENT) ==========
+// ========== FUNGSI SYNC ==========
 // ============================================================
 function syncUsers(data, webAppUrl) {
     try {
-        console.log('📝 Menyimpan data Users...');
-        console.log('📝 Data length:', data ? data.length : 0);
-        console.log('📝 WebAppUrl:', webAppUrl);
-        
         const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
         let sheet = ss.getSheetByName(SHEET_USERS);
         if (!sheet) {
-            console.log('📝 Membuat sheet Users...');
             sheet = ss.insertSheet(SHEET_USERS);
             sheet.getRange(1, 1, 1, HEADER_USERS.length).setValues([HEADER_USERS]);
             sheet.getRange(1, 1, 1, HEADER_USERS.length).setFontWeight('bold');
             sheet.setFrozenRows(1);
         }
         
-        // ========== 1. BACA DATA EXISTING DARI SHEET ==========
+        // BACA DATA EXISTING
         const existingData = sheet.getDataRange().getValues();
         const headerRow = existingData[0];
         
@@ -1875,7 +1450,6 @@ function syncUsers(data, webAppUrl) {
                     URL_Script_App: String(row[urlIdx] || ''),
                     Kelas: String(row[kelasIdx] || 'System')
                 };
-                console.log(`🔄 Mempertahankan Admin: ${username}`);
             } else if (role === 'guru') {
                 guruData = {
                     Role: 'Guru',
@@ -1885,7 +1459,6 @@ function syncUsers(data, webAppUrl) {
                     URL_Script_App: String(row[urlIdx] || ''),
                     Kelas: String(row[kelasIdx] || '')
                 };
-                console.log(`🔄 Mempertahankan Guru: ${username}`);
             } else if (role === 'siswa') {
                 existingSiswa.push({
                     Role: 'Siswa',
@@ -1895,15 +1468,10 @@ function syncUsers(data, webAppUrl) {
                     URL_Script_App: String(row[urlIdx] || ''),
                     Kelas: String(row[kelasIdx] || 'Peserta Didik')
                 });
-                console.log(`📝 Siswa existing: ${username}`);
             }
         }
         
-        console.log(`🔄 Admin ditemukan: ${adminData ? adminData.Username : 'TIDAK ADA'}`);
-        console.log(`🔄 Guru ditemukan: ${guruData ? guruData.Username : 'TIDAK ADA'}`);
-        console.log(`📝 ${existingSiswa.length} siswa existing`);
-        
-        // ========== 2. PROSES DATA DARI CLIENT ==========
+        // PROSES DATA DARI CLIENT
         let clientAdmin = null;
         let clientGuru = null;
         let clientSiswa = [];
@@ -1926,7 +1494,6 @@ function syncUsers(data, webAppUrl) {
                         URL_Script_App: webAppUrl || String(item.URL_Script_App || ''),
                         Kelas: String(item.Kelas || 'System')
                     };
-                    console.log(`📤 Admin dari client: ${username} - ${nama}`);
                 } else if (role === 'guru') {
                     clientGuru = {
                         Role: 'Guru',
@@ -1936,9 +1503,7 @@ function syncUsers(data, webAppUrl) {
                         URL_Script_App: webAppUrl || String(item.URL_Script_App || ''),
                         Kelas: String(item.Kelas || '')
                     };
-                    console.log(`📤 Guru dari client: ${username} - ${nama}`);
                 } else if (role === 'siswa') {
-                    // Cek apakah siswa sudah ada
                     if (!existingUsernames.has(username)) {
                         clientSiswa.push({
                             Role: 'Siswa',
@@ -1948,65 +1513,33 @@ function syncUsers(data, webAppUrl) {
                             URL_Script_App: webAppUrl || String(item.URL_Script_App || ''),
                             Kelas: String(item.Kelas || 'Peserta Didik')
                         });
-                        console.log(`➕ Siswa baru dari client: ${username} - ${nama}`);
-                    } else {
-                        console.log(`⚠️ Siswa ${username} sudah ada, skip`);
                     }
                 }
             }
         }
         
-        // ========== 3. PRIORITAS: DATA DARI CLIENT LEBIH UTAMA ==========
-        // ADMIN: client > existing > default
-        let finalAdmin = null;
-        if (clientAdmin) {
-            finalAdmin = clientAdmin;
-            console.log(`✅ ADMIN menggunakan data dari client: ${finalAdmin.Username}`);
-        } else if (adminData) {
-            finalAdmin = adminData;
-            // Tapi URL_Script_App tetap pakai webAppUrl dari client
-            finalAdmin.URL_Script_App = webAppUrl || finalAdmin.URL_Script_App;
-            console.log(`✅ ADMIN menggunakan data existing: ${finalAdmin.Username}`);
-        } else {
-            finalAdmin = {
-                Role: 'Admin',
-                Username: 'admin',
-                Password: '123',
-                Nama: 'Administrator',
-                URL_Script_App: webAppUrl || '',
-                Kelas: 'System'
-            };
-            console.log('➕ ADMIN default dibuat');
-        }
+        // PRIORITAS DATA
+        let finalAdmin = clientAdmin || adminData || {
+            Role: 'Admin',
+            Username: 'admin',
+            Password: '123',
+            Nama: 'Administrator',
+            URL_Script_App: webAppUrl || '',
+            Kelas: 'System'
+        };
         
-        // GURU: client > existing > default
-        let finalGuru = null;
-        if (clientGuru) {
-            finalGuru = clientGuru;
-            console.log(`✅ GURU menggunakan data dari client: ${finalGuru.Username}`);
-        } else if (guruData) {
-            finalGuru = guruData;
-            // Tapi URL_Script_App tetap pakai webAppUrl dari client
-            finalGuru.URL_Script_App = webAppUrl || finalGuru.URL_Script_App;
-            console.log(`✅ GURU menggunakan data existing: ${finalGuru.Username}`);
-        } else {
-            finalGuru = {
-                Role: 'Guru',
-                Username: 'guru',
-                Password: '123',
-                Nama: 'Guru Pengajar',
-                URL_Script_App: webAppUrl || '',
-                Kelas: ''
-            };
-            console.log('➕ GURU default dibuat');
-        }
+        let finalGuru = clientGuru || guruData || {
+            Role: 'Guru',
+            Username: 'guru',
+            Password: '123',
+            Nama: 'Guru Pengajar',
+            URL_Script_App: webAppUrl || '',
+            Kelas: ''
+        };
         
-        console.log(`📝 Menambahkan ${clientSiswa.length} siswa baru`);
-        
-        // ========== 4. GABUNGKAN SEMUA DATA ==========
+        // GABUNGKAN SEMUA DATA
         let allRows = [];
         
-        // Admin
         allRows.push([
             finalAdmin.Role,
             finalAdmin.Username,
@@ -2015,9 +1548,7 @@ function syncUsers(data, webAppUrl) {
             finalAdmin.URL_Script_App,
             finalAdmin.Kelas
         ]);
-        console.log(`✅ Admin: ${finalAdmin.Username} - ${finalAdmin.Nama} | URL: ${finalAdmin.URL_Script_App}`);
         
-        // Guru
         allRows.push([
             finalGuru.Role,
             finalGuru.Username,
@@ -2026,53 +1557,30 @@ function syncUsers(data, webAppUrl) {
             finalGuru.URL_Script_App,
             finalGuru.Kelas
         ]);
-        console.log(`✅ Guru: ${finalGuru.Username} - ${finalGuru.Nama} | URL: ${finalGuru.URL_Script_App}`);
         
-        // Siswa existing
-        if (existingSiswa.length > 0) {
-            for (const s of existingSiswa) {
-                // Update URL dengan webAppUrl terbaru
-                s.URL_Script_App = webAppUrl || s.URL_Script_App;
-                allRows.push([
-                    s.Role,
-                    s.Username,
-                    s.Password,
-                    s.Nama,
-                    s.URL_Script_App,
-                    s.Kelas
-                ]);
-            }
-            console.log(`✅ ${existingSiswa.length} siswa existing dipertahankan`);
+        for (const s of existingSiswa) {
+            s.URL_Script_App = webAppUrl || s.URL_Script_App;
+            allRows.push([
+                s.Role, s.Username, s.Password, s.Nama, s.URL_Script_App, s.Kelas
+            ]);
         }
         
-        // Siswa baru dari client
-        if (clientSiswa.length > 0) {
-            for (const s of clientSiswa) {
-                allRows.push([
-                    s.Role,
-                    s.Username,
-                    s.Password,
-                    s.Nama,
-                    s.URL_Script_App,
-                    s.Kelas
-                ]);
-            }
-            console.log(`✅ ${clientSiswa.length} siswa baru ditambahkan`);
+        for (const s of clientSiswa) {
+            allRows.push([
+                s.Role, s.Username, s.Password, s.Nama, s.URL_Script_App, s.Kelas
+            ]);
         }
         
-        // ========== 5. TULIS KE SHEET ==========
+        // TULIS KE SHEET
         const lastRow = sheet.getLastRow();
         if (lastRow > 1) {
             sheet.deleteRows(2, lastRow - 1);
-            console.log('🗑️ Data lama dihapus');
         }
         
         if (allRows.length > 0) {
             sheet.getRange(2, 1, allRows.length, HEADER_USERS.length).setValues(allRows);
-            console.log(`✅ ${allRows.length} baris data Users tersimpan`);
         }
         
-        // ========== 6. RESPONSE ==========
         return ContentService
             .createTextOutput(JSON.stringify({
                 status: 'success',
@@ -2090,7 +1598,6 @@ function syncUsers(data, webAppUrl) {
             .setMimeType(ContentService.MimeType.JSON);
         
     } catch(err) {
-        console.log('❌ Error syncUsers:', err.toString());
         return ContentService
             .createTextOutput(JSON.stringify({
                 status: 'error',
@@ -2100,13 +1607,8 @@ function syncUsers(data, webAppUrl) {
     }
 }
 
-// ============================================================
-// ========== FUNGSI SYNC MAPEL ==========
-// ============================================================
 function syncMapel(data) {
     try {
-        console.log('📝 Menyimpan data Mapel...');
-        
         const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
         let sheet = ss.getSheetByName('Mapel');
         if (!sheet) {
@@ -2126,7 +1628,6 @@ function syncMapel(data) {
             ]);
             if (rows.length > 0) {
                 sheet.getRange(2, 1, rows.length, headers.length).setValues(rows);
-                console.log(`✅ ${rows.length} baris data Mapel tersimpan`);
             }
         }
         
@@ -2138,7 +1639,6 @@ function syncMapel(data) {
             .setMimeType(ContentService.MimeType.JSON);
         
     } catch(err) {
-        console.log('❌ Error syncMapel:', err.toString());
         return ContentService
             .createTextOutput(JSON.stringify({
                 status: 'error',
@@ -2148,13 +1648,8 @@ function syncMapel(data) {
     }
 }
 
-// ============================================================
-// ========== FUNGSI SYNC ABSENSI ==========
-// ============================================================
 function syncAbsensi(data) {
     try {
-        console.log('📝 Menyimpan data Absensi...');
-        
         const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
         let sheet = ss.getSheetByName('Absensi');
         if (!sheet) {
@@ -2174,7 +1669,6 @@ function syncAbsensi(data) {
             ]);
             if (rows.length > 0) {
                 sheet.getRange(2, 1, rows.length, headers.length).setValues(rows);
-                console.log(`✅ ${rows.length} baris data Absensi tersimpan`);
             }
         }
         
@@ -2186,7 +1680,6 @@ function syncAbsensi(data) {
             .setMimeType(ContentService.MimeType.JSON);
         
     } catch(err) {
-        console.log('❌ Error syncAbsensi:', err.toString());
         return ContentService
             .createTextOutput(JSON.stringify({
                 status: 'error',
@@ -2196,13 +1689,8 @@ function syncAbsensi(data) {
     }
 }
 
-// ============================================================
-// ========== FUNGSI SYNC NILAI ==========
-// ============================================================
 function syncNilai(data) {
     try {
-        console.log('📝 Menyimpan data Nilai...');
-        
         const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
         let sheet = ss.getSheetByName('Nilai');
         if (!sheet) {
@@ -2229,7 +1717,6 @@ function syncNilai(data) {
             ]);
             if (rows.length > 0) {
                 sheet.getRange(2, 1, rows.length, headers.length).setValues(rows);
-                console.log(`✅ ${rows.length} baris data Nilai tersimpan`);
             }
         }
         
@@ -2241,7 +1728,6 @@ function syncNilai(data) {
             .setMimeType(ContentService.MimeType.JSON);
         
     } catch(err) {
-        console.log('❌ Error syncNilai:', err.toString());
         return ContentService
             .createTextOutput(JSON.stringify({
                 status: 'error',
@@ -2251,13 +1737,48 @@ function syncNilai(data) {
     }
 }
 
-// ============================================================
-// ========== FUNGSI SYNC PENGUMUMAN ==========
-// ============================================================
+function syncJurnal(data) {
+    try {
+        const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+        let sheet = ss.getSheetByName('Jurnal');
+        if (!sheet) {
+            sheet = ss.insertSheet('Jurnal');
+        }
+        
+        sheet.clear();
+        const headers = ['Tanggal', 'Mata Pelajaran', 'Kegiatan Pembelajaran'];
+        sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+        
+        if (data && data.length > 0) {
+            const rows = data.map(item => [
+                item.Tanggal || '',
+                item.Mapel || '',
+                item.Kegiatan || ''
+            ]);
+            if (rows.length > 0) {
+                sheet.getRange(2, 1, rows.length, headers.length).setValues(rows);
+            }
+        }
+        
+        return ContentService
+            .createTextOutput(JSON.stringify({
+                status: 'success',
+                message: 'Data Jurnal Harian berhasil disinkronisasi (' + (data ? data.length : 0) + ' records)'
+            }))
+            .setMimeType(ContentService.MimeType.JSON);
+        
+    } catch(err) {
+        return ContentService
+            .createTextOutput(JSON.stringify({
+                status: 'error',
+                message: 'Error syncJurnal: ' + err.toString()
+            }))
+            .setMimeType(ContentService.MimeType.JSON);
+    }
+}
+
 function syncPengumuman(data) {
     try {
-        console.log('📝 Menyimpan data Pengumuman...');
-        
         const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
         let sheet = ss.getSheetByName('Pengumuman');
         if (!sheet) {
@@ -2277,7 +1798,6 @@ function syncPengumuman(data) {
             ]);
             if (rows.length > 0) {
                 sheet.getRange(2, 1, rows.length, headers.length).setValues(rows);
-                console.log(`✅ ${rows.length} baris data Pengumuman tersimpan`);
             }
         }
         
@@ -2289,7 +1809,6 @@ function syncPengumuman(data) {
             .setMimeType(ContentService.MimeType.JSON);
         
     } catch(err) {
-        console.log('❌ Error syncPengumuman:', err.toString());
         return ContentService
             .createTextOutput(JSON.stringify({
                 status: 'error',
@@ -2300,127 +1819,8 @@ function syncPengumuman(data) {
 }
 
 // ============================================================
-// ========== FUNGSI SYNC JURNAL HARIAN ==========
-// ============================================================
-function syncJurnal(data) {
-    try {
-        console.log('📝 Menyimpan data Jurnal Harian...');
-        console.log('📝 Data length:', data ? data.length : 0);
-        
-        const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-        let sheet = ss.getSheetByName('Jurnal');
-        if (!sheet) {
-            console.log('📝 Membuat sheet Jurnal...');
-            sheet = ss.insertSheet('Jurnal');
-        }
-        
-        sheet.clear();
-        const headers = ['Tanggal', 'Mata Pelajaran', 'Kegiatan Pembelajaran'];
-        sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
-        
-        if (data && data.length > 0) {
-            const rows = data.map(item => [
-                item.Tanggal || '',
-                item.Mapel || '',
-                item.Kegiatan || ''
-            ]);
-            
-            if (rows.length > 0) {
-                sheet.getRange(2, 1, rows.length, headers.length).setValues(rows);
-                console.log(`✅ ${rows.length} baris data Jurnal tersimpan`);
-            }
-        }
-        
-        return ContentService
-            .createTextOutput(JSON.stringify({
-                status: 'success',
-                message: 'Data Jurnal Harian berhasil disinkronisasi (' + (data ? data.length : 0) + ' records)'
-            }))
-            .setMimeType(ContentService.MimeType.JSON);
-        
-    } catch(err) {
-        console.log('❌ Error syncJurnal:', err.toString());
-        return ContentService
-            .createTextOutput(JSON.stringify({
-                status: 'error',
-                message: 'Error syncJurnal: ' + err.toString()
-            }))
-            .setMimeType(ContentService.MimeType.JSON);
-    }
-}
-
-// ============================================================
 // ========== FUNGSI UTILITY ==========
 // ============================================================
-
-function testConnection() {
-    const testData = {
-        action: 'save_kuis',
-        metadata: {
-            waktu_mulai: new Date().toLocaleString('id-ID'),
-            waktu_selesai: new Date(Date.now() + 7*24*60*60*1000).toLocaleString('id-ID'),
-            durasi: 30
-        },
-        questions: [
-            {
-                tipe: 'PG',
-                pertanyaan: 'Contoh soal uji coba?',
-                pilihanA: 'Opsi A',
-                pilihanB: 'Opsi B',
-                pilihanC: 'Opsi C',
-                pilihanD: 'Opsi D',
-                jawaban: 'A'
-            }
-        ]
-    };
-    
-    const mockEvent = {
-        postData: {
-            contents: JSON.stringify(testData)
-        }
-    };
-    
-    const result = doPost(mockEvent);
-    Logger.log("Hasil test: " + result.getContent());
-    return result;
-}
-
-function clearBuatKuisData() {
-    const sheet = getSheetBuatKuis();
-    const lastRow = sheet.getLastRow();
-    
-    if (lastRow >= 2) {
-        sheet.deleteRows(2, lastRow - 1);
-        Logger.log("✅ Semua data buat kuis telah dihapus. Total baris: " + (lastRow - 1));
-    } else {
-        Logger.log("ℹ️ Tidak ada data yang dihapus");
-    }
-}
-
-function clearHasilKuisData() {
-    const sheet = getSheetHasilKuis();
-    const lastRow = sheet.getLastRow();
-    
-    if (lastRow >= 2) {
-        sheet.deleteRows(2, lastRow - 1);
-        Logger.log("✅ Semua data hasil kuis telah dihapus. Total baris: " + (lastRow - 1));
-    } else {
-        Logger.log("ℹ️ Tidak ada data yang dihapus");
-    }
-}
-
-function clearAllUsersData() {
-    const sheet = getSheetUsers();
-    const lastRow = sheet.getLastRow();
-    
-    if (lastRow >= 2) {
-        sheet.deleteRows(2, lastRow - 1);
-        Logger.log("✅ Semua data Users telah dihapus. Total baris: " + (lastRow - 1));
-    } else {
-        Logger.log("ℹ️ Tidak ada data Users yang dihapus");
-    }
-}
-
 function onDeploy() {
     const result = initializeSheets();
     Logger.log("🚀 Deploy selesai: " + JSON.stringify(result));
@@ -3898,7 +3298,7 @@ function onDeploy() {
     }
 
     // ============================================================
-    // FUNGSI SYNC DATA KE APPS SCRIPT - PERBAIKAN: GURU TETAP AMAN
+    // FUNGSI SYNC DATA KE APPS SCRIPT
     // ============================================================
     
     async function syncDataToAppScript(type, rawData) {
@@ -3910,9 +3310,6 @@ function onDeploy() {
             const currentNamaGuru = localStorage.getItem('app_nama_guru') || 'Guru Pengajar';
             
             if (type === 'users') {
-                // ========== PERBAIKAN: HANYA KIRIM DATA SISWA ==========
-                // Guru dan Admin TIDAK dikirim dari client, 
-                // karena di server akan dipertahankan username & password aslinya
                 const siswaData = (Array.isArray(rawData) ? rawData : Object.values(rawData))
                     .filter(user => user.role === 'siswa')
                     .map(user => ({
@@ -3924,22 +3321,17 @@ function onDeploy() {
                         Kelas: user.kelas || ''
                     }));
                 
-                // KIRIM DATA GURU UNTUK UPDATE NAMA SAJA, TAPI TANPA PASSWORD
-                // (server akan mempertahankan password asli dari sheet)
                 const guruData = (Array.isArray(rawData) ? rawData : Object.values(rawData))
                     .filter(user => user.role === 'guru')
                     .map(user => ({
                         Role: user.role || 'guru',
                         Username: user.username || 'guru',
-                        // PASSWORD TIDAK DIKIRIM - server akan pertahankan yang asli
                         Nama: currentNamaGuru,
                         URL_Script_App: url || '',
                         Kelas: user.kelas || ''
                     }));
                 
                 payloadData = [...siswaData, ...guruData];
-                
-                console.log(`📤 Mengirim ${siswaData.length} siswa dan ${guruData.length} guru (password guru tidak dikirim)`);
                 
             } else if (type === 'mapel') {
                 payloadData = (Array.isArray(rawData) ? rawData : Object.values(rawData)).map(mapel => ({
@@ -3994,7 +3386,6 @@ function onDeploy() {
 
             if (payloadData.length === 0) return;
 
-            // Kirim data ke server
             await fetch(url, {
                 method: 'POST',
                 mode: 'no-cors',
@@ -4013,7 +3404,7 @@ function onDeploy() {
     }
 
     // ============================================================
-    // FUNGSI PROMPT SYNC - PERBAIKAN
+    // FUNGSI PROMPT SYNC
     // ============================================================
     
     function promptSync() {
@@ -4024,7 +3415,6 @@ function onDeploy() {
         
         const currentNamaGuru = localStorage.getItem('app_nama_guru') || 'Guru Pengajar';
         
-        // PASTIKAN GURU MENGGUNAKAN NAMA DARI LOCALSTORAGE
         const guru = usersDb.find(u => u.role === 'guru');
         if (guru) {
             guru.nama = currentNamaGuru;
@@ -4035,7 +3425,7 @@ function onDeploy() {
         
         Swal.fire({
             title: 'Menyinkronkan Data...',
-            text: 'Mengirimkan semua data ke Google Sheets.\n⚠️ Username & Password GURU tidak akan berubah!',
+            text: 'Mengirimkan semua data ke Google Sheets.',
             showConfirmButton: false,
             didOpen: () => Swal.showLoading()
         });
@@ -4050,8 +3440,7 @@ function onDeploy() {
             Swal.fire({
                 title: 'Sukses!',
                 html: `Semua data telah disinkronisasi dengan database.<br><br>
-                       ✅ Nama guru: "<strong>${currentNamaGuru}</strong>"<br>
-                       ✅ Username dan Password GURU <strong>TETAP AMAN</strong> (tidak berubah)`,
+                       ✅ Nama guru: "<strong>${currentNamaGuru}</strong>"`,
                 icon: 'success'
             });
         }).catch((error) => {
@@ -4061,7 +3450,7 @@ function onDeploy() {
     }
 
     // ============================================================
-    // FUNGSI PULL DATA DARI GOOGLE SHEETS - PERTAHANKAN NAMA GURU
+    // FUNGSI PULL DATA DARI GOOGLE SHEETS (TARIK DATA)
     // ============================================================
     
     async function pullDataFromSheet() {
@@ -4082,210 +3471,362 @@ function onDeploy() {
             progressPercent.innerText = '0%';
             progressFill.style.width = '0%';
 
-            const response = await fetch(`${url}?action=get_data&type=all`);
-            const result = await response.json();
+            // ========== AMBIL DATA DARI GOOGLE SHEETS ==========
+            let allData = {};
+            let success = false;
+
+            // COBA 1: GET dengan action=get_data&type=all
+            try {
+                progressText.innerText = 'Mengambil data dari Google Sheets (GET)...';
+                progressPercent.innerText = '10%';
+                progressFill.style.width = '10%';
+                
+                const response = await fetch(`${url}?action=get_data&type=all`);
+                const result = await response.json();
+                
+                if (result.status === 'success' && result.data) {
+                    allData = result.data;
+                    success = true;
+                    console.log('✅ Data berhasil diambil via GET');
+                } else {
+                    throw new Error('GET method gagal');
+                }
+            } catch(getError) {
+                console.warn('⚠️ GET method gagal, mencoba POST...');
+                
+                // COBA 2: POST dengan action=get_data
+                try {
+                    progressText.innerText = 'Mengambil data dari Google Sheets (POST)...';
+                    progressPercent.innerText = '20%';
+                    progressFill.style.width = '20%';
+                    
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ 
+                            action: 'get_data', 
+                            type: 'all',
+                            webAppUrl: url 
+                        })
+                    });
+                    const result = await response.json();
+                    
+                    if (result.status === 'success' && result.data) {
+                        allData = result.data;
+                        success = true;
+                        console.log('✅ Data berhasil diambil via POST');
+                    } else {
+                        throw new Error('POST method gagal');
+                    }
+                } catch(postError) {
+                    console.warn('⚠️ POST method gagal, mencoba ambil per bagian...');
+                    
+                    // COBA 3: Ambil per bagian
+                    progressText.innerText = 'Mengambil data per bagian...';
+                    progressPercent.innerText = '30%';
+                    progressFill.style.width = '30%';
+                    
+                    const sections = ['users', 'mapel', 'absensi', 'nilai', 'jurnal'];
+                    let successCount = 0;
+                    
+                    for (let i = 0; i < sections.length; i++) {
+                        const section = sections[i];
+                        try {
+                            progressText.innerText = `Mengambil data ${section}...`;
+                            progressPercent.innerText = `${30 + (i * 8)}%`;
+                            progressFill.style.width = `${30 + (i * 8)}%`;
+                            
+                            // Coba GET dulu
+                            let response = await fetch(`${url}?action=get_data&type=${section}`);
+                            let result = await response.json();
+                            
+                            // Jika GET gagal, coba POST
+                            if (result.status !== 'success') {
+                                response = await fetch(url, {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ 
+                                        action: 'get_data', 
+                                        type: section,
+                                        webAppUrl: url 
+                                    })
+                                });
+                                result = await response.json();
+                            }
+                            
+                            if (result.status === 'success' && result.data) {
+                                if (Array.isArray(result.data)) {
+                                    allData[section] = result.data;
+                                } else if (result.data[section]) {
+                                    allData[section] = result.data[section];
+                                } else {
+                                    const keys = Object.keys(result.data);
+                                    if (keys.length > 0) {
+                                        allData[section] = result.data[keys[0]] || [];
+                                    }
+                                }
+                                successCount++;
+                                console.log(`✅ Data ${section} berhasil diambil`);
+                            }
+                        } catch(sectionError) {
+                            console.warn(`⚠️ Gagal mengambil data ${section}:`, sectionError);
+                        }
+                    }
+                    
+                    // COBA 4: Ambil users dengan endpoint khusus
+                    if (!allData.users || allData.users.length === 0) {
+                        try {
+                            progressText.innerText = 'Mengambil data users (endpoint khusus)...';
+                            progressPercent.innerText = '70%';
+                            progressFill.style.width = '70%';
+                            
+                            const response = await fetch(`${url}?action=get_users`);
+                            const result = await response.json();
+                            
+                            if (result.status === 'success' && result.data) {
+                                allData.users = result.data;
+                                console.log('✅ Data users berhasil diambil via get_users');
+                            }
+                        } catch(userError) {
+                            console.warn('⚠️ Gagal mengambil data users:', userError);
+                        }
+                    }
+                    
+                    if (successCount > 0 || (allData.users && allData.users.length > 0)) {
+                        success = true;
+                    }
+                }
+            }
+
+            if (!success) {
+                throw new Error('Gagal mengambil data dari Google Sheets');
+            }
 
             progressText.innerText = 'Memproses data...';
-            progressPercent.innerText = '50%';
-            progressFill.style.width = '50%';
+            progressPercent.innerText = '80%';
+            progressFill.style.width = '80%';
 
-            if (result.status === 'success' && result.data) {
-                const data = result.data;
-                let importedCount = 0;
+            // ========== PROSES DATA YANG DIDAPAT ==========
+            let importedCount = 0;
+            const currentNamaGuru = localStorage.getItem('app_nama_guru') || 'Guru Pengajar';
 
-                // PERTAHANKAN NAMA GURU DARI LOCALSTORAGE
-                const currentNamaGuru = localStorage.getItem('app_nama_guru') || 'Guru Pengajar';
-                const currentGuruUsername = 'guru';
-                const currentGuruPassword = '123';
-
-                // ========== PERBAIKAN: Import Users - HANYA SISWA ==========
-                if (data.users && data.users.length > 0) {
-                    const existingUsernames = new Set(usersDb.map(u => u.username));
-                    let newUsers = [];
+            // ========== IMPORT USERS ==========
+            if (allData.users && allData.users.length > 0) {
+                const existingUsernames = new Set(usersDb.map(u => u.username));
+                let newUsers = [];
+                let guruFromSheet = null;
+                
+                allData.users.forEach(row => {
+                    const role = (row.Role || row.role || '').toLowerCase();
+                    const username = row.Username || row.username || '';
+                    const nama = row.Nama || row.nama || username;
+                    const password = row.Password || row.password || '123';
+                    const kelas = row.Kelas || row.kelas || '';
+                    const idTambahan = row.ID_Tambahan || row.id_tambahan || row.No_Absen || row.no_absen || '';
                     
-                    // PERTAHANKAN DATA GURU YANG SUDAH ADA DENGAN USERNAME & PASSWORD TETAP
-                    const existingGuru = usersDb.filter(u => u.role === 'guru');
+                    if (!username) return;
                     
-                    data.users.forEach(row => {
-                        // HANYA PROSES SISWA
-                        if (row.Role === 'siswa' && row.Username && !existingUsernames.has(row.Username)) {
-                            newUsers.push({
-                                role: 'siswa',
-                                username: row.Username,
-                                password: row.Password || '123',
-                                nama: row.Nama || row.Username,
-                                id_tambahan: row.ID_Tambahan || '',
-                                kelas: row.Kelas || 'Kelas 1'
-                            });
-                            existingUsernames.add(row.Username);
-                        }
-                    });
-                    
-                    // HANYA PERTAHANKAN GURU, JANGAN OVERWRITE
-                    usersDb = usersDb.filter(u => u.role === 'guru');
-                    
-                    // PASTIKAN GURU TETAP DENGAN USERNAME & PASSWORD YANG TEPAT
-                    const guruFromSheet = data.users.find(row => row.Role === 'guru');
-                    if (guruFromSheet) {
-                        // Gunakan username & password dari sheet, tapi pertahankan nama dari localStorage
-                        const guru = usersDb.find(u => u.role === 'guru');
-                        if (guru) {
-                            guru.username = guruFromSheet.Username || 'guru';
-                            guru.password = guruFromSheet.Password || '123';
-                            guru.nama = currentNamaGuru;
-                        } else {
-                            usersDb.push({
-                                role: 'guru',
-                                username: guruFromSheet.Username || 'guru',
-                                password: guruFromSheet.Password || '123',
-                                nama: currentNamaGuru,
-                                id_tambahan: '',
-                                kelas: ''
-                            });
-                        }
-                    } else {
-                        // Jika tidak ada guru di sheet, buat default
-                        const guru = usersDb.find(u => u.role === 'guru');
-                        if (!guru) {
-                            usersDb.push({
-                                role: 'guru',
-                                username: 'guru',
-                                password: '123',
-                                nama: currentNamaGuru,
-                                id_tambahan: '',
-                                kelas: ''
-                            });
-                        } else {
-                            guru.nama = currentNamaGuru;
-                        }
+                    if (role === 'guru') {
+                        guruFromSheet = row;
+                    } else if (role === 'siswa' && !existingUsernames.has(username)) {
+                        newUsers.push({
+                            role: 'siswa',
+                            username: username,
+                            password: password,
+                            nama: nama,
+                            id_tambahan: idTambahan,
+                            kelas: kelas || 'Kelas 1'
+                        });
+                        existingUsernames.add(username);
                     }
-                    
-                    if (newUsers.length > 0) {
-                        usersDb = usersDb.concat(newUsers);
-                        importedCount += newUsers.length;
-                    }
-                    
-                    // PASTIKAN NAMA GURU DI LOCALSTORAGE TETAP
-                    localStorage.setItem('app_nama_guru', currentNamaGuru);
-                    localStorage.setItem('app_users_db', JSON.stringify(usersDb));
-                }
-
-                // Import Mapel
-                if (data.mapel && data.mapel.length > 0) {
-                    const existingKodes = new Set(mapelDb.map(m => m.kode));
-                    let newMapel = [];
-                    data.mapel.forEach(row => {
-                        if (row.Kode && !existingKodes.has(row.Kode)) {
-                            newMapel.push({
-                                id: row.ID || 'MP_' + Date.now() + '_' + row.Kode,
-                                kode: row.Kode,
-                                nama: row.Nama || row.Kode,
-                                kkm: parseInt(row.KKM) || 75
-                            });
-                            existingKodes.add(row.Kode);
-                        }
-                    });
-                    if (newMapel.length > 0) {
-                        mapelDb = mapelDb.concat(newMapel);
-                        importedCount += newMapel.length;
-                    }
-                }
-
-                // Import Absensi
-                if (data.absensi && data.absensi.length > 0) {
-                    data.absensi.forEach(row => {
-                        if (row.Tanggal && row.Username) {
-                            if (!absensiDb[row.Tanggal]) {
-                                absensiDb[row.Tanggal] = {};
-                            }
-                            absensiDb[row.Tanggal][row.Username] = row.Status_Kehadiran || 'Hadir';
-                        }
-                    });
-                }
-
-                // Import Nilai
-                if (data.nilai && data.nilai.length > 0) {
-                    data.nilai.forEach(row => {
-                        if (row.Mapel && row.Username) {
-                            const mapelObj = mapelDb.find(m => m.nama === row.Mapel || m.kode === row.Mapel);
-                            const kode = mapelObj ? mapelObj.kode : row.Mapel;
-                            if (!nilaiDb[kode]) {
-                                nilaiDb[kode] = {};
-                            }
-                            if (!nilaiDb[kode][row.Username]) {
-                                nilaiDb[kode][row.Username] = {};
-                            }
-                            const n = nilaiDb[kode][row.Username];
-                            for (let i = 1; i <= 10; i++) {
-                                const key = 'Harian_' + i;
-                                if (row[key] !== undefined) {
-                                    n['h' + i] = parseFloat(row[key]) || 0;
-                                }
-                            }
-                            if (row.UTS !== undefined) n.uts = parseFloat(row.UTS) || 0;
-                            if (row.UAS !== undefined) n.uas = parseFloat(row.UAS) || 0;
-                            if (row.Nilai_Akhir !== undefined) n.nilaiAkhir = parseFloat(row.Nilai_Akhir) || 0;
-                        }
-                    });
-                }
-
-                // Import Jurnal
-                if (data.jurnal && data.jurnal.length > 0) {
-                    data.jurnal.forEach(row => {
-                        if (row.Tanggal && row.Mapel) {
-                            const mapelObj = mapelDb.find(m => m.nama === row.Mapel || m.kode === row.Mapel);
-                            const kode = mapelObj ? mapelObj.kode : row.Mapel;
-                            const key = `${row.Tanggal}_${kode}`;
-                            if (!jurnalDb[key]) {
-                                jurnalDb[key] = [];
-                            }
-                            jurnalDb[key].push({
-                                tanggal: row.Tanggal,
-                                mapelKode: kode,
-                                kegiatan: row['Kegiatan Pembelajaran'] || row.Kegiatan || ''
-                            });
-                        }
-                    });
-                }
-
-                // UPDATE UI DENGAN NAMA GURU YANG BENAR
-                updateProfilGuruUI(currentNamaGuru);
-                updateSidebarProfile();
-
-                saveAppData();
-
-                progressText.innerText = 'Selesai!';
-                progressPercent.innerText = '100%';
-                progressFill.style.width = '100%';
-
-                setTimeout(() => {
-                    progressEl.style.display = 'none';
-                }, 2000);
-
-                // Ambil info guru dari sheet untuk ditampilkan
-                let guruInfo = '';
-                if (data.users) {
-                    const guruFromSheet = data.users.find(row => row.Role === 'guru');
-                    if (guruFromSheet) {
-                        guruInfo = `<br>👤 Guru: <strong>${guruFromSheet.Nama || currentNamaGuru}</strong><br>🔑 Username: <strong>${guruFromSheet.Username || 'guru'}</strong> (password tetap aman)`;
-                    }
-                }
-
-                Swal.fire({
-                    title: 'Tarik Data Berhasil!',
-                    html: `Berhasil mengimpor ${importedCount} data baru dari Google Sheets.<br><br>
-                           ✅ Nama guru: "<strong>${currentNamaGuru}</strong>"<br>
-                           ✅ Username dan Password GURU <strong>TETAP AMAN</strong> (tidak berubah)${guruInfo}`,
-                    icon: 'success'
                 });
-
-                updateDashboard();
-                renderSiswaTable();
-                renderMapelTable();
-
-            } else {
-                throw new Error(result.message || 'Gagal mengambil data');
+                
+                // PERTAHANKAN GURU
+                usersDb = usersDb.filter(u => u.role === 'guru');
+                
+                if (guruFromSheet) {
+                    const guruNama = guruFromSheet.Nama || guruFromSheet.nama || currentNamaGuru;
+                    const guruUsername = guruFromSheet.Username || guruFromSheet.username || 'guru';
+                    const guruPassword = guruFromSheet.Password || guruFromSheet.password || '123';
+                    
+                    const existingGuru = usersDb.find(u => u.role === 'guru');
+                    if (existingGuru) {
+                        existingGuru.username = guruUsername;
+                        existingGuru.password = guruPassword;
+                        existingGuru.nama = currentNamaGuru;
+                    } else {
+                        usersDb.push({
+                            role: 'guru',
+                            username: guruUsername,
+                            password: guruPassword,
+                            nama: currentNamaGuru,
+                            id_tambahan: '',
+                            kelas: ''
+                        });
+                    }
+                } else {
+                    const existingGuru = usersDb.find(u => u.role === 'guru');
+                    if (!existingGuru) {
+                        usersDb.push({
+                            role: 'guru',
+                            username: 'guru',
+                            password: '123',
+                            nama: currentNamaGuru,
+                            id_tambahan: '',
+                            kelas: ''
+                        });
+                    } else {
+                        existingGuru.nama = currentNamaGuru;
+                    }
+                }
+                
+                if (newUsers.length > 0) {
+                    usersDb = usersDb.concat(newUsers);
+                    importedCount += newUsers.length;
+                }
+                
+                localStorage.setItem('app_nama_guru', currentNamaGuru);
+                localStorage.setItem('app_users_db', JSON.stringify(usersDb));
             }
+
+            // ========== IMPORT MAPEL ==========
+            if (allData.mapel && allData.mapel.length > 0) {
+                const existingKodes = new Set(mapelDb.map(m => m.kode));
+                let newMapel = [];
+                allData.mapel.forEach(row => {
+                    const kode = row.Kode || row.kode || '';
+                    const nama = row.Nama || row.nama || kode;
+                    const kkm = parseInt(row.KKM || row.kkm || 75);
+                    const id = row.ID || row.id || 'MP_' + Date.now() + '_' + kode;
+                    
+                    if (kode && !existingKodes.has(kode)) {
+                        newMapel.push({
+                            id: id,
+                            kode: kode,
+                            nama: nama,
+                            kkm: kkm
+                        });
+                        existingKodes.add(kode);
+                    }
+                });
+                if (newMapel.length > 0) {
+                    mapelDb = mapelDb.concat(newMapel);
+                    importedCount += newMapel.length;
+                }
+            }
+
+            // ========== IMPORT ABSENSI ==========
+            if (allData.absensi && allData.absensi.length > 0) {
+                allData.absensi.forEach(row => {
+                    const tanggal = row.Tanggal || row.tanggal || '';
+                    const username = row.Username || row.username || '';
+                    const status = row.Status_Kehadiran || row.status_kehadiran || row.Status || row.status || 'Hadir';
+                    
+                    if (tanggal && username) {
+                        if (!absensiDb[tanggal]) {
+                            absensiDb[tanggal] = {};
+                        }
+                        absensiDb[tanggal][username] = status;
+                    }
+                });
+            }
+
+            // ========== IMPORT NILAI ==========
+            if (allData.nilai && allData.nilai.length > 0) {
+                allData.nilai.forEach(row => {
+                    const mapelNama = row.Mapel || row.mapel || '';
+                    const username = row.Username || row.username || '';
+                    
+                    if (mapelNama && username) {
+                        const mapelObj = mapelDb.find(m => m.nama === mapelNama || m.kode === mapelNama);
+                        const kode = mapelObj ? mapelObj.kode : mapelNama;
+                        
+                        if (!nilaiDb[kode]) {
+                            nilaiDb[kode] = {};
+                        }
+                        if (!nilaiDb[kode][username]) {
+                            nilaiDb[kode][username] = {};
+                        }
+                        
+                        const n = nilaiDb[kode][username];
+                        for (let i = 1; i <= 10; i++) {
+                            const key = 'Harian_' + i;
+                            const val = row[key] || row['h' + i] || 0;
+                            n['h' + i] = parseFloat(val) || 0;
+                        }
+                        n.uts = parseFloat(row.UTS || row.uts || 0) || 0;
+                        n.uas = parseFloat(row.UAS || row.uas || 0) || 0;
+                    }
+                });
+            }
+
+            // ========== IMPORT JURNAL ==========
+            if (allData.jurnal && allData.jurnal.length > 0) {
+                allData.jurnal.forEach(row => {
+                    const tanggal = row.Tanggal || row.tanggal || '';
+                    const mapelNama = row['Mata Pelajaran'] || row.Mapel || row.mapel || '';
+                    const kegiatan = row['Kegiatan Pembelajaran'] || row.Kegiatan || row.kegiatan || '';
+                    
+                    if (tanggal && mapelNama) {
+                        const mapelObj = mapelDb.find(m => m.nama === mapelNama || m.kode === mapelNama);
+                        const kode = mapelObj ? mapelObj.kode : mapelNama;
+                        const key = `${tanggal}_${kode}`;
+                        
+                        if (!jurnalDb[key]) {
+                            jurnalDb[key] = [];
+                        }
+                        
+                        const existing = jurnalDb[key].find(item => item.mapelKode === kode);
+                        if (existing) {
+                            existing.kegiatan = kegiatan;
+                        } else {
+                            jurnalDb[key].push({
+                                tanggal: tanggal,
+                                mapelKode: kode,
+                                kegiatan: kegiatan
+                            });
+                        }
+                    }
+                });
+            }
+
+            // UPDATE UI
+            updateProfilGuruUI(currentNamaGuru);
+            updateSidebarProfile();
+            saveAppData();
+
+            progressText.innerText = 'Selesai!';
+            progressPercent.innerText = '100%';
+            progressFill.style.width = '100%';
+
+            setTimeout(() => {
+                progressEl.style.display = 'none';
+            }, 2000);
+
+            // Info guru
+            let guruInfo = '';
+            if (allData.users) {
+                const guruFromSheet = allData.users.find(row => {
+                    const role = (row.Role || row.role || '').toLowerCase();
+                    return role === 'guru';
+                });
+                if (guruFromSheet) {
+                    const guruNama = guruFromSheet.Nama || guruFromSheet.nama || currentNamaGuru;
+                    const guruUsername = guruFromSheet.Username || guruFromSheet.username || 'guru';
+                    guruInfo = `<br>👤 Guru: <strong>${guruNama}</strong><br>🔑 Username: <strong>${guruUsername}</strong>`;
+                }
+            }
+
+            Swal.fire({
+                title: 'Tarik Data Berhasil!',
+                html: `Berhasil mengimpor ${importedCount} data baru dari Google Sheets.<br><br>
+                       ✅ Nama guru: "<strong>${currentNamaGuru}</strong>"${guruInfo}`,
+                icon: 'success'
+            });
+
+            updateDashboard();
+            renderSiswaTable();
+            renderMapelTable();
 
         } catch (error) {
             progressEl.style.display = 'none';
@@ -4374,6 +3915,95 @@ function onDeploy() {
     function applyTheme(themeClass) {
         document.body.className = themeClass;
         localStorage.setItem('app_theme', themeClass);
+    }
+
+    // ============================================================
+    // BACKUP & RESTORE
+    // ============================================================
+    
+    function backupDataLocal() {
+        const data = {
+            users: usersDb,
+            mapel: mapelDb,
+            absensi: absensiDb,
+            nilai: nilaiDb,
+            jurnal: jurnalDb,
+            jadwal: jadwalDb,
+            settings: {
+                nama_sekolah: localStorage.getItem('app_nama_sekolah'),
+                logo_kab: localStorage.getItem('app_logo_kab'),
+                logo_sek: localStorage.getItem('app_logo_sek'),
+                nama_guru: localStorage.getItem('app_nama_guru'),
+                foto_guru: localStorage.getItem('app_foto_guru'),
+                script_url: localStorage.getItem('app_script_url')
+            },
+            timestamp: new Date().toISOString()
+        };
+
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `backup_data_${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+
+        Swal.fire('Sukses', 'Data berhasil di-backup.', 'success');
+    }
+
+    function restoreDataLocal(input) {
+        const file = input.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const data = JSON.parse(e.target.result);
+
+                if (data.users) {
+                    usersDb = data.users;
+                    localStorage.setItem('app_users_db', JSON.stringify(usersDb));
+                }
+                if (data.mapel) {
+                    mapelDb = data.mapel;
+                    localStorage.setItem('app_mapel_db', JSON.stringify(mapelDb));
+                }
+                if (data.absensi) {
+                    absensiDb = data.absensi;
+                    localStorage.setItem('app_absensi_db', JSON.stringify(absensiDb));
+                }
+                if (data.nilai) {
+                    nilaiDb = data.nilai;
+                    localStorage.setItem('app_nilai_db', JSON.stringify(nilaiDb));
+                }
+                if (data.jurnal) {
+                    jurnalDb = data.jurnal;
+                    localStorage.setItem('app_jurnal_db', JSON.stringify(jurnalDb));
+                }
+                if (data.settings) {
+                    if (data.settings.nama_sekolah) localStorage.setItem('app_nama_sekolah', data.settings.nama_sekolah);
+                    if (data.settings.logo_kab) localStorage.setItem('app_logo_kab', data.settings.logo_kab);
+                    if (data.settings.logo_sek) localStorage.setItem('app_logo_sek', data.settings.logo_sek);
+                    if (data.settings.nama_guru) localStorage.setItem('app_nama_guru', data.settings.nama_guru);
+                    if (data.settings.foto_guru) localStorage.setItem('app_foto_guru', data.settings.foto_guru);
+                    if (data.settings.script_url) localStorage.setItem('app_script_url', data.settings.script_url);
+                }
+
+                loadSettingsFromStorage();
+                loadProfilePhoto();
+                initAppData();
+                updateDashboard();
+                renderSiswaTable();
+                renderMapelTable();
+                updateSidebarProfile();
+
+                Swal.fire('Sukses', 'Data berhasil direstore.', 'success');
+            } catch(err) {
+                Swal.fire('Error', 'File backup tidak valid: ' + err.message, 'error');
+            }
+        };
+        reader.readAsText(file);
+        input.value = '';
     }
 
     // ============================================================
